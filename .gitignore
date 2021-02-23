@@ -27,3 +27,10 @@ override.tf.json
 
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
+#
+
+# Added for kitchen terraform
+examples/*/terraform.tfvars
+examples/*/terraform.tfstate*
+examples/*/terraform.tfstate.d/*
+examples/*/.terraform

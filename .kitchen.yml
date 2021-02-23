@@ -1,0 +1,23 @@
+---
+driver:
+  name: terraform
+
+provisioner:
+  name: terraform
+
+platforms:
+- name: local
+
+verifier:
+  name: terraform
+
+suites:
+  - name: default
+    driver:
+      root_module_directory: examples/hybrid
+    verifier:
+      systems:
+        - name: default
+          backend: local
+          attrs:
+            - test/integration/attributes/default/attrs.yml
