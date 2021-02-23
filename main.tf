@@ -17,6 +17,22 @@ locals {
   })
 }
 
+data "template_cloudinit_config" "cloud-init" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "init.cfg"
+    content_type = "text/cloud-config"
+    content      = local.user_data
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = local.user_data_script
+  }
+}
+
 resource "aws_launch_configuration" "kong" {
   name_prefix          = format("%s-%s-", var.service, var.environment)
   image_id             = var.ami_id
