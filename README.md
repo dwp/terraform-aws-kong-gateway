@@ -7,7 +7,7 @@ Prototyping - frequent commits, only a few tests
 
 ## Examples
 Examples of how to use the module are in the examples directory.
-Currently two examples exist `hybrid` and `hybrid_with_ingress`.
+Currently there is one example:
 
 `hybrid` deploys Kong in hybrid mode
 
