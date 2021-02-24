@@ -1,8 +1,8 @@
 locals {
 
-  user_data = templatefile("${path.module}/templates/cloud_init.cfg", {})
+  user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
 
-  user_data_script = templatefile("${path.module}/templates/cloud_init.sh", {
+  user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
     DB_USER        = var.kong_database_user
     CE_PKG         = var.ce_pkg
     EE_PKG         = var.ee_pkg
@@ -59,7 +59,7 @@ resource "aws_launch_configuration" "kong" {
 
 resource "aws_autoscaling_group" "kong" {
   name                = format("%s-%s", var.service, var.environment)
-  vpc_zone_identifier = data.aws_subnet_ids.private.ids
+  vpc_zone_identifier = var.private_subnets
 
   launch_configuration = aws_launch_configuration.kong.name
 

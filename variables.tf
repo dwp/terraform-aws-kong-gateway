@@ -161,6 +161,16 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
+variable "private_subnets" {
+  description = "List of private subent IDs"
+  type        = list(string)
+}
+
+variable "public_subnets" {
+  description = "List of public subent IDs"
+  type        = list(string)
+}
+
 variable "deck_version" {
   description = "The version of deck to install"
   type        = string
