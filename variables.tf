@@ -181,3 +181,46 @@ variable "session_secret" {
   description = "The host address or name to access kong developer portal"
   type        = string
 }
+
+variable "ec2_root_volume_size" {
+  description = "Size of the root volume (in Gigabytes)"
+  type        = string
+
+  default = 8
+}
+
+variable "ec2_root_volume_type" {
+  description = "Type of the root volume (standard, gp2, or io)"
+  type        = string
+
+  default = "gp2"
+}
+
+variable "asg_max_size" {
+  description = "The maximum size of the auto scale group"
+  type        = string
+
+  default = 3
+}
+
+variable "asg_min_size" {
+  description = "The minimum size of the auto scale group"
+  type        = string
+
+  default = 1
+}
+
+variable "asg_desired_capacity" {
+  description = "The number of instances that should be running in the group"
+  type        = string
+
+  default = 2
+}
+
+variable "asg_health_check_grace_period" {
+  description = "Time in seconds after instance comes into service before checking health"
+  type        = string
+
+  # Terraform default is 300
+  default = 300
+}
