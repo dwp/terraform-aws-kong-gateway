@@ -33,4 +33,5 @@ override.tf.json
 examples/*/terraform.tfvars
 examples/*/terraform.tfstate*
 examples/*/terraform.tfstate.d/*
-examples/*/.terraform
+examples/*/.terraform*
+.kitchen/

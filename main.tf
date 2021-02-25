@@ -1,12 +1,25 @@
 locals {
+  create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
+  create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
+
+  security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
+  private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
+
+  ssm_parameter_path = format("%s/%s", var.environment, var.service)
+
+  vpc_object = {
+    id      = var.vpc_id
+    subnets = local.private_subnets
+  }
 
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
-
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
     DB_USER        = var.kong_database_user
+    DB_HOST        = module.database.outputs.endpoint
+    DB_NAME        = module.database.outputs.name
     CE_PKG         = var.ce_pkg
     EE_PKG         = var.ee_pkg
-    PARAMETER_PATH = var.ssm_parameter_path
+    PARAMETER_PATH = local.ssm_parameter_path
     REGION         = var.region
     VPC_CIDR_BLOCK = var.vpc_cidr_block
     DECK_VERSION   = var.deck_version
@@ -15,6 +28,35 @@ locals {
     SESSION_SECRET = random_string.session_secret.result
     KONG_CONFIG    = var.kong_config
   })
+}
+
+module "security_groups" {
+  count                             = local.create_security_groups
+  source                            = "./modules/security_groups"
+  vpc_id                            = var.vpc_id
+  rules_with_source_cidr_blocks     = var.rules_with_source_cidr_blocks
+  rules_with_source_security_groups = var.rules_with_source_security_groups
+  tags                              = var.tags
+}
+
+module "private_subnets" {
+  count             = local.create_private_subnets
+  source            = "./modules/subnets"
+  vpc_id            = var.vpc_id
+  region            = var.region
+  subnets_to_create = var.private_subnets_to_create
+  tags              = var.tags
+}
+
+module "database" {
+  source = "./modules/database"
+  name   = var.kong_database_name
+  vpc    = local.vpc_object
+  database_credentials = { # FIXME: secretes_manager
+    username = var.kong_database_user
+    password = var.kong_database_password
+  }
+  tags = var.tags
 }
 
 data "template_cloudinit_config" "cloud-init" {
@@ -40,7 +82,7 @@ resource "aws_launch_configuration" "kong" {
   iam_instance_profile = var.iam_instance_profile_name
   key_name             = var.key_name
 
-  security_groups = var.security_group_ids
+  security_groups = local.security_groups
 
   associate_public_ip_address = false
   enable_monitoring           = true
@@ -59,7 +101,7 @@ resource "aws_launch_configuration" "kong" {
 
 resource "aws_autoscaling_group" "kong" {
   name                = format("%s-%s", var.service, var.environment)
-  vpc_zone_identifier = var.private_subnets
+  vpc_zone_identifier = local.private_subnets
 
   launch_configuration = aws_launch_configuration.kong.name
 

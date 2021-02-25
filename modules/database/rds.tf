@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "cluster" {
-  subnet_ids = var.vpc.subnets[*].id
+  subnet_ids = var.vpc.subnets
 }
 
 resource "aws_kms_key" "aurora" {

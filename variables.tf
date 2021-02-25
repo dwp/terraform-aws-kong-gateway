@@ -1,3 +1,8 @@
+variable "vpc_id" {
+  description = "The id of the vpc to create resources in"
+  type        = string
+}
+
 variable "ami_id" {
   description = "AMI image id to use for the deployments"
   type        = string
@@ -126,6 +131,17 @@ variable "additional_tags" {
   default     = {}
 }
 
+variable "kong_database_name" {
+  description = "The kong database name"
+  type        = string
+  default     = "kong"
+}
+
+variable "kong_database_password" {
+  description = "The password for the kong database"
+  type        = string
+}
+
 ## cloud init variables
 
 variable "kong_database_user" {
@@ -146,10 +162,10 @@ variable "ee_pkg" {
   default     = "kong-enterprise-edition-1.3.0.1.bionic.all.deb" # todo: update
 }
 
-variable "ssm_parameter_path" {
-  description = "The path to the Kong config items in SSM"
-  type        = string
-}
+#variable "ssm_parameter_path" {
+#  description = "The path to the Kong config items in SSM"
+#  type        = string
+#}
 
 variable "region" {
   description = "The aws region to access the SSM config items"
@@ -164,12 +180,13 @@ variable "vpc_cidr_block" {
 variable "private_subnets" {
   description = "List of private subent IDs"
   type        = list(string)
+  default     = []
 }
-
-variable "public_subnets" {
-  description = "List of public subent IDs"
-  type        = list(string)
-}
+#
+#variable "public_subnets" {
+#  description = "List of public subent IDs"
+#  type        = list(string)
+#}
 
 variable "deck_version" {
   description = "The version of deck to install"
@@ -180,17 +197,19 @@ variable "deck_version" {
 variable "manager_host" {
   description = "The host address or name to access kong manager"
   type        = string
+  default     = ""
 }
 
 variable "portal_host" {
   description = "The host address or name to access kong developer portal"
   type        = string
+  default     = ""
 }
 
-variable "session_secret" {
-  description = "The host address or name to access kong developer portal"
-  type        = string
-}
+#variable "session_secret" {
+#  description = "The host address or name to access kong developer portal"
+#  type        = string
+#}
 
 variable "ec2_root_volume_size" {
   description = "Size of the root volume (in Gigabytes)"
@@ -233,4 +252,100 @@ variable "asg_health_check_grace_period" {
 
   # Terraform default is 300
   default = 300
+}
+
+variable "rules_with_source_cidr_blocks" {
+  description = "Security rules for the Kong instance that have a cidr range for their source"
+  type = map(object({
+    type        = string,
+    from_port   = number,
+    to_port     = number,
+    protocol    = string,
+    cidr_blocks = list(string)
+  }))
+  default = {
+    "kong-ingress-proxy-http" = {
+      type        = "ingress",
+      from_port   = 8000,
+      to_port     = 8000,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-api-http" = {
+      type        = "ingress",
+      from_port   = 8001,
+      to_port     = 8001,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-manager-http" = {
+      type        = "ingress",
+      from_port   = 8002,
+      to_port     = 8002,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-portal-gui-http" = {
+      type        = "ingress",
+      from_port   = 8003,
+      to_port     = 8003,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-portal-http" = {
+      type        = "ingress",
+      from_port   = 8004,
+      to_port     = 8004,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-80" = {
+      type        = "ingress",
+      from_port   = 80,
+      to_port     = 80,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-443" = {
+      type        = "ingress",
+      from_port   = 443,
+      to_port     = 443,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+}
+
+
+variable "rules_with_source_security_groups" {
+  description = "Security rules for the Kong instance that have another security group for their source"
+  type = map(object({
+    type                     = string,
+    from_port                = number,
+    to_port                  = number,
+    protocol                 = string,
+    source_security_group_id = string
+  }))
+  default = {}
+}
+
+variable "private_subnets_to_create" {
+  description = "A map of subnet objects to create"
+  type = list(object({
+    cidr_block = string
+    az         = string
+    public     = bool
+  }))
+  default = [
+    {
+      cidr_block = "10.0.1.0/24"
+      az         = "default"
+      public     = false
+    }
+  ]
+}
+
+variable "tags" {
+  description = "Tags to apply to aws resources"
+  type        = map(string)
 }

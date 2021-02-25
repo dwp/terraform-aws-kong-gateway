@@ -53,9 +53,12 @@ fi
 # Setup database
 echo "Setting up Kong database"
 PGPASSWORD=$(aws_get_parameter "db/password/master")
-DB_HOST=$(aws_get_parameter "db/host")
-DB_NAME=$(aws_get_parameter "db/name")
+DB_HOST=${DB_HOST}
+DB_NAME=${DB_NAME}
 DB_PASSWORD=$(aws_get_parameter "db/password")
+
+#DB_HOST=$(aws_get_parameter "db/host")
+#DB_NAME=$(aws_get_parameter "db/name")
 export PGPASSWORD
 
 RESULT=$(psql --host $DB_HOST --username root \
