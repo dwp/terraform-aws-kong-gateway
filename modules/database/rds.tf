@@ -1,5 +1,5 @@
 resource "aws_db_subnet_group" "cluster" {
-  subnet_ids = var.vpc.subnets[*].id
+  subnet_ids = var.vpc.subnets
 }
 
 resource "aws_kms_key" "aurora" {
@@ -11,11 +11,6 @@ resource "aws_kms_key" "aurora" {
 resource "aws_kms_alias" "aurora" {
   name          = "alias/${var.name}-db-key"
   target_key_id = aws_kms_key.aurora.key_id
-}
-
-data "aws_db_cluster_snapshot" "cluster" {
-  db_cluster_identifier = var.name
-  most_recent           = true
 }
 
 resource "aws_rds_cluster" "cluster" {
@@ -32,7 +27,6 @@ resource "aws_rds_cluster" "cluster" {
   db_subnet_group_name      = aws_db_subnet_group.cluster.id
   final_snapshot_identifier = "${var.name}-final-snapshot"
   skip_final_snapshot       = false
-  snapshot_identifier       = data.aws_db_cluster_snapshot.cluster.id
   storage_encrypted         = true
   kms_key_id                = aws_kms_key.aurora.arn
   vpc_security_group_ids    = [aws_security_group.db.id]
