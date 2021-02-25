@@ -3,12 +3,12 @@ data "aws_availability_zones" "default" {
 }
 
 locals {
-  default_az = data.aws_availability_zones.default.names.0
+  default_az = data.aws_availability_zones.default.names
   subnets = [
     for s in var.subnets_to_create :
     {
       cidr_block = s.cidr_block,
-      az         = s.az == "default" ? local.default_az : s.az
+      az         = s.az == "default" ? local.default_az[index(var.subnets_to_create, s)] : s.az
       public     = s.public
     }
   ]

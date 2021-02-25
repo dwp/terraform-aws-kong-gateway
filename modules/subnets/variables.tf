@@ -25,7 +25,17 @@ variable "subnets_to_create" {
     {
       cidr_block = "10.0.1.0/24"
       az         = "default"
-      public     = true
+      public     = false
+    },
+    {
+      cidr_block = "10.0.2.0/24"
+      az         = "default"
+      public     = false
+    },
+    {
+      cidr_block = "10.0.3.0/24"
+      az         = "default"
+      public     = false
     }
   ]
 }

@@ -55,16 +55,23 @@ variable "rules_with_source_cidr_blocks" {
       cidr_blocks = ["0.0.0.0/0"]
     },
     "kong-egress-80" = {
-      type        = "ingress",
+      type        = "egress",
       from_port   = 80,
       to_port     = 80,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
     "kong-egress-443" = {
-      type        = "ingress",
+      type        = "egress",
       from_port   = 443,
       to_port     = 443,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-postgresq" = {
+      type        = "egress",
+      from_port   = 5432,
+      to_port     = 5432,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     }

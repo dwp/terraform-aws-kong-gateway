@@ -5,18 +5,21 @@ locals {
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
 
-  ssm_parameter_path = format("%s/%s", var.environment, var.service)
+  azs = length(var.availability_zones) > 0 ? var.availability_zones : module.private_subnets.0.azs
+
+  ssm_parameter_path = format("/%s/%s", var.service, var.environment)
 
   vpc_object = {
     id      = var.vpc_id
     subnets = local.private_subnets
+    azs     = local.azs
   }
 
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
     DB_USER        = var.kong_database_user
     DB_HOST        = module.database.outputs.endpoint
-    DB_NAME        = module.database.outputs.name
+    DB_NAME        = module.database.outputs.database_name
     CE_PKG         = var.ce_pkg
     EE_PKG         = var.ee_pkg
     PARAMETER_PATH = local.ssm_parameter_path
@@ -49,12 +52,13 @@ module "private_subnets" {
 }
 
 module "database" {
-  source = "./modules/database"
-  name   = var.kong_database_name
-  vpc    = local.vpc_object
+  source                  = "./modules/database"
+  name                    = var.kong_database_name
+  vpc                     = local.vpc_object
+  allowed_security_groups = local.security_groups
   database_credentials = { # FIXME: secretes_manager
-    username = var.kong_database_user
-    password = var.kong_database_password
+    username = var.postgresql_master_user
+    password = var.postgresql_master_password
   }
   tags = var.tags
 }
@@ -97,6 +101,7 @@ resource "aws_launch_configuration" "kong" {
   lifecycle {
     create_before_destroy = true
   }
+  depends_on = [module.database]
 }
 
 resource "aws_autoscaling_group" "kong" {

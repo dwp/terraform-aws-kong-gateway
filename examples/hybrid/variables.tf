@@ -47,6 +47,18 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
+variable "asg_desired_capacity" {
+  description = "The size of the autoscaling group"
+  type        = string
+  default     = 2
+}
+
+variable "postgresql_master_user" {
+  description = "The master user for postgresql"
+  type        = string
+  default     = "root"
+}
+
 variable "tags" {
   default = {
     "Dept" = "Testing",

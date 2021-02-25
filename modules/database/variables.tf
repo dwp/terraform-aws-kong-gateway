@@ -13,6 +13,7 @@ variable "vpc" {
   type = object({
     id      = string
     subnets = list(string)
+    azs     = list(string)
   })
 }
 
@@ -45,4 +46,9 @@ variable "database_credentials" {
     username = string,
     password = string,
   })
+}
+
+variable "allowed_security_groups" {
+  description = "The ids of the security groups to allow db access from"
+  type        = list(string)
 }

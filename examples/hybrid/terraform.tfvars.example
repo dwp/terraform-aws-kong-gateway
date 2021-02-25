@@ -1,6 +1,7 @@
 region = "" # an aws region
 key_name = "" # does not need to be set
-cidr_block = "" # cidr range for the vpc
+vpc_cidr_block = "" # cidr range for the vpc
+asg_desired_capacity   = "" # the nubmer of asg instances
 # the following will be moved to secrets manager
 kong_database_password = ""
 ee_bintray_auth = ""
