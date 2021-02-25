@@ -58,26 +58,9 @@ resource "aws_ssm_parameter" "ee-admin-token" {
   }
 }
 
-#resource "aws_ssm_parameter" "db-host" {
-#  name = format("/%s/%s/db/host", var.service, var.environment)
-#  type = "String"
-#  value = coalesce(
-#    join("", aws_db_instance.kong.*.address),
-#    join("", aws_rds_cluster.kong.*.endpoint),
-#    "none"
-#  )
-#}
-
-#resource "aws_ssm_parameter" "db-name" {
-#  name  = format("/%s/%s/db/name", var.service, var.environment)
-#  type  = "String"
-#  value = replace(format("%s_%s", var.service, var.environment), "-", "_")
-#}
-
 resource "aws_ssm_parameter" "db-password" {
-  name = format("/%s/%s/db/password", var.service, var.environment)
-  type = "SecureString"
-  #value = random_string.db_password.result
+  name  = format("/%s/%s/db/password", var.service, var.environment)
+  type  = "SecureString"
   value = var.kong_database_password
 
   key_id = aws_kms_alias.kong.target_key_arn

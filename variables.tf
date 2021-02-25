@@ -156,11 +156,6 @@ variable "ee_pkg" {
   default     = "kong-enterprise-edition-1.3.0.1.bionic.all.deb" # todo: update
 }
 
-#variable "ssm_parameter_path" {
-#  description = "The path to the Kong config items in SSM"
-#  type        = string
-#}
-
 variable "region" {
   description = "The aws region to access the SSM config items"
   type        = string
@@ -183,12 +178,6 @@ variable "availability_zones" {
   default     = []
 }
 
-#
-#variable "public_subnets" {
-#  description = "List of public subent IDs"
-#  type        = list(string)
-#}
-
 variable "deck_version" {
   description = "The version of deck to install"
   type        = string
@@ -206,11 +195,6 @@ variable "portal_host" {
   type        = string
   default     = ""
 }
-
-#variable "session_secret" {
-#  description = "The host address or name to access kong developer portal"
-#  type        = string
-#}
 
 variable "ec2_root_volume_size" {
   description = "Size of the root volume (in Gigabytes)"
