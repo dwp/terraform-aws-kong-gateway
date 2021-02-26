@@ -125,23 +125,42 @@ variable "additional_tags" {
   default     = {}
 }
 
-variable "kong_database_name" {
-  description = "The kong database name"
-  type        = string
-  default     = "kong"
+variable "postgres_config" {
+  description = "Configuration settings for the postgres database engine"
+  type = object({
+    master_user     = string
+    master_password = string
+  })
+  default = {
+    master_user     = "root"
+    master_password = null
+  }
 }
 
-variable "kong_database_password" {
-  description = "The password for the kong database"
+variable "postgres_host" {
+  description = "The address or name of the postgres database host, set this variable when choosing to skip_rds_creation"
   type        = string
+  default     = ""
 }
 
-## cloud init variables
+variable "skip_rds_creation" {
+  description = "If set to true then this module will not create its own rds instance"
+  type        = bool
+  default     = false
+}
 
-variable "kong_database_user" {
-  description = "The database use needed to access kong"
-  type        = string
-  default     = "kong"
+variable "kong_database_config" {
+  description = "Configuration for the kong database"
+  type = object({
+    name     = string
+    user     = string
+    password = string
+  })
+  default = {
+    name     = "kong"
+    user     = "kong"
+    password = null
+  }
 }
 
 variable "ce_pkg" {
@@ -219,18 +238,6 @@ variable "asg_min_size" {
   description = "The minimum size of the auto scale group"
   type        = string
   default     = 1
-}
-
-variable "postgresql_master_user" {
-  description = "The master user for postgresql"
-  type        = string
-  default     = "root"
-}
-
-variable "postgresql_master_password" {
-  description = "The master user for postgresql"
-  type        = string
-  default     = "root"
 }
 
 variable "asg_desired_capacity" {

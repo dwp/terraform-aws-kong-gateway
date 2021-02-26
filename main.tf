@@ -2,6 +2,16 @@ locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
+  # If the module user has specified a postgres_host then we use
+  # that as our endpoint, as we will not be triggering the database module
+  db_info = var.postgres_host != "" ? {
+    endpoint      = var.postgres_host
+    database_name = var.kong_database_config.name
+    } : {
+    endpoint      = module.database.0.outputs.endpoint,
+    database_name = module.database.0.outputs.database_name
+  }
+
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
 
@@ -17,9 +27,9 @@ locals {
 
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
-    DB_USER        = var.kong_database_user
-    DB_HOST        = module.database.outputs.endpoint
-    DB_NAME        = module.database.outputs.database_name
+    DB_USER        = var.kong_database_config.user
+    DB_HOST        = local.db_info.endpoint
+    DB_NAME        = local.db_info.database_name
     CE_PKG         = var.ce_pkg
     EE_PKG         = var.ee_pkg
     PARAMETER_PATH = local.ssm_parameter_path
@@ -52,13 +62,14 @@ module "private_subnets" {
 }
 
 module "database" {
+  count                   = var.skip_rds_creation ? 0 : 1
   source                  = "./modules/database"
-  name                    = var.kong_database_name
+  name                    = var.kong_database_config.name
   vpc                     = local.vpc_object
   allowed_security_groups = local.security_groups
   database_credentials = { # FIXME: secretes_manager
-    username = var.postgresql_master_user
-    password = var.postgresql_master_password
+    username = var.postgres_config.master_user
+    password = var.postgres_config.master_password
   }
   tags = var.tags
 }
