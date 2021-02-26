@@ -95,7 +95,7 @@ locals {
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
     db_master_pass = random_string.master_password.result
-    db_master_user = var.postgresql_master_user
+    db_master_user = var.postgres_master_user
   })
 }
 
@@ -126,25 +126,33 @@ resource "aws_instance" "external_postgres" {
 }
 
 module "create_kong_asg" {
-  source                     = "../../"
-  vpc_id                     = aws_vpc.vpc.id
-  ami_id                     = data.aws_ami.ubuntu.id
-  key_name                   = var.key_name
-  region                     = var.region
-  vpc_cidr_block             = aws_vpc.vpc.cidr_block
-  environment                = var.environment
-  service                    = var.service
-  description                = var.description
-  iam_instance_profile_name  = aws_iam_instance_profile.kong.name
-  asg_desired_capacity       = var.asg_desired_capacity
-  postgresql_master_user     = var.postgresql_master_user
-  postgresql_master_password = random_string.master_password.result
-  postgresql_host            = aws_instance.external_postgres.private_ip
-  kong_database_user         = var.kong_database_user
-  kong_database_name         = var.kong_database_name
-  kong_database_password     = var.kong_database_password
-  skip_rds                   = true
-  tags                       = var.tags
+  source                    = "../../"
+  vpc_id                    = aws_vpc.vpc.id
+  ami_id                    = data.aws_ami.ubuntu.id
+  key_name                  = var.key_name
+  region                    = var.region
+  vpc_cidr_block            = aws_vpc.vpc.cidr_block
+  environment               = var.environment
+  service                   = var.service
+  description               = var.description
+  iam_instance_profile_name = aws_iam_instance_profile.kong.name
+  asg_desired_capacity      = var.asg_desired_capacity
+
+  postgres_config = {
+    master_user     = var.postgres_master_user
+    master_password = random_string.master_password.result
+  }
+
+  postgres_host = aws_instance.external_postgres.private_ip
+
+  kong_database_config = {
+    user     = var.kong_database_user
+    name     = var.kong_database_name
+    password = var.kong_database_password
+  }
+
+  skip_rds_creation = true
+  tags              = var.tags
 }
 
 resource "aws_route_table" "private" {

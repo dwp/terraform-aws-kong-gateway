@@ -55,7 +55,7 @@ variable "asg_desired_capacity" {
   default     = 2
 }
 
-variable "postgresql_master_user" {
+variable "postgres_master_user" {
   description = "The master user for postgresql"
   type        = string
   default     = "root"
