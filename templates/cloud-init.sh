@@ -1,4 +1,19 @@
-#!/bin/sh
+#!/bin/bash
+
+set -x
+exec &> /tmp/cloud-init.log
+
+# Pause: in testing we need this
+# to make sure we wait to be routed out
+# the internet before trying to get
+# packages
+for ((i=1;i<=300;i++)); do
+  curl ubuntu.com/security/notices
+  if [ $? -eq 0 ]; then
+    break
+  fi
+  sleep 1
+done
 
 # Function to grab SSM parameters
 aws_get_parameter() {
@@ -8,6 +23,14 @@ aws_get_parameter() {
         --output text \
         --query Parameter.Value 2>/dev/null
 }
+
+apt-get update
+
+apt-get upgrade -y
+
+apt-get install -y apt-listchanges unattended-upgrades \
+  ntp runit runit-systemd dnsutils curl telnet pwgen \
+  postgresql-client perl libpcre3 awscli
 
 # Enable auto updates
 echo "Enabling auto updates"
@@ -53,12 +76,11 @@ fi
 # Setup database
 echo "Setting up Kong database"
 PGPASSWORD=$(aws_get_parameter "db/password/master")
-DB_HOST=${DB_HOST}
-DB_NAME=${DB_NAME}
 DB_PASSWORD=$(aws_get_parameter "db/password")
 
-#DB_HOST=$(aws_get_parameter "db/host")
-#DB_NAME=$(aws_get_parameter "db/name")
+DB_HOST=${DB_HOST}
+DB_NAME=${DB_NAME}
+
 export PGPASSWORD
 
 RESULT=$(psql --host $DB_HOST --username root \

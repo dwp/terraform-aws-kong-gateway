@@ -14,18 +14,6 @@ variable "kong_database_password" {
   type        = string
 }
 
-variable "kong_database_name" {
-  description = "The kong database name"
-  type        = string
-  default     = "kong"
-}
-
-variable "kong_database_user" {
-  description = "The database use needed to access kong"
-  type        = string
-  default     = "kong"
-}
-
 variable "environment" {
   description = "Resource environment tag (i.e. dev, stage, prod)"
   type        = string
@@ -71,6 +59,18 @@ variable "postgresql_master_user" {
   description = "The master user for postgresql"
   type        = string
   default     = "root"
+}
+
+variable "kong_database_name" {
+  description = "The kong database name"
+  type        = string
+  default     = "kong"
+}
+
+variable "kong_database_user" {
+  description = "The database use needed to access kong"
+  type        = string
+  default     = "kong"
 }
 
 variable "tags" {

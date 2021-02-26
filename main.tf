@@ -1,6 +1,15 @@
 locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
+  create_postgres        = 0 # var.postgresql_host != "" ? 0 : 1
+
+  db_info = var.postgresql_host != "" ? {
+    endpoint      = var.postgresql_host
+    database_name = var.kong_database_name
+    } : {
+    endpoint      = module.database.0.outputs.endpoint,
+    database_name = module.database.0.outputs.database_name
+  }
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
@@ -18,8 +27,8 @@ locals {
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
     DB_USER        = var.kong_database_user
-    DB_HOST        = module.database.outputs.endpoint
-    DB_NAME        = module.database.outputs.database_name
+    DB_HOST        = local.db_info.endpoint
+    DB_NAME        = local.db_info.database_name
     CE_PKG         = var.ce_pkg
     EE_PKG         = var.ee_pkg
     PARAMETER_PATH = local.ssm_parameter_path
@@ -52,6 +61,7 @@ module "private_subnets" {
 }
 
 module "database" {
+  count                   = var.skip_rds ? 0 : 1
   source                  = "./modules/database"
   name                    = var.kong_database_name
   vpc                     = local.vpc_object

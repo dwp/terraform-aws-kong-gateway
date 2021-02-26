@@ -233,6 +233,18 @@ variable "postgresql_master_password" {
   default     = "root"
 }
 
+variable "postgresql_host" {
+  description = "If you already have a postgresq host to connect to specify it here, otherwise the module will defalut to creating an rds postgresq db"
+  type        = string
+  default     = ""
+}
+
+variable "skip_rds" {
+  description = "If you already have a postgresq host to connect to, set this to true to skip the creation of a Postgres RDS database"
+  type        = bool
+  default     = false
+}
+
 variable "asg_desired_capacity" {
   description = "The number of instances that should be running in the group"
   type        = string
