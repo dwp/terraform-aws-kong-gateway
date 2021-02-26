@@ -127,7 +127,7 @@ resource "aws_autoscaling_group" "kong" {
   health_check_type         = "ELB"
   max_size                  = var.asg_max_size
   min_size                  = var.asg_min_size
-
+  target_group_arns         = var.target_group_arns
   tag {
     key                 = "Name"
     value               = format("%s-%s", var.service, var.environment)

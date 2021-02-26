@@ -20,4 +20,13 @@ suites:
         - name: default
           backend: local
           attrs:
-            - test/integration/attributes/default/attrs.yml
+            - test/integration/default/attrs.yml
+  - name: hybrid_external_database
+    driver:
+      root_module_directory: examples/hybrid_external_database
+    verifier:
+      systems:
+        - name: default
+          backend: local
+          attrs:
+            - test/integration/hybrid_external_database/attrs.yml

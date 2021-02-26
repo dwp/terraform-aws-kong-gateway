@@ -318,6 +318,20 @@ variable "rules_with_source_cidr_blocks" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
+    "kong-egress-8000" = {
+      type        = "egress",
+      from_port   = 8000,
+      to_port     = 8000,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8001" = {
+      type        = "egress",
+      from_port   = 8001,
+      to_port     = 8001,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
     "kong-egress-postgresq" = {
       type        = "egress",
       from_port   = 5432,
@@ -365,6 +379,12 @@ variable "private_subnets_to_create" {
       public     = false
     }
   ]
+}
+
+variable "target_group_arns" {
+  description = "A list of target groups to associate with the kong asg"
+  type        = list(string)
+  default     = []
 }
 
 variable "tags" {
