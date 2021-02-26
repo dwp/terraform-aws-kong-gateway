@@ -1,0 +1,57 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+
+jobs:
+  get-publish-version:
+    runs-on: ubuntu-latest
+    outputs:
+      publish-version: ${{ steps.get-publish-version.outputs.publish-version }}
+    steps:
+      - name: Prepare SemVer
+        id: prepare-semver
+        run: |
+          LATEST_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          [  -z "$LATEST_VERSION" ] && LATEST_VERSION="0.0.0"
+          echo ::set-output name=latest_version_out::$LATEST_VERSION
+          commit_message="${{ github.event.head_commit.message }}"
+          if [[ "${commit_message,,}" == *"major release"* ]]; then
+            echo ::set-output name=semver_increment::"m"
+          elif [[ "${commit_message,,}" == *"minor release"* ]]; then
+            echo ::set-output name=semver_increment::"i"
+          else
+            echo ::set-output name=semver_increment::"p"
+          fi
+      - name: Increment SemVer
+        id: semver
+        uses: matt-FFFFFF/simple-semver@v0.1.0
+        with:
+          semver-input: ${{ steps.prepare-semver.outputs.latest_version_out }}
+          increment: ${{ steps.prepare-semver.outputs.semver_increment }}
+      - name: Get publish version
+        id: get-publish-version
+        run: echo "::set-output name=publish-version::${{ steps.semver.outputs.semver }}"
+
+
+  publish-github-release:
+    runs-on: ubuntu-latest
+    needs: [get-publish-version]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@master
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.get-publish-version.outputs.publish-version }}
+          release_name: Release ${{ needs.get-publish-version.outputs.publish-version }}
+          draft: false
+          prerelease: false
