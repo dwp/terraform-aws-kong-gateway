@@ -371,3 +371,17 @@ variable "tags" {
   description = "Tags to apply to aws resources"
   type        = map(string)
 }
+
+variable "proxy_config" {
+  description = "(optional) Configure HTTP, HTTPS, and NO_PROXY"
+  type = object({
+    http_proxy  = string
+    https_proxy = string
+    no_proxy    = string
+  })
+  default = {
+    http_proxy  = null
+    https_proxy = null
+    no_proxy    = null
+  }
+}

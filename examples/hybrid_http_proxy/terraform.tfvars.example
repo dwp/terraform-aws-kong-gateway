@@ -1,0 +1,10 @@
+region                 = "" # an aws region
+key_name               = "" # does not need to be set
+vpc_cidr_block         = "" # cidr range for the vpc
+kong_database_password = ""
+
+proxy_config = {
+  http_proxy  = "" # e.g. "http://proxy.example.com:1234"
+  https_proxy = "" # e.g. "https://proxy.example.com:1234"
+  no_proxy    = "169.254.169.254,127.0.0.1"
+}

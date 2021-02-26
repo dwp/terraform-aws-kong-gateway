@@ -27,6 +27,7 @@ locals {
 
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
+    PROXY_CONFIG   = var.proxy_config
     DB_USER        = var.kong_database_config.user
     DB_HOST        = local.db_info.endpoint
     DB_NAME        = local.db_info.database_name

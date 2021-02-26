@@ -3,6 +3,12 @@
 set -x
 exec &> /tmp/cloud-init.log
 
+%{ for config_key, config_value in PROXY_CONFIG ~}
+%{ if config_value != null ~}
+export ${config_key}="${config_value}"
+%{ endif ~}
+%{ endfor ~}
+
 # Pause: in testing we need this
 # to make sure we wait to be routed out
 # the internet before trying to get
