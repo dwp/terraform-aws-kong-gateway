@@ -73,6 +73,8 @@ variable "postgres_master_user" {
   default     = "root"
 }
 
+variable "external_cidr_blocks" { default = ["0.0.0.0/0"] }
+
 variable "tags" {
   default = {
     "Dept" = "Testing",

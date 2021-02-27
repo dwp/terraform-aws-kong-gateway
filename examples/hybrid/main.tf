@@ -32,17 +32,38 @@ resource "aws_eip" "nat_eip" {
   depends_on = [aws_internet_gateway.ig]
 }
 
-resource "aws_subnet" "public_subnet" {
+resource "aws_subnet" "public_subnets" {
+  count                   = length(module.create_kong_asg.private_subnet_azs)
   vpc_id                  = aws_vpc.vpc.id
-  cidr_block              = "10.0.5.0/24"
-  availability_zone       = "${var.region}c"
+  cidr_block              = "10.0.${4 + count.index}.0/24"
+  availability_zone       = module.create_kong_asg.private_subnet_azs[count.index]
   map_public_ip_on_launch = true
+}
+
+locals {
+  public_subnet_ids = aws_subnet.public_subnets.*.id
 }
 
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat_eip.id
-  subnet_id     = aws_subnet.public_subnet.id
+  subnet_id     = aws_subnet.public_subnets.0.id
   depends_on    = [aws_internet_gateway.ig]
+}
+
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.vpc.id
+}
+
+resource "aws_route" "public_internet_gateway" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.ig.id
+}
+
+resource "aws_route_table_association" "public" {
+  count          = length(local.public_subnet_ids)
+  subnet_id      = element(local.public_subnet_ids, count.index)
+  route_table_id = aws_route_table.public.id
 }
 
 module "create_kong_asg" {
@@ -69,36 +90,19 @@ module "create_kong_asg" {
     password = var.kong_database_password
   }
 
-  tags = var.tags
-}
+  target_group_arns = local.target_groups
 
-output "database" {
-  value = module.create_kong_asg.database
+  tags = var.tags
 }
 
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.vpc.id
 }
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.vpc.id
-}
-
-resource "aws_route" "public_internet_gateway" {
-  route_table_id         = aws_route_table.public.id
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = aws_internet_gateway.ig.id
-}
-
 resource "aws_route" "private_nat_gateway" {
   route_table_id         = aws_route_table.private.id
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = aws_nat_gateway.nat.id
-}
-
-resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.public.id
 }
 
 resource "aws_route_table_association" "private" {

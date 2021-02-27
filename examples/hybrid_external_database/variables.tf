@@ -73,6 +73,8 @@ variable "kong_database_user" {
   default     = "kong"
 }
 
+variable "external_cidr_blocks" { default = ["0.0.0.0/0"] }
+
 variable "tags" {
   default = {
     "Dept" = "Testing",

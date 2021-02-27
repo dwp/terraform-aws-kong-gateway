@@ -1,5 +1,5 @@
 ---
-name: default
+name: hybrid_external_database
 inputs:
 - name: kong-api-endpoint
   type: string
