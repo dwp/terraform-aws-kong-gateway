@@ -32,11 +32,42 @@ resource "aws_eip" "nat_eip" {
   depends_on = [aws_internet_gateway.ig]
 }
 
+resource "aws_security_group" "allow_postgres" {
+  name        = "allow_postgres"
+  description = "Allow postgres inbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description = "postgresql from VPC"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "TCP"
+    cidr_blocks = [aws_vpc.vpc.cidr_block]
+  }
+
+  ingress {
+    description = "postgresql from VPC"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
+
 resource "aws_subnet" "public_subnets" {
-  count                   = length(module.create_kong_asg.private_subnet_azs)
+  count                   = length(module.create_kong_cp.private_subnet_azs)
   vpc_id                  = aws_vpc.vpc.id
   cidr_block              = "10.0.${4 + count.index}.0/24"
-  availability_zone       = module.create_kong_asg.private_subnet_azs[count.index]
+  availability_zone       = module.create_kong_cp.private_subnet_azs[count.index]
   map_public_ip_on_launch = true
 }
 
@@ -66,18 +97,46 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-module "create_kong_asg" {
-  source                    = "../../"
+locals {
+
+  kong_control_plane_config = {
+    "KONG_ROLE"              = "control_plane"
+    "KONG_PROXY_LISTEN"      = "off"
+    "KONG_ANONYMOUS_REPORTS" = "off"
+    "KONG_PORTAL"            = "on"
+    "KONG_VITALS"            = "on"
+    "KONG_AUDIT_LOG"         = "on"
+    "KONG_LOG_LEVEL"         = "debug"
+  }
+
+  kong_data_plane_config = {
+    "KONG_ROLE"              = "data_plane"
+    "KONG_DATABASE"          = "off"
+    "KONG_LOG_LEVEL"         = "debug"
+    "KONG_ANONYMOUS_REPORTS" = "off"
+  }
+
+  kong_hybrid_conf = {
+    cluster_cert = tls_locally_signed_cert.cert.cert_pem
+    cluster_key  = tls_private_key.cert.private_key_pem
+    endpoint     = aws_lb.internal.dns_name
+  }
+}
+
+module "create_kong_cp" {
+  source = "../../"
+
+  instance_type             = var.instance_type
   vpc_id                    = aws_vpc.vpc.id
   ami_id                    = data.aws_ami.ubuntu.id
   key_name                  = var.key_name
   region                    = var.region
   vpc_cidr_block            = aws_vpc.vpc.cidr_block
-  environment               = var.environment
-  service                   = var.service
-  description               = var.description
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
-  asg_desired_capacity      = var.asg_desired_capacity
+
+  asg_desired_capacity = var.asg_desired_capacity
+  asg_max_size         = var.asg_max_size
+  asg_min_size         = var.asg_min_size
 
   postgres_config = {
     master_user     = var.postgres_master_user
@@ -90,9 +149,47 @@ module "create_kong_asg" {
     password = var.kong_database_password
   }
 
-  target_group_arns = local.target_groups
+  target_group_arns = local.target_group_cp
 
-  tags = var.tags
+  kong_config      = local.kong_control_plane_config
+  kong_hybrid_conf = local.kong_hybrid_conf
+
+  environment = var.environment
+  service     = var.service
+  description = var.description
+  tags        = var.tags
+}
+
+module "create_kong_dp" {
+  source = "../../"
+
+  instance_type  = var.instance_type
+  vpc_id         = aws_vpc.vpc.id
+  ami_id         = data.aws_ami.ubuntu.id
+  key_name       = var.key_name
+  region         = var.region
+  vpc_cidr_block = aws_vpc.vpc.cidr_block
+
+  iam_instance_profile_name = aws_iam_instance_profile.kong.name
+
+
+  asg_desired_capacity = var.asg_desired_capacity
+  asg_max_size         = var.asg_max_size
+  asg_min_size         = var.asg_min_size
+
+  target_group_arns = local.target_group_dp
+
+  skip_rds_creation = true
+  kong_config       = local.kong_data_plane_config
+  kong_hybrid_conf  = local.kong_hybrid_conf
+
+  private_subnets    = module.create_kong_cp.private_subnet_ids
+  availability_zones = module.create_kong_cp.private_subnet_azs
+
+  environment = var.environment
+  service     = var.service
+  description = var.description
+  tags        = var.tags
 }
 
 resource "aws_route_table" "private" {
@@ -106,7 +203,7 @@ resource "aws_route" "private_nat_gateway" {
 }
 
 resource "aws_route_table_association" "private" {
-  count          = length(module.create_kong_asg.private_subnet_ids)
-  subnet_id      = element(module.create_kong_asg.private_subnet_ids, count.index)
+  count          = length(module.create_kong_cp.private_subnet_ids)
+  subnet_id      = element(module.create_kong_cp.private_subnet_ids, count.index)
   route_table_id = aws_route_table.private.id
 }

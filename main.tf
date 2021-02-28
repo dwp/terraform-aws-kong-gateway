@@ -2,14 +2,21 @@ locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
+  role = lookup(var.kong_config, "KONG_ROLE", "ebedded")
+  tags = merge(var.tags, {
+    "service"     = var.service,
+    "environment" = var.environment,
+    "role"        = local.role
+  })
+
   # If the module user has specified a postgres_host then we use
   # that as our endpoint, as we will not be triggering the database module
   db_info = var.postgres_host != "" ? {
     endpoint      = var.postgres_host
     database_name = var.kong_database_config.name
     } : {
-    endpoint      = module.database.0.outputs.endpoint,
-    database_name = module.database.0.outputs.database_name
+    endpoint      = local.role == "data_plane" ? "" : module.database.0.outputs.endpoint,
+    database_name = local.role == "data_plane" ? "" : module.database.0.outputs.database_name
   }
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
@@ -27,21 +34,25 @@ locals {
 
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
-    PROXY_CONFIG   = var.proxy_config
-    DB_USER        = var.kong_database_config.user
-    DB_HOST        = local.db_info.endpoint
-    DB_NAME        = local.db_info.database_name
-    CE_PKG         = var.ce_pkg
-    EE_PKG         = var.ee_pkg
-    PARAMETER_PATH = local.ssm_parameter_path
-    REGION         = var.region
-    VPC_CIDR_BLOCK = var.vpc_cidr_block
-    DECK_VERSION   = var.deck_version
-    MANAGER_HOST   = var.manager_host
-    PORTAL_HOST    = var.portal_host
-    SESSION_SECRET = random_string.session_secret.result
-    KONG_CONFIG    = var.kong_config
+    proxy_config     = var.proxy_config
+    db_user          = var.kong_database_config.user
+    db_host          = local.db_info.endpoint
+    db_name          = local.db_info.database_name
+    ce_pkg           = var.ce_pkg
+    ee_pkg           = var.ee_pkg
+    parameter_path   = local.ssm_parameter_path
+    region           = var.region
+    vpc_cidr_block   = var.vpc_cidr_block
+    deck_version     = var.deck_version
+    manager_host     = var.manager_host
+    portal_host      = var.portal_host
+    session_secret   = random_string.session_secret.result
+    kong_config      = var.kong_config
+    kong_ports       = var.kong_ports
+    kong_ssl_uris    = var.kong_ssl_uris
+    kong_hybrid_conf = var.kong_hybrid_conf
   })
+  name = format("%s-%s-%s", var.service, var.environment, random_string.prefix.result)
 }
 
 module "security_groups" {
@@ -92,7 +103,7 @@ data "template_cloudinit_config" "cloud-init" {
 }
 
 resource "aws_launch_configuration" "kong" {
-  name_prefix          = format("%s-%s-", var.service, var.environment)
+  name_prefix          = local.name
   image_id             = var.ami_id
   instance_type        = var.instance_type
   iam_instance_profile = var.iam_instance_profile_name
@@ -116,8 +127,10 @@ resource "aws_launch_configuration" "kong" {
   depends_on = [module.database]
 }
 
+
+
 resource "aws_autoscaling_group" "kong" {
-  name                = format("%s-%s", var.service, var.environment)
+  name_prefix         = local.name
   vpc_zone_identifier = local.private_subnets
 
   launch_configuration = aws_launch_configuration.kong.name
@@ -129,36 +142,20 @@ resource "aws_autoscaling_group" "kong" {
   max_size                  = var.asg_max_size
   min_size                  = var.asg_min_size
   target_group_arns         = var.target_group_arns
-  tag {
-    key                 = "Name"
-    value               = format("%s-%s", var.service, var.environment)
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "Environment"
-    value               = var.environment
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "Description"
-    value               = var.description
-    propagate_at_launch = true
-  }
-  tag {
-    key                 = "Service"
-    value               = var.service
-    propagate_at_launch = true
-  }
 
   dynamic "tag" {
-    for_each = var.additional_tags
-
+    for_each = local.tags
     content {
       key                 = tag.key
       value               = tag.value
       propagate_at_launch = true
     }
   }
+}
+
+resource "random_string" "prefix" {
+  length  = 6
+  special = false
 }
 
 resource "random_string" "session_secret" {

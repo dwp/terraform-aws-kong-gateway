@@ -3,7 +3,7 @@
 set -x
 exec &> /tmp/cloud-init.log
 
-%{ for config_key, config_value in PROXY_CONFIG ~}
+%{ for config_key, config_value in proxy_config ~}
 %{ if config_value != null ~}
 export ${config_key}="${config_value}"
 %{ endif ~}
@@ -23,8 +23,8 @@ done
 
 # Function to grab SSM parameters
 aws_get_parameter() {
-    aws ssm --region ${REGION} get-parameter \
-        --name "${PARAMETER_PATH}/$1" \
+    aws ssm --region ${region} get-parameter \
+        --name "${parameter_path}/$1" \
         --with-decryption \
         --output text \
         --query Parameter.Value 2>/dev/null
@@ -36,7 +36,7 @@ apt-get upgrade -y
 
 apt-get install -y apt-listchanges unattended-upgrades \
   ntp runit runit-systemd dnsutils curl telnet pwgen \
-  postgresql-client perl libpcre3 awscli
+  postgresql-client perl libpcre3 awscli jq
 
 # Enable auto updates
 echo "Enabling auto updates"
@@ -46,27 +46,46 @@ dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Installing decK
 # https://github.com/hbagdi/deck
-curl -sL https://github.com/hbagdi/deck/releases/download/v${DECK_VERSION}/deck_${DECK_VERSION}_linux_amd64.tar.gz \
+curl -sL https://github.com/hbagdi/deck/releases/download/v${deck_version}/deck_${deck_version}_linux_amd64.tar.gz \
     -o deck.tar.gz
 tar zxf deck.tar.gz deck
 sudo mv deck /usr/local/bin
 sudo chown root:kong /usr/local/bin/deck
 sudo chmod 755 /usr/local/bin/deck
 
+# These certificates are used for
+# clustering Kong control plane
+# and data plane when used in hybrid
+# mode
+%{ if lookup(kong_config, "KONG_ROLE", null) != null ~}
+mkdir -p /etc/kong_clustering
+%{ if kong_hybrid_conf.cluster_cert != "" ~}
+cat << EOF >/etc/kong_clustering/cluster.crt
+${kong_hybrid_conf.cluster_cert}
+EOF
+%{ endif ~}
+
+%{ if kong_hybrid_conf.cluster_key != "" ~}
+cat << EOF >/etc/kong_clustering/cluster.key
+${kong_hybrid_conf.cluster_key}
+EOF
+%{ endif ~}
+%{ endif ~}
 # Install Kong
 echo "Installing Kong"
 EE_LICENSE=$(aws_get_parameter ee/license)
 EE_CREDS=$(aws_get_parameter ee/bintray-auth)
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${EE_PKG} \
+    curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
         -u $EE_CREDS \
-        -o ${EE_PKG} 
+        -o ${ee_pkg} 
 
-    if [ ! -f ${EE_PKG} ]; then
+    if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
         exit 1
     fi
-    dpkg -i ${EE_PKG}
+    dpkg -i ${ee_pkg}
+    apt-get -f install -y
 
     cat <<EOF > /etc/kong/license.json
 $EE_LICENSE
@@ -74,25 +93,27 @@ EOF
     chown root:kong /etc/kong/license.json
     chmod 640 /etc/kong/license.json
 else  
-    curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${CE_PKG}" \
-        -o ${CE_PKG}
-    dpkg -i ${CE_PKG}
+    curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
+        -o ${ce_pkg}
+    dpkg -i ${ce_pkg}
+    apt-get -f install -y
 fi
 
+%{ if lookup(kong_config, "KONG_ROLE", "embedded") != "data_plane" ~}
 # Setup database
 echo "Setting up Kong database"
 PGPASSWORD=$(aws_get_parameter "db/password/master")
 DB_PASSWORD=$(aws_get_parameter "db/password")
 
-DB_HOST=${DB_HOST}
-DB_NAME=${DB_NAME}
+DB_HOST=${db_host}
+DB_NAME=${db_name}
 
 export PGPASSWORD
 
 RESULT=$(psql --host $DB_HOST --username root \
     --tuples-only --no-align postgres \
     <<EOF
-SELECT 1 FROM pg_roles WHERE rolname='${DB_USER}'
+SELECT 1 FROM pg_roles WHERE rolname='${db_user}'
 EOF
 )
 
@@ -104,65 +125,81 @@ fi
 echo $RESULT | grep -q 1
 if [ $? != 0 ]; then
     psql --host $DB_HOST --username root postgres <<EOF
-CREATE USER ${DB_USER} WITH PASSWORD '$DB_PASSWORD';
-GRANT ${DB_USER} TO root;
-CREATE DATABASE $DB_NAME OWNER = ${DB_USER};
+CREATE USER ${db_user} WITH PASSWORD '$DB_PASSWORD';
+GRANT ${db_user} TO root;
+CREATE DATABASE $DB_NAME OWNER = ${db_user};
 EOF
 fi
 unset PGPASSWORD
+%{ endif }
+# Setup systemd unit file
+cat <<EOF > /etc/systemd/system/kong-gw.service
+[Unit]
+Description=KongGW
+Documentation=https://docs.konghq.com/
+After=syslog.target network.target remote-fs.target nss-lookup.target
 
+[Service]
+ExecStartPre=/usr/local/bin/kong prepare -p /usr/local/kong
+ExecStart=/usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c nginx.conf
+ExecReload=/usr/local/bin/kong prepare -p /usr/local/kong
+ExecReload=/usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c nginx.conf -s reload
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+Environment=KONG_NGINX_DAEMON=off
+Environment=KONG_PROXY_ACCESS_LOG=syslog:server=unix:/dev/log
+Environment=KONG_PROXY_ERROR_LOG=syslog:server=unix:/dev/log
+Environment=KONG_ADMIN_ACCESS_LOG=syslog:server=unix:/dev/log
+Environment=KONG_ADMIN_ERROR_LOG=syslog:server=unix:/dev/log
+EnvironmentFile=/etc/kong/kong_env.conf
+
+LimitNOFILE=infinity
+
+[Install]
+WantedBy=multi-user.target
+EOF
 # Setup Configuration file
-cat <<EOF > /etc/kong/kong.conf
-# kong.conf, Kong configuration file
-# Written by Dennis Kelly <dennisk@zillowgroup.com>
-# Updated by Dennis Kelly <dennis.kelly@konghq.com>
-#
-# 2020-01-23: Support for EE Kong Manager Auth
-# 2019-09-30: Support for 1.x releases and Dev Portal
-# 2018-03-13: Support for 0.12 and load balancing
-# 2017-06-20: Initial release
-#
-# Notes:
-#   - See kong.conf.default for further information
-
-# Database settings
-database = postgres 
-pg_host = $DB_HOST
-pg_user = ${DB_USER}
-pg_password = $DB_PASSWORD
-pg_database = $DB_NAME
+cat <<EOF > /etc/kong/kong_env.conf
+%{if lookup(kong_config, "KONG_ROLE", "embedded") == "embedded" || lookup(kong_config, "KONG_ROLE", "embedded") == "control_plane" ~}
+KONG_DATABASE="postgres"
+KONG_PG_HOST="$DB_HOST"
+KONG_PG_USER="${db_user}"
+KONG_PG_PASSWORD="$DB_PASSWORD"
+KONG_PG_DATABASE="$DB_NAME"
+%{ endif }
 
 # Load balancer headers
-real_ip_header = X-Forwarded-For
-trusted_ips = 0.0.0.0/0
+KONG_REAL_IP_HEADER="X-Forwarded-For"
+KONG_TRUSTED_IPS="0.0.0.0/0"
 
-# SSL terminiation is performed by load balancers
-proxy_listen = 0.0.0.0:8000
-# For /status to load balancers
-admin_listen = 0.0.0.0:8001
+%{if lookup(kong_config, "KONG_ROLE", null) != null ~}
+%{if kong_config["KONG_ROLE"] == "data_plane" ~}
+KONG_PROXY_LISTEN="0.0.0.0:${kong_ports.proxy}"
+%{ else ~}
+KONG_ADMIN_LISTEN="0.0.0.0:${kong_ports.admin_api}"
+%{ endif ~}
+%{ else ~}
+KONG_PROXY_LISTEN="0.0.0.0:${kong_ports.proxy}"
+KONG_ADMIN_LISTEN="0.0.0.0:${kong_ports.admin_api}"
+%{ endif ~}
 EOF
-chmod 640 /etc/kong/kong.conf
-chgrp kong /etc/kong/kong.conf
+chmod 640 /etc/kong/kong_env.conf
+chgrp kong /etc/kong/kong_env.conf
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    cat <<EOF >> /etc/kong/kong.conf
+    cat <<EOF >> /etc/kong/kong_env.conf
+KONG_ADMIN_GUI_LISTEN="0.0.0.0:${kong_ports.admin_gui}"
+KONG_PORTAL_GUI_LISTEN="0.0.0.0:${kong_ports.portal_gui}"
+KONG_PORTAL_API_LISTEN="0.0.0.0:${kong_ports.portal_api}"
 
-# Enterprise Edition Settings
-# SSL terminiation is performed by load balancers
-admin_gui_listen  = 0.0.0.0:8002
-portal_gui_listen = 0.0.0.0:8003
-portal_api_listen = 0.0.0.0:8004
+KONG_ADMIN_API_URI="${kong_ssl_uris.admin_api_uri}"
+KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 
-admin_api_uri = https://${MANAGER_HOST}:8444
-admin_gui_url = https://${MANAGER_HOST}:8445
-
-portal              = on
-portal_gui_protocol = https
-portal_gui_host     = ${PORTAL_HOST}:8446
-portal_api_url      = http://${PORTAL_HOST}:8447
-portal_cors_origins = https://${PORTAL_HOST}:8446, https://${PORTAL_HOST}:8447
-
-vitals = on
+KONG_PORTAL_GUI_PROTOCOL="https"
+KONG_PORTAL_GUI_HOST="${kong_ssl_uris.portal_gui_host}"
+KONG_PORTAL_API_URL="${kong_ssl_uris.portal_api_url}"
+KONG_PORTAL_CORS_ORIGINS="https://${kong_ssl_uris.portal_gui_host}, https://${kong_ssl_uris.portal_api_url}"
 EOF
 
     for DIR in gui lib portal; do
@@ -176,82 +213,38 @@ fi
 chown root:kong /usr/local/kong
 chmod 2775 /usr/local/kong
 
+%{if lookup(kong_config, "KONG_ROLE", "embedded") == "embedded" || lookup(kong_config, "KONG_ROLE", "embedded") == "control_plane" ~}
 # Initialize Kong
 echo "Initializing Kong"
+
+export KONG_DATABASE="postgres"
+export KONG_PG_HOST="$DB_HOST"
+export KONG_PG_DATABASE="$DB_NAME"
+export KONG_PG_USER="${db_user}"
+export KONG_PG_PASSWORD="$DB_PASSWORD"
+export KONG_PG_DATABASE="$DB_NAME"
+
 if [ "$EE_LICENSE" != "placeholder" ]; then
     ADMIN_TOKEN=$(aws_get_parameter "ee/admin/token")
-    sudo -u kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
+    kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
 else 
-    sudo -u kong kong migrations bootstrap
+    kong migrations bootstrap
 fi
 
-cat <<'EOF' > /usr/local/kong/nginx.conf
-worker_processes auto;
-daemon off;
+unset KONG_DATABASE
+unset KONG_PG_HOST
+unset KONG_PG_DATABASE
+unset KONG_PG_USER
+unset KONG_PG_PASSWORD
+unset KONG_PG_DATABASE
+%{ endif ~}
 
-pid pids/nginx.pid;
-error_log logs/error.log notice;
-
-worker_rlimit_nofile 65536;
-
-events {
-    worker_connections 8192;
-    multi_accept on;
-}
-
-http {
-    include nginx-kong.conf;
-}
-EOF
-chown root:kong /usr/local/kong/nginx.conf
-
-# Log rotation
-cat <<'EOF' > /etc/logrotate.d/kong
-/usr/local/kong/logs/*.log {
-  rotate 14
-  daily
-  compress
-  missingok
-  notifempty
-  create 640 kong kong
-  sharedscripts
-
-  postrotate
-    /usr/bin/sv 1 /etc/sv/kong
-  endscript
-}
-EOF
-
-# Start Kong under supervision
-echo "Starting Kong under supervision"
-mkdir -p /etc/sv/kong /etc/sv/kong/log
-
-cat <<'EOF' > /etc/sv/kong/run
-#!/bin/sh -e
-exec 2>&1
-
-ulimit -n 65536
-sudo -u kong kong prepare
-exec chpst -u kong /usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c nginx.conf
-EOF
-
-cat <<'EOF' > /etc/sv/kong/log/run
-#!/bin/sh -e
-
-[ -d /var/log/kong ] || mkdir -p /var/log/kong
-chown kong:kong /var/log/kong
-
-exec chpst -u kong /usr/bin/svlogd -tt /var/log/kong
-EOF
-chmod 744 /etc/sv/kong/run /etc/sv/kong/log/run
-
-cd /etc/service
-ln -s /etc/sv/kong
-
+systemctl enable --now kong-gw
+%{if lookup(kong_config, "KONG_ROLE", "embedded") == "embedded" || lookup(kong_config, "KONG_ROLE", "embedded") == "control_plane" ~}
 # Verify Admin API is up
 RUNNING=0
 for I in 1 2 3 4 5 6 7 8 9; do
-    curl -s -I http://localhost:8001/status | grep -q "200 OK"
+    curl -s -I http://localhost:${kong_ports.admin_api}/status | grep -q "200 OK"
     if [ $? = 0 ]; then
         RUNNING=1
         break
@@ -265,57 +258,77 @@ if [ $RUNNING = 0 ]; then
 fi
 
 # Enable healthchecks using a kong endpoint
-curl -s -I http://localhost:8000/status | grep -q "200 OK"
+curl -s localhost:${kong_ports.admin_api}/services | \
+  jq -e -r '.data[] | select(.name | contains("status")) | if .id !="" then .name else false end'
 if [ $? != 0 ]; then
     echo "Configuring healthcheck"
-    curl -s -X POST http://localhost:8001/services \
+    curl -s -X POST http://localhost:${kong_ports.admin_api}/services \
         -d name=status \
-        -d host=localhost \
-        -d port=8001 \
-        -d path=/status > /dev/null
-    curl -s -X POST http://localhost:8001/services/status/routes \
+        -d url=http://httpbin.org/get > /dev/null
+    curl -s -X POST http://localhost:${kong_ports.admin_api}/services/status/routes \
         -d name=status \
         -d 'methods[]=HEAD' \
         -d 'methods[]=GET' \
         -d 'paths[]=/status' > /dev/null
-    curl -s -X POST http://localhost:8001/services/status/plugins \
+    curl -s -X POST http://localhost:${kong_ports.admin_api}/services/status/plugins \
         -d name=ip-restriction \
         -d "config.whitelist=127.0.0.1" \
-        -d "config.whitelist=${VPC_CIDR_BLOCK}" > /dev/null
+        -d "config.whitelist=${vpc_cidr_block}" > /dev/null
 fi
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Configuring enterprise edition settings"
     
     # Monitor role, endpoints, user, for healthcheck
-    curl -s -X GET -I http://localhost:8001/rbac/roles/monitor | grep -q "200 OK"
+    curl -s -X GET -I http://localhost:${kong_ports.admin_api}/rbac/roles/monitor | grep -q "200 OK"
     if [ $? != 0 ]; then
         COMMENT="Load balancer access to /status"
 
-        curl -s -X POST http://localhost:8001/rbac/roles \
+        curl -s -X POST http://localhost:${kong_ports.admin_api}/rbac/roles \
             -d name=monitor \
             -d comment="$COMMENT" > /dev/null
-        curl -s -X POST http://localhost:8001/rbac/roles/monitor/endpoints \
+        curl -s -X POST http://localhost:${kong_ports.admin_api}/rbac/roles/monitor/endpoints \
             -d endpoint=/status -d actions=read \
             -d comment="$COMMENT" > /dev/null
-        curl -s -X POST http://localhost:8001/rbac/users \
+        curl -s -X POST http://localhost:${kong_ports.admin_api}/rbac/users \
             -d name=monitor -d user_token=monitor \
             -d comment="$COMMENT" > /dev/null
-        curl -s -X POST http://localhost:8001/rbac/users/monitor/roles \
+        curl -s -X POST http://localhost:${kong_ports.admin_api}/rbac/users/monitor/roles \
             -d roles=monitor > /dev/null
 
         # Add authentication token for /status
-        curl -s -X POST http://localhost:8001/services/status/plugins \
+        curl -s -X POST http://localhost:${kong_ports.admin_api}/services/status/plugins \
             -d name=request-transformer \
             -d 'config.add.headers[]=Kong-Admin-Token:monitor' > /dev/null
     fi
 
-    sv stop /etc/sv/kong
-    cat <<EOF >> /etc/kong/kong.conf
-enforce_rbac = on
-admin_gui_auth = basic-auth
-admin_gui_session_conf = { "secret":"${SESSION_SECRET}", "cookie_secure":false }
+    cat <<EOF >> /etc/kong/kong_env.conf
+%{ if lookup(kong_config, "KONG_ADMIN_GUI_SESSION_CONF", null) == null }
+KONG_ADMIN_GUI_SESSION_CONF="{\"secret\":\"${session_secret}\",\"cookie_secure\":false}"
+%{ endif }
+EOF
+fi
+%{ endif }
+
+cat <<EOF >> /etc/kong/kong_env.conf
+%{ if lookup(kong_config, "KONG_ROLE", null) == "control_plane" ~}
+KONG_CLUSTER_MTLS="shared"
+KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
+KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
+%{ endif ~}
+
+%{ if lookup(kong_config, "KONG_ROLE", null) == "data_plane" ~}
+KONG_CLUSTER_MTLS="shared"
+KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
+KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
+KONG_LUA_SSL_TRUSTED_CERTIFICATE="/etc/kong_clustering/cluster.crt"
+KONG_CLUSTER_CONTROL_PLANE="${kong_hybrid_conf.endpoint}:${kong_ports.cluster}"
+KONG_CLUSTER_TELEMETRY_ENDPOINT="${kong_hybrid_conf.endpoint}:${kong_ports.telemetry}"
+%{ endif ~}
+
+%{ for key, value in kong_config ~}
+${key}="${value}"
+%{ endfor ~}
 EOF
 
-    sv start /etc/sv/kong     
-fi
+systemctl restart kong-gw

@@ -59,7 +59,6 @@ resource "aws_lb_target_group" "external-proxy" {
   port     = 8000
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
-
   health_check {
     healthy_threshold   = 5
     interval            = 5
@@ -75,7 +74,6 @@ resource "aws_lb_target_group" "external-admin-api" {
   port     = 8001
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
-
   health_check {
     healthy_threshold   = 5
     interval            = 5
@@ -87,8 +85,13 @@ resource "aws_lb_target_group" "external-admin-api" {
 }
 
 locals {
-  target_groups = [
+  target_group_cp = [
     aws_lb_target_group.external-admin-api.arn,
+    aws_lb_target_group.internal-cluster.arn,
+    aws_lb_target_group.internal-telemetry.arn,
+    aws_lb_target_group.internal-admin-api.arn
+  ]
+  target_group_dp = [
     aws_lb_target_group.external-proxy.arn
   ]
 }
@@ -115,3 +118,91 @@ resource "aws_lb_listener" "admin" {
   }
 }
 
+resource "aws_lb" "internal" {
+
+  name               = "kong-internal-lb"
+  internal           = true
+  subnets            = module.create_kong_dp.private_subnet_ids
+  load_balancer_type = "network"
+  idle_timeout       = 60
+  tags               = var.tags
+}
+
+resource "aws_lb_target_group" "internal-cluster" {
+  name     = "internal-cluster-8005"
+  port     = 8005
+  protocol = "TCP"
+  vpc_id   = aws_vpc.vpc.id
+
+  health_check {
+    healthy_threshold   = 5
+    interval            = 30
+    port                = 8005
+    protocol            = "TCP"
+    unhealthy_threshold = 5
+  }
+}
+
+resource "aws_lb_target_group" "internal-telemetry" {
+  name     = "internal-telemetry-8006"
+  port     = 8006
+  protocol = "TCP"
+  vpc_id   = aws_vpc.vpc.id
+  health_check {
+    healthy_threshold   = 5
+    interval            = 30
+    port                = 8006
+    protocol            = "TCP"
+    unhealthy_threshold = 5
+  }
+}
+
+resource "aws_lb_target_group" "internal-admin-api" {
+  name     = "internal-admin-api-8001" # FIX
+  port     = 8001
+  protocol = "TCP"
+  vpc_id   = aws_vpc.vpc.id
+  health_check {
+    healthy_threshold   = 5
+    interval            = 30
+    port                = 8001
+    protocol            = "TCP"
+    unhealthy_threshold = 5
+  }
+}
+
+resource "aws_lb_listener" "cluster" {
+
+  load_balancer_arn = aws_lb.internal.arn
+  port              = 8005
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.internal-cluster.arn
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "telemetry" {
+
+  load_balancer_arn = aws_lb.internal.arn
+  port              = 8006
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.internal-telemetry.arn
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "internal-admin" {
+
+  load_balancer_arn = aws_lb.internal.arn
+  port              = 8001
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.internal-admin-api.arn
+    type             = "forward"
+  }
+}

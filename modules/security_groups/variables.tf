@@ -18,66 +18,8 @@ variable "rules_with_source_cidr_blocks" {
     protocol    = string,
     cidr_blocks = list(string)
   }))
-  default = {
-    "kong-ingress-proxy-http" = {
-      type        = "ingress",
-      from_port   = 8000,
-      to_port     = 8000,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-api-http" = {
-      type        = "ingress",
-      from_port   = 8001,
-      to_port     = 8001,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-manager-http" = {
-      type        = "ingress",
-      from_port   = 8002,
-      to_port     = 8002,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-portal-gui-http" = {
-      type        = "ingress",
-      from_port   = 8003,
-      to_port     = 8003,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-portal-http" = {
-      type        = "ingress",
-      from_port   = 8004,
-      to_port     = 8004,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-80" = {
-      type        = "egress",
-      from_port   = 80,
-      to_port     = 80,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-443" = {
-      type        = "egress",
-      from_port   = 443,
-      to_port     = 443,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-postgresq" = {
-      type        = "egress",
-      from_port   = 5432,
-      to_port     = 5432,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
+  default = {}
 }
-
 
 variable "rules_with_source_security_groups" {
   description = "Security rules for the Kong instance that have another security group for their source"
