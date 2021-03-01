@@ -48,12 +48,6 @@ variable "placement_tenancy" {
   default     = "default"
 }
 
-variable "kong_config" {
-  description = "A map of key value pairs that describe the Kong GW config, used when constructing the userdata script"
-  type        = map(string)
-  default     = {}
-}
-
 variable "root_block_size" {
   description = "The size of the root block device to attach to each instance"
   type        = number
@@ -166,13 +160,13 @@ variable "kong_database_config" {
 variable "ce_pkg" {
   description = "Filename of the Community Edition package"
   type        = string
-  default     = "kong-1.5.0.bionic.amd64.deb" # todo: update
+  default     = "kong-2.3.2.focal.amd64.deb"
 }
 
 variable "ee_pkg" {
   description = "Filename of the Enterprise Edition package"
   type        = string
-  default     = "kong-enterprise-edition-1.3.0.1.bionic.all.deb" # todo: update
+  default     = "kong-enterprise-eition-2.3.2.0.focal.all.deb"
 }
 
 variable "region" {
@@ -249,7 +243,7 @@ variable "asg_desired_capacity" {
 variable "asg_health_check_grace_period" {
   description = "Time in seconds after instance comes into service before checking health"
   type        = string
-  default     = 300
+  default     = 600
 }
 
 variable "rules_with_source_cidr_blocks" {
@@ -304,6 +298,20 @@ variable "rules_with_source_cidr_blocks" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
+    "kong-ingress-8005" = {
+      type        = "ingress",
+      from_port   = 8005,
+      to_port     = 8005,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-8006" = {
+      type        = "ingress",
+      from_port   = 8006,
+      to_port     = 8006,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
     "kong-egress-80" = {
       type        = "egress",
       from_port   = 80,
@@ -329,6 +337,20 @@ variable "rules_with_source_cidr_blocks" {
       type        = "egress",
       from_port   = 8001,
       to_port     = 8001,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8005" = {
+      type        = "egress",
+      from_port   = 8005,
+      to_port     = 8005,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8006" = {
+      type        = "egress",
+      from_port   = 8006,
+      to_port     = 8006,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
@@ -390,6 +412,7 @@ variable "target_group_arns" {
 variable "tags" {
   description = "Tags to apply to aws resources"
   type        = map(string)
+  default     = {}
 }
 
 variable "proxy_config" {
@@ -404,4 +427,61 @@ variable "proxy_config" {
     https_proxy = null
     no_proxy    = null
   }
+}
+
+variable "kong_ports" {
+  description = "An object defining the kong http ports"
+  type = object({
+    proxy      = number
+    admin_api  = number
+    admin_gui  = number
+    portal_gui = number
+    portal_api = number
+    cluster    = number
+    telemetry  = number
+  })
+  default = {
+    proxy      = 8000
+    admin_api  = 8001
+    admin_gui  = 8002
+    portal_gui = 8003
+    portal_api = 8004
+    cluster    = 8005
+    telemetry  = 8006
+  }
+}
+
+variable "kong_hybrid_conf" {
+  description = "An object defining the kong http ports"
+  type = object({
+    cluster_cert = string
+    cluster_key  = string
+    endpoint     = string
+  })
+  default = {
+    cluster_cert = ""
+    cluster_key  = ""
+    endpoint     = ""
+  }
+}
+variable "kong_ssl_uris" {
+  description = "Object containing the ssl uris for kong, e.g. load balancer dns names and ports"
+  type = object({
+    admin_api_uri   = string
+    admin_gui_url   = string
+    portal_gui_host = string
+    portal_api_url  = string
+  })
+  default = {
+    admin_api_uri   = "https://localhost:8444"
+    admin_gui_url   = "https://localhost:8445"
+    portal_gui_host = "https://localhost:8446"
+    portal_api_url  = "https://localhost:8447"
+  }
+}
+
+variable "kong_config" {
+  description = "A map of key value pairs that describe the Kong GW config, used when constructing the userdata script"
+  type        = map(string)
+  default     = {}
 }
