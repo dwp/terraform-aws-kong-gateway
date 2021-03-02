@@ -54,7 +54,7 @@ jobs:
           echo "Running: kitchen converge hybrid-external-database"
           kitchen converge hybrid-external-database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log
           sleep 30 # TODO: remove after check added to kitchen
-          kitchen verify hybrid_external_database
+          kitchen verify hybrid-external-database
         continue-on-error: true
       - name: Teardown
-        run: kitchen destroy hybrid_external_database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-destroy.log
+        run: kitchen destroy hybrid-external-database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-destroy.log
