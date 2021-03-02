@@ -52,10 +52,10 @@ jobs:
         run: |
           bundle install
           echo "Running: kitchen converge hybrid-external-database"
-          kitchen converge hybrid-external-database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log
+          kitchen converge hybrid-external-database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log || echo "kitchen converge failed"
           sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g" ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log
           sleep 30 # TODO: remove after check added to kitchen
-          kitchen verify hybrid-external-database
+          kitchen verify hybrid-external-database  || echo "kitchen verify failed"
           echo "Kitchen logs:"
           sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g" .kitchen/logs/hybrid-external-database-local.log
         continue-on-error: true
