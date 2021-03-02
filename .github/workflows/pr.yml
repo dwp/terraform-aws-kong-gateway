@@ -52,7 +52,17 @@ jobs:
         run: |
           bundle install
           kitchen converge
-          echo "TODO: curl status until ready"
+          # Confirm that Kong is running before testing
+          for ((i=1;i<=300;i++)); do
+            curl hostname.tbc/status
+            if [ $? -eq 0 ]; then
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "unable to reach Kong status endpoint"
+          exit 1
+        continue-on-error: true
       - name: Test
         run: kitchen verify
         continue-on-error: true
