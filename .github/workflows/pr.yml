@@ -51,7 +51,8 @@ jobs:
       - name: Build and Test
         run: |
           bundle install
-          kitchen converge hybrid_external_database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log
+          echo "Running: kitchen converge hybrid-external-database"
+          kitchen converge hybrid-external-database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log
           sleep 30 # TODO: remove after check added to kitchen
           kitchen verify hybrid_external_database
         continue-on-error: true
