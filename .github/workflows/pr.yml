@@ -48,23 +48,12 @@ jobs:
       - uses: hashicorp/setup-terraform@v1
         with:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
-      - name: Build
+      - name: Build and Test
         run: |
           bundle install
-          kitchen converge
-          # Confirm that Kong is running before testing
-          for ((i=1;i<=300;i++)); do
-            curl hostname.tbc/status
-            if [ $? -eq 0 ]; then
-              exit 0
-            fi
-            sleep 10
-          done
-          echo "unable to reach Kong status endpoint"
-          exit 1
-        continue-on-error: true
-      - name: Test
-        run: kitchen verify
+          kitchen converge hybrid_external_database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-converge.log
+          sleep 30 # TODO: remove after check added to kitchen
+          kitchen verify hybrid_external_database
         continue-on-error: true
       - name: Teardown
-        run: kitchen destroy
+        run: kitchen destroy hybrid_external_database > ${{ github.workspace }}/${{ github.run_id }}-${{ github.run_number }}-destroy.log
