@@ -39,24 +39,16 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Set up Ruby
-        uses: actions/setup-ruby@v1
+      - name: Kitchen Test hybrid-external-database
+        uses: dwp/github-action-kitchen-terraform@v0.14.7
         with:
-          ruby-version: ${{ env.RUBY_VERSION }}
-      - name: Setup bundler
-        uses: ./.github/actions/setup-bundler-for-testing
-      - uses: hashicorp/setup-terraform@v1
-        with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-      - name: Kitchen Test
-        uses: lzysh/github-kitchen-terraform-action@v1.0.0
-        with:
-          kitchen-command: "test"
-        continue-on-error: true
-      - name: Kitchen Destroy
-        uses: lzysh/github-kitchen-terraform-action@v1.0.0
-        with:
-          kitchen-command: "destroy"
+          kitchen-command: "test hybrid-external-database"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
+          TF_VAR_region: eu-west-1
+          TF_VAR_vpc_cidr_block: "10.0.0.0/16"
+          TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
 #      - name: Build and Test
 #        run: |
 #          bundle install
