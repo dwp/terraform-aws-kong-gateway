@@ -42,7 +42,7 @@ jobs:
       - name: Kitchen Test hybrid-external-database
         uses: dwp/github-action-kitchen-terraform@v0.14.7
         with:
-          kitchen-command: "test hybrid-external-database"
+          kitchen-command: "list"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
