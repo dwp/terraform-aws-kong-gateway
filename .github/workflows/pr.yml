@@ -40,7 +40,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Kitchen Test hybrid-external-database
-        uses: dwp/github-action-kitchen-terraform@0.0.1
+        uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
           kitchen-command: test hybrid-external-database
           aws-account-number: ${{ secrets.AWS_ACCOUNT }}
@@ -50,12 +50,3 @@ jobs:
           TF_VAR_region: eu-west-1
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
-#      - name: Build and Test
-#        run: |
-#          bundle install
-#          kitchen test hybrid-external-database | sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g"
-#          echo "Kitchen logs:"
-#          sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g" .kitchen/logs/hybrid-external-database-local.log
-#        continue-on-error: true
-#      - name: Teardown
-#        run: kitchen destroy hybrid-external-database sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g"
