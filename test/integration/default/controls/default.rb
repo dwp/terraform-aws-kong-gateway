@@ -1,31 +1,16 @@
-require 'net/http'
-require 'uri'
-
 api = input('kong-api-endpoint')
 proxy = input('kong-proxy-endpoint')
 
-# set up service and route so we can test
-uri = URI.parse("#{api}/services")
-request = Net::HTTP::Post.new(uri)
-request.set_form_data(
-  'name' => 'test',
-  'url' => 'http://httpbin.org'
-)
+require_relative '../../libraries/kong_util'
 
-Net::HTTP.start(uri.hostname, uri.port).request(request)
+wait("#{api}/clustering/status")
 
-uri = URI.parse("#{api}/services/test/routes")
-request = Net::HTTP::Post.new(uri)
-request.set_form_data(
-  'name' => 'testRoute',
-  'paths' => '/test'
-)
+post("#{api}/services", { 'name' => 'test', 'url' => 'http://httpbin.org' })
 
-Net::HTTP.start(uri.hostname, uri.port).request(request)
+post("#{api}/services/test/routes", { 'name' => 'testRoute', 'paths' => '/test' })
 
-# start testing
-cluster_members = JSON.parse(http("#{api}/clustering/status",
-                                  method: 'GET').body)
+cluster_members = JSON.parse(http("#{api}/clustering/status", method: 'GET').body)
+
 describe cluster_members do
   it { should_not be_empty }
 end
