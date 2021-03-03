@@ -40,9 +40,10 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Kitchen Test hybrid-external-database
-        uses: dwp/github-action-kitchen-terraform@v0.14.7
+        uses: dwp/github-action-kitchen-terraform@0.0.1
         with:
           kitchen-command: test hybrid-external-database
+          aws-account-number: ${{ secrets.AWS_ACCOUNT }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
