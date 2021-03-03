@@ -162,10 +162,3 @@ resource "random_string" "session_secret" {
   length  = 32
   special = false
 }
-
-output "asg_outputs" {
-  value = {
-    asg_id   = "${aws_autoscaling_group.kong.id}"
-    asg_name = "${aws_autoscaling_group.kong.name}"
-  }
-}
