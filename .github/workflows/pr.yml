@@ -51,8 +51,7 @@ jobs:
       - name: Build and Test
         run: |
           bundle install
-          kitchen converge hybrid-external-database | sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g"
-          kitchen verify hybrid-external-database | sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g"
+          kitchen test hybrid-external-database | sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g"
           echo "Kitchen logs:"
           sed "s/${{ secrets.AWS_ACCOUNT }}/REDACTED/g" .kitchen/logs/hybrid-external-database-local.log
         continue-on-error: true
