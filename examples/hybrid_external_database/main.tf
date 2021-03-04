@@ -132,6 +132,7 @@ resource "aws_instance" "external_postgres" {
 }
 
 locals {
+  environment = "${var.environment}-${terraform.workspace}"
 
   kong_control_plane_config = {
     "KONG_ROLE"              = "control_plane"
@@ -191,7 +192,7 @@ module "create_kong_cp" {
   kong_config       = local.kong_control_plane_config
   kong_hybrid_conf  = local.kong_hybrid_conf
 
-  environment = var.environment
+  environment = local.environment
   service     = var.service
   description = var.description
   tags        = var.tags
@@ -223,7 +224,7 @@ module "create_kong_dp" {
   private_subnets    = module.create_kong_cp.private_subnet_ids
   availability_zones = module.create_kong_cp.private_subnet_azs
 
-  environment = var.environment
+  environment = local.environment
   service     = var.service
   description = var.description
   tags        = var.tags
