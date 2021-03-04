@@ -9,12 +9,12 @@ resource "aws_kms_key" "aurora" {
 }
 
 resource "aws_kms_alias" "aurora" {
-  name          = "alias/${var.name}-db-key"
+  name          = "alias/${var.name}-db-key-${var.environment}"
   target_key_id = aws_kms_key.aurora.key_id
 }
 
 resource "aws_rds_cluster" "cluster" {
-  cluster_identifier        = var.name
+  cluster_identifier        = "${var.name}-${var.environment}"
   engine                    = var.database.engine
   engine_version            = var.database.engine_version
   availability_zones        = local.zone_names
