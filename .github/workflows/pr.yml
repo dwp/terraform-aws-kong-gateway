@@ -39,7 +39,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
       - name: Kitchen Test hybrid-external-database
-        uses: dwp/github-action-kitchen-terraform@${{ env.TERRAFORM_VERSION }}
+        uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
           kitchen-command: test hybrid-external-database --destroy=always
           aws-account-number: ${{ secrets.AWS_ACCOUNT }}
