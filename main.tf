@@ -77,6 +77,7 @@ module "database" {
   count                   = var.skip_rds_creation ? 0 : 1
   source                  = "./modules/database"
   name                    = var.kong_database_config.name
+  environment             = var.environment
   vpc                     = local.vpc_object
   allowed_security_groups = local.security_groups
   database_credentials = { # FIXME: secretes_manager

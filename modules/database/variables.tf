@@ -3,6 +3,12 @@ variable "name" {
   type        = string
 }
 
+variable "environment" {
+  description = "Resource environment tag (i.e. dev, stage, prod). Used in resource names"
+  type        = string
+  default     = "test"
+}
+
 variable "tags" {
   description = "Tags to apply to aws resources"
   type        = map(string)
