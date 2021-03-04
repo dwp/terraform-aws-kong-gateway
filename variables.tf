@@ -169,6 +169,20 @@ variable "ee_pkg" {
   default     = "kong-enterprise-eition-2.3.2.0.focal.all.deb"
 }
 
+variable "ee_creds_ssm_param" {
+  description = "(optional) SSM parameter names where customer's Kong enterprise license credentials are stored"
+  type = object({
+    license      = string
+    bintray_auth = string
+    api_token    = string
+  })
+  default = {
+    license      = null
+    bintray_auth = null
+    api_token    = null
+  }
+}
+
 variable "region" {
   description = "The aws region to access the SSM config items"
   type        = string

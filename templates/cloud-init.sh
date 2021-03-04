@@ -56,7 +56,7 @@ done
 # Function to grab SSM parameters
 aws_get_parameter() {
     aws ssm --region ${region} get-parameter \
-        --name "${parameter_path}/$1" \
+        --name $1 \
         --with-decryption \
         --output text \
         --query Parameter.Value 2>/dev/null
@@ -104,10 +104,15 @@ EOF
 %{ endif ~}
 %{ endif ~}
 # Install Kong
-echo "Installing Kong"
-EE_LICENSE=$(aws_get_parameter ee/license)
-EE_CREDS=$(aws_get_parameter ee/bintray-auth)
+
+%{ if ee_creds.license != null && ee_creds.bintray_auth != null && ee_creds.api_token != null ~}
+EE_LICENSE=$(aws_get_parameter ${ee_creds.license}/)
+EE_CREDS=$(aws_get_parameter ${ee_creds.bintray_auth})
+%{ else ~}
+EE_LICENSE = "placeholder"
+%{ endif ~}
 if [ "$EE_LICENSE" != "placeholder" ]; then
+    echo "Installing Kong EE"
     curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
         -u $EE_CREDS \
         -o ${ee_pkg}
@@ -125,6 +130,7 @@ EOF
     chown root:kong /etc/kong/license.json
     chmod 640 /etc/kong/license.json
 else
+    echo "Installing Kong CE"
     curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
         -o ${ce_pkg}
     dpkg -i ${ce_pkg}
@@ -134,8 +140,8 @@ fi
 %{ if lookup(kong_config, "KONG_ROLE", "embedded") != "data_plane" ~}
 # Setup database
 echo "Setting up Kong database"
-PGPASSWORD=$(aws_get_parameter "db/password/master")
-DB_PASSWORD=$(aws_get_parameter "db/password")
+PGPASSWORD=$(aws_get_parameter "${parameter_path}/db/password/master")
+DB_PASSWORD=$(aws_get_parameter "${parameter_path}/db/password")
 
 DB_HOST=${db_host}
 DB_NAME=${db_name}
@@ -257,7 +263,7 @@ export KONG_PG_PASSWORD="$DB_PASSWORD"
 export KONG_PG_DATABASE="$DB_NAME"
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    ADMIN_TOKEN=$(aws_get_parameter "ee/admin/token")
+    ADMIN_TOKEN=$(aws_get_parameter ${ee_creds.api_token}
     kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
 else
     kong migrations bootstrap

@@ -40,6 +40,7 @@ locals {
     db_name          = local.db_info.database_name
     ce_pkg           = var.ce_pkg
     ee_pkg           = var.ee_pkg
+    ee_creds         = var.ee_creds_ssm_param
     parameter_path   = local.ssm_parameter_path
     region           = var.region
     vpc_cidr_block   = var.vpc_cidr_block
