@@ -104,13 +104,12 @@ EOF
 %{ endif ~}
 %{ endif ~}
 # Install Kong
-
 %{ if ee_creds_ssm_param.license != null && ee_creds_ssm_param.bintray_auth != null && ee_creds_ssm_param.admin_token != null ~}
-EE_LICENSE=$(aws_get_parameter ${ee_creds_ssm_param.license}/)
+EE_LICENSE=$(aws_get_parameter ${ee_creds_ssm_param.license})
 EE_BINTRAY_AUTH=$(aws_get_parameter ${ee_creds_ssm_param.bintray_auth})
-ADMIN_TOKEN=$(aws_get_parameter ${ee_creds_ssm_param.admin_token}
+ADMIN_TOKEN=$(aws_get_parameter ${ee_creds_ssm_param.admin_token})
 %{ else ~}
-EE_LICENSE = "placeholder"
+EE_LICENSE="placeholder"
 %{ endif ~}
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Installing Kong EE"
