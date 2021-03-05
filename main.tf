@@ -34,24 +34,24 @@ locals {
 
   user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
   user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
-    proxy_config     = var.proxy_config
-    db_user          = var.kong_database_config.user
-    db_host          = local.db_info.endpoint
-    db_name          = local.db_info.database_name
-    ce_pkg           = var.ce_pkg
-    ee_pkg           = var.ee_pkg
-    ee_creds         = var.ee_creds_ssm_param
-    parameter_path   = local.ssm_parameter_path
-    region           = var.region
-    vpc_cidr_block   = var.vpc_cidr_block
-    deck_version     = var.deck_version
-    manager_host     = var.manager_host
-    portal_host      = var.portal_host
-    session_secret   = random_string.session_secret.result
-    kong_config      = var.kong_config
-    kong_ports       = var.kong_ports
-    kong_ssl_uris    = var.kong_ssl_uris
-    kong_hybrid_conf = var.kong_hybrid_conf
+    proxy_config       = var.proxy_config
+    db_user            = var.kong_database_config.user
+    db_host            = local.db_info.endpoint
+    db_name            = local.db_info.database_name
+    ce_pkg             = var.ce_pkg
+    ee_pkg             = var.ee_pkg
+    ee_creds_ssm_param = var.ee_creds_ssm_param
+    parameter_path     = local.ssm_parameter_path
+    region             = var.region
+    vpc_cidr_block     = var.vpc_cidr_block
+    deck_version       = var.deck_version
+    manager_host       = var.manager_host
+    portal_host        = var.portal_host
+    session_secret     = random_string.session_secret.result
+    kong_config        = var.kong_config
+    kong_ports         = var.kong_ports
+    kong_ssl_uris      = var.kong_ssl_uris
+    kong_hybrid_conf   = var.kong_hybrid_conf
   })
   name = format("%s-%s-%s", var.service, var.environment, random_string.prefix.result)
 }

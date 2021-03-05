@@ -174,12 +174,12 @@ variable "ee_creds_ssm_param" {
   type = object({
     license      = string
     bintray_auth = string
-    api_token    = string
+    admin_token  = string
   })
   default = {
     license      = null
     bintray_auth = null
-    api_token    = null
+    admin_token  = null
   }
 }
 

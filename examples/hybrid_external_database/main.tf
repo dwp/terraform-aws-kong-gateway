@@ -172,7 +172,7 @@ module "create_kong_cp" {
   ee_creds_ssm_param = {
     license      = aws_ssm_parameter.ee-license.name
     bintray_auth = aws_ssm_parameter.ee-bintray-auth.name
-    api_token    = aws_ssm_parameter.ee-admin-token.name
+    admin_token  = aws_ssm_parameter.ee-admin-token.name
   }
 
   asg_desired_capacity = var.asg_desired_capacity

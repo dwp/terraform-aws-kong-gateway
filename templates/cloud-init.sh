@@ -105,9 +105,10 @@ EOF
 %{ endif ~}
 # Install Kong
 
-%{ if ee_creds.license != null && ee_creds.bintray_auth != null && ee_creds.api_token != null ~}
-EE_LICENSE=$(aws_get_parameter ${ee_creds.license}/)
-EE_BINTRAY_AUTH=$(aws_get_parameter ${ee_creds.bintray_auth})
+%{ if ee_creds_ssm_param.license != null && ee_creds_ssm_param.bintray_auth != null && ee_creds_ssm_param.admin_token != null ~}
+EE_LICENSE=$(aws_get_parameter ${ee_creds_ssm_param.license}/)
+EE_BINTRAY_AUTH=$(aws_get_parameter ${ee_creds_ssm_param.bintray_auth})
+ADMIN_TOKEN=$(aws_get_parameter ${ee_creds_ssm_param.admin_token}
 %{ else ~}
 EE_LICENSE = "placeholder"
 %{ endif ~}
@@ -262,7 +263,6 @@ export KONG_PG_PASSWORD="$DB_PASSWORD"
 export KONG_PG_DATABASE="$DB_NAME"
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    ADMIN_TOKEN=$(aws_get_parameter ${ee_creds.api_token}
     kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
 else
     kong migrations bootstrap
