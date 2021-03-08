@@ -144,6 +144,10 @@ resource "aws_autoscaling_group" "kong" {
   min_size                  = var.asg_min_size
   target_group_arns         = var.target_group_arns
 
+  lifecycle {
+    ignore_changes = [load_balancers, target_group_arns]
+  }
+
   dynamic "tag" {
     for_each = local.tags
     content {
