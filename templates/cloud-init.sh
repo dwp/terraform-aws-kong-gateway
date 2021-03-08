@@ -1,13 +1,45 @@
 #!/bin/bash
 
 set -x
-exec &> /tmp/cloud-init.log
 
 %{ for config_key, config_value in proxy_config ~}
 %{ if config_value != null ~}
 export ${config_key}="${config_value}"
 %{ endif ~}
 %{ endfor ~}
+
+# Proxy Setting
+echo "Checking and setting Proxy configuration..."
+
+# Checking if HTTP Proxy(s) provided and setting
+%{ if proxy_config.http_proxy != null ~}
+  echo "http_proxy=${proxy_config.http_proxy}" >> /etc/environment
+  touch /etc/apt/apt.conf.d/proxy.conf
+  echo "Acquire::http::Proxy \"${proxy_config.http_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
+  echo "HTTP Proxy configured"
+%{ else ~}
+  echo "No HTTP Proxy configuration found. Skipping"
+%{ endif ~}
+
+# Checking if HTTPS Proxy(s) provided and setting
+%{ if proxy_config.https_proxy != null ~}
+  echo "https_proxy=${proxy_config.https_proxy}" >> /etc/environment
+  touch /etc/apt/apt.conf.d/proxy.conf
+  echo "Acquire::https::Proxy \"${proxy_config.https_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
+  echo "HTTPS Proxy configured"
+%{ else ~}
+  echo "No HTTPS Proxy configuration found. Skipping"
+%{ endif ~}
+
+# Checking if No Proxy configuration provided and setting
+%{ if proxy_config.no_proxy != null ~}
+  echo "no_proxy=${proxy_config.no_proxy}" >> /etc/environment
+  echo "No-Proxy settings configured"
+%{ else ~}
+  echo "No No-Proxy configuration found. Skipping"
+%{ endif ~}
+
+exec &> /tmp/cloud-init.log
 
 # Pause: in testing we need this
 # to make sure we wait to be routed out
@@ -78,7 +110,7 @@ EE_CREDS=$(aws_get_parameter ee/bintray-auth)
 if [ "$EE_LICENSE" != "placeholder" ]; then
     curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
         -u $EE_CREDS \
-        -o ${ee_pkg} 
+        -o ${ee_pkg}
 
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
@@ -92,7 +124,7 @@ $EE_LICENSE
 EOF
     chown root:kong /etc/kong/license.json
     chmod 640 /etc/kong/license.json
-else  
+else
     curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
         -o ${ce_pkg}
     dpkg -i ${ce_pkg}
@@ -227,7 +259,7 @@ export KONG_PG_DATABASE="$DB_NAME"
 if [ "$EE_LICENSE" != "placeholder" ]; then
     ADMIN_TOKEN=$(aws_get_parameter "ee/admin/token")
     kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
-else 
+else
     kong migrations bootstrap
 fi
 
@@ -278,7 +310,7 @@ fi
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Configuring enterprise edition settings"
-    
+
     # Monitor role, endpoints, user, for healthcheck
     curl -s -X GET -I http://localhost:${kong_ports.admin_api}/rbac/roles/monitor | grep -q "200 OK"
     if [ $? != 0 ]; then
