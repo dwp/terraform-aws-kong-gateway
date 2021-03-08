@@ -8,30 +8,36 @@ export ${config_key}="${config_value}"
 %{ endif ~}
 %{ endfor ~}
 
+# Proxy Setting
+echo "Checking and setting Proxy configuration..."
+
 # Checking if HTTP Proxy(s) provided and setting
-if [[ -z ${http_proxy} ]]; then
-  echo "No HTTP Proxy configuration set"
-else
+%{ if proxy_config.http_proxy != null ~}
   echo "http_proxy=${http_proxy}" >> /etc/environment
   touch /etc/apt/apt.conf.d/proxy.conf
   echo "Acquire::http::Proxy ${http_proxy};" >> /etc/apt/apt.conf.d/proxy.conf
-fi
+  echo "HTTP Proxy configured"
+%{ else ~}
+  echo "No HTTP Proxy configuration found. Skipping"
+%{ endif ~}
 
 # Checking if HTTPS Proxy(s) provided and setting
-if [[ -z ${https_proxy} ]]; then
-  echo "No HTTPS Proxy configuration set"
-else
+%{ if proxy_config.https_proxy != null ~}
   echo "https_proxy=${https_proxy}" >> /etc/environment
   touch /etc/apt/apt.conf.d/proxy.conf
   echo "Acquire::https::Proxy ${https_proxy};" >> /etc/apt/apt.conf.d/proxy.conf
-fi
+  echo "HTTPS Proxy configured"
+%{ else ~}
+  echo "No HTTPS Proxy configuration found. Skipping"
+%{ endif ~}
 
 # Checking if No Proxy configuration provided and setting
-if [[ -z ${no_proxy} ]]; then
-  echo "No No-Proxy configuration set"
-else
+%{ if proxy_config.no_proxy != null ~}
   echo "no_proxy=${no_proxy}" >> /etc/environment
-fi
+  echo "No-Proxy settings configured"
+%{ else ~}
+  echo "No No-Proxy configuration found. Skipping"
+${ endif ~}
 
 exec &> /tmp/cloud-init.log
 
