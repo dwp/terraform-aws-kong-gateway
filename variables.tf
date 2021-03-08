@@ -166,7 +166,7 @@ variable "ce_pkg" {
 variable "ee_pkg" {
   description = "Filename of the Enterprise Edition package"
   type        = string
-  default     = "kong-enterprise-eition-2.3.2.0.focal.all.deb"
+  default     = "kong-enterprise-edition-2.3.2.0.focal.all.deb"
 }
 
 variable "ee_creds_ssm_param" {
