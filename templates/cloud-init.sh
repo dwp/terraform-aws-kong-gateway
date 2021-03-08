@@ -15,7 +15,7 @@ echo "Checking and setting Proxy configuration..."
 %{ if proxy_config.http_proxy != null ~}
   echo "http_proxy=${proxy_config.http_proxy}" >> /etc/environment
   touch /etc/apt/apt.conf.d/proxy.conf
-  echo "Acquire::http::Proxy ${proxy_config.http_proxy};" >> /etc/apt/apt.conf.d/proxy.conf
+  echo "Acquire::http::Proxy \"${proxy_config.http_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
   echo "HTTP Proxy configured"
 %{ else ~}
   echo "No HTTP Proxy configuration found. Skipping"
@@ -25,7 +25,7 @@ echo "Checking and setting Proxy configuration..."
 %{ if proxy_config.https_proxy != null ~}
   echo "https_proxy=${proxy_config.https_proxy}" >> /etc/environment
   touch /etc/apt/apt.conf.d/proxy.conf
-  echo "Acquire::https::Proxy ${proxy_config.https_proxy};" >> /etc/apt/apt.conf.d/proxy.conf
+  echo "Acquire::https::Proxy \"${proxy_config.https_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
   echo "HTTPS Proxy configured"
 %{ else ~}
   echo "No HTTPS Proxy configuration found. Skipping"
