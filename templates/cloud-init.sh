@@ -37,7 +37,7 @@ echo "Checking and setting Proxy configuration..."
   echo "No-Proxy settings configured"
 %{ else ~}
   echo "No No-Proxy configuration found. Skipping"
-${ endif ~}
+%{ endif ~}
 
 exec &> /tmp/cloud-init.log
 
