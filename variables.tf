@@ -172,14 +172,16 @@ variable "ee_pkg" {
 variable "ee_creds_ssm_param" {
   description = "(optional) SSM parameter names where customer's Kong enterprise license credentials are stored"
   type = object({
-    license      = string
-    bintray_auth = string
-    admin_token  = string
+    license          = string
+    bintray_username = string
+    bintray_password = string
+    admin_token      = string
   })
   default = {
-    license      = null
-    bintray_auth = null
-    admin_token  = null
+    license          = null
+    bintray_username = null
+    bintray_password = null
+    admin_token      = null
   }
 }
 

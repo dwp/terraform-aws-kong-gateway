@@ -104,9 +104,10 @@ EOF
 %{ endif ~}
 %{ endif ~}
 # Install Kong
-%{ if ee_creds_ssm_param.license != null && ee_creds_ssm_param.bintray_auth != null && ee_creds_ssm_param.admin_token != null ~}
+%{ if ee_creds_ssm_param.license != null && ee_creds_ssm_param.bintray_username != null && ee_creds_ssm_param.bintray_password != null && ee_creds_ssm_param.admin_token != null ~}
 EE_LICENSE=$(aws_get_parameter ${ee_creds_ssm_param.license})
-EE_BINTRAY_AUTH=$(aws_get_parameter ${ee_creds_ssm_param.bintray_auth})
+EE_BINTRAY_USERNAME=$(aws_get_parameter ${ee_creds_ssm_param.bintray_username})
+EE_BINTRAY_PASSWORD=$(aws_get_parameter ${ee_creds_ssm_param.bintray_password})
 ADMIN_TOKEN=$(aws_get_parameter ${ee_creds_ssm_param.admin_token})
 %{ else ~}
 EE_LICENSE="placeholder"
@@ -114,8 +115,8 @@ EE_LICENSE="placeholder"
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Installing Kong EE"
     curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
-        -u $EE_BINTRAY_AUTH \
-        -o ${ee_pkg}
+        -u $EE_BINTRAY_USERNAME:$EE_BINTRAY_PASSWORD \
+        -o ${ee_pkg} 
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
         exit 1
