@@ -30,3 +30,12 @@ suites:
           backend: local
           attrs:
             - test/integration/hybrid_external_database/attrs.yml
+  - name: hybrid_http_proxy
+    driver:
+      root_module_directory: examples/hybrid_http_proxy
+    verifier:
+      systems:
+        - name: default
+          backend: local
+          attrs:
+            - test/integration/hybrid_http_proxy/attrs.yml
