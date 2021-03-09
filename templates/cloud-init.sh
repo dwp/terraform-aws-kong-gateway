@@ -116,7 +116,7 @@ if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Installing Kong EE"
     curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
         -u $EE_BINTRAY_USERNAME:$EE_BINTRAY_PASSWORD \
-        -o ${ee_pkg} 
+        -o ${ee_pkg}
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
         exit 1
@@ -237,7 +237,7 @@ KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 KONG_PORTAL_GUI_PROTOCOL="https"
 KONG_PORTAL_GUI_HOST="${kong_ssl_uris.portal_gui_host}"
 KONG_PORTAL_API_URL="${kong_ssl_uris.portal_api_url}"
-KONG_PORTAL_CORS_ORIGINS="https://${kong_ssl_uris.portal_gui_host}, https://${kong_ssl_uris.portal_api_url}"
+KONG_PORTAL_CORS_ORIGINS="${kong_ssl_uris.portal_gui_host}, ${kong_ssl_uris.portal_api_url}"
 EOF
 
     for DIR in gui lib portal; do

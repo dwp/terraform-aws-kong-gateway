@@ -26,8 +26,8 @@ resource "aws_rds_cluster" "cluster" {
   apply_immediately         = true
   db_subnet_group_name      = aws_db_subnet_group.cluster.id
   final_snapshot_identifier = "${var.name}-final-snapshot"
-  skip_final_snapshot       = false
-  storage_encrypted         = true
+  skip_final_snapshot       = var.skip_final_snapshot
+  storage_encrypted         = var.encrypt_storage
   kms_key_id                = aws_kms_key.aurora.arn
   vpc_security_group_ids    = [aws_security_group.db.id]
   tags                      = merge(var.tags, { Name = "${var.name}-db" })
