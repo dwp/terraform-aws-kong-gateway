@@ -82,7 +82,7 @@ module "database" {
   vpc                     = local.vpc_object
   allowed_security_groups = local.security_groups
   skip_final_snapshot     = var.skip_final_snapshot
-  storage_encrypted       = var.encrypt_storage
+  encrypt_storage         = var.encrypt_storage
   database_credentials = { # FIXME: secretes_manager
     username = var.postgres_config.master_user
     password = var.postgres_config.master_password
