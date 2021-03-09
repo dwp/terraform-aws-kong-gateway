@@ -78,7 +78,7 @@ EE_CREDS=$(aws_get_parameter ee/bintray-auth)
 if [ "$EE_LICENSE" != "placeholder" ]; then
     curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
         -u $EE_CREDS \
-        -o ${ee_pkg} 
+        -o ${ee_pkg}
 
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
@@ -92,7 +92,7 @@ $EE_LICENSE
 EOF
     chown root:kong /etc/kong/license.json
     chmod 640 /etc/kong/license.json
-else  
+else
     curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
         -o ${ce_pkg}
     dpkg -i ${ce_pkg}
@@ -199,7 +199,7 @@ KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 KONG_PORTAL_GUI_PROTOCOL="https"
 KONG_PORTAL_GUI_HOST="${kong_ssl_uris.portal_gui_host}"
 KONG_PORTAL_API_URL="${kong_ssl_uris.portal_api_url}"
-KONG_PORTAL_CORS_ORIGINS="https://${kong_ssl_uris.portal_gui_host}, https://${kong_ssl_uris.portal_api_url}"
+KONG_PORTAL_CORS_ORIGINS="${kong_ssl_uris.portal_gui_host}, ${kong_ssl_uris.portal_api_url}"
 EOF
 
     for DIR in gui lib portal; do
@@ -227,7 +227,7 @@ export KONG_PG_DATABASE="$DB_NAME"
 if [ "$EE_LICENSE" != "placeholder" ]; then
     ADMIN_TOKEN=$(aws_get_parameter "ee/admin/token")
     kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
-else 
+else
     kong migrations bootstrap
 fi
 
@@ -244,6 +244,7 @@ systemctl enable --now kong-gw
 # Verify Admin API is up
 RUNNING=0
 for I in 1 2 3 4 5 6 7 8 9; do
+    echo "Run Number: ${I}"
     curl -s -I http://localhost:${kong_ports.admin_api}/status | grep -q "200 OK"
     if [ $? = 0 ]; then
         RUNNING=1
@@ -251,6 +252,8 @@ for I in 1 2 3 4 5 6 7 8 9; do
     fi
     sleep 1
 done
+echo
+echo "RUNNING = ${RUNNING}"
 
 if [ $RUNNING = 0 ]; then
     echo "Cannot connect to admin API, avoiding further configuration."
@@ -278,7 +281,7 @@ fi
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Configuring enterprise edition settings"
-    
+
     # Monitor role, endpoints, user, for healthcheck
     curl -s -X GET -I http://localhost:${kong_ports.admin_api}/rbac/roles/monitor | grep -q "200 OK"
     if [ $? != 0 ]; then
