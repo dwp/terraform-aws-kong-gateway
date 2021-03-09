@@ -17,10 +17,22 @@ resource "aws_kms_alias" "kong" {
   target_key_id = aws_kms_key.kong.key_id
 }
 
-resource "aws_ssm_parameter" "ee-bintray-auth" {
-  name  = format("/%s/%s/ee/bintray-auth", var.service, local.environment)
+resource "aws_ssm_parameter" "ee_bintray_username" {
+  name  = format("/%s/%s/ee/bintray-username", var.service, local.environment)
   type  = "SecureString"
-  value = var.ee_bintray_auth
+  value = var.ee_bintray_username
+
+  key_id = aws_kms_alias.kong.target_key_arn
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "ee_bintray_password" {
+  name  = format("/%s/%s/ee/bintray-password", var.service, local.environment)
+  type  = "SecureString"
+  value = var.ee_bintray_password
 
   key_id = aws_kms_alias.kong.target_key_arn
 

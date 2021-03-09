@@ -14,6 +14,10 @@ def wait(url, max=500)
       break
     rescue Exception => e
       count += 1
+      if count == max
+        raise 'There was an issue with contancting the Kong control plane, check if the Kong service is running'
+      end
+
       sleep 1
       next
     end

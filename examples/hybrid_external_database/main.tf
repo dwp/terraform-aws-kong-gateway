@@ -169,6 +169,13 @@ module "create_kong_cp" {
   vpc_cidr_block            = aws_vpc.vpc.cidr_block
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
 
+  ee_creds_ssm_param = {
+    license          = aws_ssm_parameter.ee-license.name
+    bintray_username = aws_ssm_parameter.ee_bintray_username.name
+    bintray_password = aws_ssm_parameter.ee_bintray_password.name
+    admin_token      = aws_ssm_parameter.ee-admin-token.name
+  }
+
   asg_desired_capacity = var.asg_desired_capacity
   asg_max_size         = var.asg_max_size
   asg_min_size         = var.asg_min_size

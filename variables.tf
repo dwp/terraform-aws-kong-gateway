@@ -166,7 +166,23 @@ variable "ce_pkg" {
 variable "ee_pkg" {
   description = "Filename of the Enterprise Edition package"
   type        = string
-  default     = "kong-enterprise-eition-2.3.2.0.focal.all.deb"
+  default     = "kong-enterprise-edition-2.3.2.0.focal.all.deb"
+}
+
+variable "ee_creds_ssm_param" {
+  description = "(optional) SSM parameter names where customer's Kong enterprise license credentials are stored"
+  type = object({
+    license          = string
+    bintray_username = string
+    bintray_password = string
+    admin_token      = string
+  })
+  default = {
+    license          = null
+    bintray_username = null
+    bintray_password = null
+    admin_token      = null
+  }
 }
 
 variable "region" {

@@ -38,8 +38,14 @@ variable "description" {
   default     = "Kong API Gateway"
 }
 
-variable "ee_bintray_auth" {
-  description = "enterprise repo creds"
+variable "ee_bintray_username" {
+  description = "enterprise repo username"
+  type        = string
+  default     = "placeholder"
+}
+
+variable "ee_bintray_password" {
+  description = "enterprise repo password"
   type        = string
   default     = "placeholder"
 }
