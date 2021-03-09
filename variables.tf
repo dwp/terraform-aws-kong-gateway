@@ -502,6 +502,12 @@ variable "kong_config" {
   default     = {}
 }
 
+variable "kong_clear_database" {
+  description = "(optional) If set to true then the database contents will be replaced when control plane instance starts. Typically only used during development."
+  type        = bool
+  default     = false
+}
+
 variable "skip_final_snapshot" {
   type        = bool
   description = "true/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"

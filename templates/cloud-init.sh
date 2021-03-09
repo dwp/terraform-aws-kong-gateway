@@ -263,7 +263,8 @@ export KONG_PG_PASSWORD="$DB_PASSWORD"
 export KONG_PG_DATABASE="$DB_NAME"
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
+    export KONG_PASSWORD=$ADMIN_TOKEN
+    kong migrations bootstrap %{ if clear_database}-f %{endif}
 else
     kong migrations bootstrap
 fi
