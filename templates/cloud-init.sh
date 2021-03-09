@@ -281,7 +281,6 @@ systemctl enable --now kong-gw
 # Verify Admin API is up
 RUNNING=0
 for I in 1 2 3 4 5 6 7 8 9; do
-    echo "Run Number: ${I}"
     curl -s -I http://localhost:${kong_ports.admin_api}/status | grep -q "200 OK"
     if [ $? = 0 ]; then
         RUNNING=1
@@ -289,8 +288,6 @@ for I in 1 2 3 4 5 6 7 8 9; do
     fi
     sleep 1
 done
-echo
-echo "RUNNING = ${RUNNING}"
 
 if [ $RUNNING = 0 ]; then
     echo "Cannot connect to admin API, avoiding further configuration."
