@@ -515,13 +515,11 @@ variable "kong_clear_database" {
 variable "skip_final_snapshot" {
   type        = bool
   description = "true/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"
-
   default     = true
 }
 
 variable "encrypt_storage" {
   type        = bool
   description = "true/false value to set whether storage within the RDS Database should be encrypted"
-
   default     = true
 }
