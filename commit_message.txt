@@ -1,0 +1,9 @@
+Cloud init fixes for EE install (#33)
+
+* fix `kong migrations bootstrap` command and allow optionally clearing DB
+
+Signed-off-by: Daniel.Hill <daniel.hill@engineering.digital.dwp.gov.uk>
+
+* add Kong conf for admin GUI auth
+
+Signed-off-by: Daniel.Hill <daniel.hill@engineering.digital.dwp.gov.uk>
