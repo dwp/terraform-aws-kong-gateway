@@ -263,7 +263,8 @@ export KONG_PG_PASSWORD="$DB_PASSWORD"
 export KONG_PG_DATABASE="$DB_NAME"
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
-    kong KONG_PASSWORD=$ADMIN_TOKEN kong migrations bootstrap
+    export KONG_PASSWORD=$ADMIN_TOKEN
+    kong migrations bootstrap %{ if clear_database}-f %{endif}
 else
     kong migrations bootstrap
 fi
@@ -342,6 +343,9 @@ if [ "$EE_LICENSE" != "placeholder" ]; then
     cat <<EOF >> /etc/kong/kong_env.conf
 %{ if lookup(kong_config, "KONG_ADMIN_GUI_SESSION_CONF", null) == null }
 KONG_ADMIN_GUI_SESSION_CONF="{\"secret\":\"${session_secret}\",\"cookie_secure\":false}"
+KONG_ADMIN_GUI_AUTH="basic-auth"
+KONG_ENFORCE_RBAC="on"
+KONG_ADMIN_LISTEN="0.0.0.0:8001, 0.0.0.0:8444 ssl"
 %{ endif }
 EOF
 fi

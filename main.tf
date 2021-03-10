@@ -52,6 +52,7 @@ locals {
     kong_ports         = var.kong_ports
     kong_ssl_uris      = var.kong_ssl_uris
     kong_hybrid_conf   = var.kong_hybrid_conf
+    clear_database     = var.kong_clear_database
   })
   name = format("%s-%s-%s", var.service, var.environment, random_string.prefix.result)
 }
