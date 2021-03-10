@@ -237,7 +237,9 @@ KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 KONG_PORTAL_GUI_PROTOCOL="${kong_ssl_uris.protocol}"
 KONG_PORTAL_GUI_HOST="${replace(kong_ssl_uris.portal_gui_host, "${kong_ssl_uris.protocol}://", "")}"
 KONG_PORTAL_API_URL="${kong_ssl_uris.portal_api_url}"
-KONG_PORTAL_CORS_ORIGINS="${kong_ssl_uris.portal_gui_host}, ${kong_ssl_uris.portal_api_url}"
+%{ if kong_ssl_uris.portal_cors_origins != null ~}
+KONG_PORTAL_CORS_ORIGINS="${kong_ssl_uris.portal_cors_origins}"
+%{ endif ~}
 EOF
 
     for DIR in gui lib portal; do

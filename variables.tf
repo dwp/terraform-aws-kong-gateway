@@ -488,6 +488,7 @@ variable "kong_ssl_uris" {
     admin_gui_url       = string
     portal_gui_host     = string
     portal_api_url      = string
+    portal_cors_origins = string
   })
   default = {
     protocol            = "https"
@@ -495,6 +496,7 @@ variable "kong_ssl_uris" {
     admin_gui_url       = "https://localhost:8445"
     portal_gui_host     = "https://localhost:8446"
     portal_api_url      = "https://localhost:8447"
+    portal_cors_origins = null
   }
 }
 
