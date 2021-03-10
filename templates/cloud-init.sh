@@ -231,11 +231,11 @@ KONG_ADMIN_GUI_LISTEN="0.0.0.0:${kong_ports.admin_gui}"
 KONG_PORTAL_GUI_LISTEN="0.0.0.0:${kong_ports.portal_gui}"
 KONG_PORTAL_API_LISTEN="0.0.0.0:${kong_ports.portal_api}"
 
-KONG_ADMIN_API_URI="${kong_ssl_uris.admin_api_uri}"
+KONG_ADMIN_API_URI="${replace(kong_ssl_uris.admin_api_uri, "${kong_ssl_uris.protocol}://", "")}"
 KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 
-KONG_PORTAL_GUI_PROTOCOL="https"
-KONG_PORTAL_GUI_HOST="${kong_ssl_uris.portal_gui_host}"
+KONG_PORTAL_GUI_PROTOCOL="${kong_ssl_uris.protocol}"
+KONG_PORTAL_GUI_HOST="${replace(kong_ssl_uris.portal_gui_host, "${kong_ssl_uris.protocol}://", "")}"
 KONG_PORTAL_API_URL="${kong_ssl_uris.portal_api_url}"
 KONG_PORTAL_CORS_ORIGINS="${kong_ssl_uris.portal_gui_host}, ${kong_ssl_uris.portal_api_url}"
 EOF

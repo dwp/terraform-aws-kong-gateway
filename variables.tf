@@ -483,16 +483,18 @@ variable "kong_hybrid_conf" {
 variable "kong_ssl_uris" {
   description = "Object containing the ssl uris for kong, e.g. load balancer dns names and ports"
   type = object({
-    admin_api_uri   = string
-    admin_gui_url   = string
-    portal_gui_host = string
-    portal_api_url  = string
+    protocol            = string
+    admin_api_uri       = string
+    admin_gui_url       = string
+    portal_gui_host     = string
+    portal_api_url      = string
   })
   default = {
-    admin_api_uri   = "https://localhost:8444"
-    admin_gui_url   = "https://localhost:8445"
-    portal_gui_host = "https://localhost:8446"
-    portal_api_url  = "https://localhost:8447"
+    protocol            = "https"
+    admin_api_uri       = "https://localhost:8444"
+    admin_gui_url       = "https://localhost:8445"
+    portal_gui_host     = "https://localhost:8446"
+    portal_api_url      = "https://localhost:8447"
   }
 }
 
