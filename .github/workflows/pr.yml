@@ -7,9 +7,6 @@ on:
 env:
   TERRAFORM_VERSION: 0.14.7
 
-defaults:
-  run:
-    shell: bash
 
 jobs:
   get-publish-version:
