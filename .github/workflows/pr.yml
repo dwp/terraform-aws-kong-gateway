@@ -23,6 +23,7 @@ jobs:
           [  -z "$LATEST_VERSION" ] && LATEST_VERSION="0.0.0"
           echo ::set-output name=latest_version_out::$LATEST_VERSION
           commit_message=$(cat commit_message.txt)
+          echo $commit_message
           if [[ "${commit_message,,}" == *"major release"* ]]; then
             echo ::set-output name=semver_increment::"m"
           elif [[ "${commit_message,,}" == *"minor release"* ]]; then
