@@ -20,14 +20,6 @@ jobs:
           LATEST_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
           [  -z "$LATEST_VERSION" ] && LATEST_VERSION="0.0.0"
           echo ::set-output name=latest_version_out::$LATEST_VERSION
-#          commit_message="${{ github.event.head_commit.message }}"
-#          if [[ "${commit_message,,}" == *"major release"* ]]; then
-#            echo ::set-output name=semver_increment::"m"
-#          elif [[ "${commit_message,,}" == *"minor release"* ]]; then
-#            echo ::set-output name=semver_increment::"i"
-#          else
-#            echo ::set-output name=semver_increment::"p"
-#          fi
           echo ::set-output name=semver_increment::"p"
       - name: Increment SemVer
         id: semver
