@@ -96,6 +96,11 @@ cat << EOF >/etc/kong_clustering/cluster.crt
 ${kong_hybrid_conf.cluster_cert}
 EOF
 %{ endif ~}
+%{ if kong_hybrid_conf.ca_cert != "" ~}
+cat << EOF >/etc/kong_clustering/cluster_ca.crt
+${kong_hybrid_conf.ca_cert}
+EOF
+%{ endif ~}
 
 %{ if kong_hybrid_conf.cluster_key != "" ~}
 cat << EOF >/etc/kong_clustering/cluster.key
@@ -213,13 +218,13 @@ KONG_TRUSTED_IPS="0.0.0.0/0"
 
 %{if lookup(kong_config, "KONG_ROLE", null) != null ~}
 %{if kong_config["KONG_ROLE"] == "data_plane" ~}
-KONG_PROXY_LISTEN="0.0.0.0:${kong_ports.proxy}"
+KONG_PROXY_LISTEN="0.0.0.0:${kong_ports.proxy}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 %{ else ~}
-KONG_ADMIN_LISTEN="0.0.0.0:${kong_ports.admin_api}"
+KONG_ADMIN_LISTEN="0.0.0.0:${kong_ports.admin_api}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 %{ endif ~}
 %{ else ~}
-KONG_PROXY_LISTEN="0.0.0.0:${kong_ports.proxy}"
-KONG_ADMIN_LISTEN="0.0.0.0:${kong_ports.admin_api}"
+KONG_PROXY_LISTEN="0.0.0.0:${kong_ports.proxy}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
+KONG_ADMIN_LISTEN="0.0.0.0:${kong_ports.admin_api}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 %{ endif ~}
 EOF
 chmod 640 /etc/kong/kong_env.conf
@@ -227,9 +232,9 @@ chgrp kong /etc/kong/kong_env.conf
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
     cat <<EOF >> /etc/kong/kong_env.conf
-KONG_ADMIN_GUI_LISTEN="0.0.0.0:${kong_ports.admin_gui}"
-KONG_PORTAL_GUI_LISTEN="0.0.0.0:${kong_ports.portal_gui}"
-KONG_PORTAL_API_LISTEN="0.0.0.0:${kong_ports.portal_api}"
+KONG_ADMIN_GUI_LISTEN="0.0.0.0:${kong_ports.admin_gui}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
+KONG_PORTAL_GUI_LISTEN="0.0.0.0:${kong_ports.portal_gui}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
+KONG_PORTAL_API_LISTEN="0.0.0.0:${kong_ports.portal_api}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 
 KONG_ADMIN_API_URI="${replace(kong_ssl_uris.admin_api_uri, "${kong_ssl_uris.protocol}://", "")}"
 KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
@@ -284,7 +289,7 @@ systemctl enable --now kong-gw
 # Verify Admin API is up
 RUNNING=0
 for I in 1 2 3 4 5 6 7 8 9; do
-    curl -s -I http://localhost:${kong_ports.admin_api}/status | grep -q "200 OK"
+    curl -s -I %{ if kong_ssl_uris.protocol == "https"}-k https%{else}http%{endif}://localhost:${kong_ports.admin_api}/status | grep -q "200 OK"
     if [ $? = 0 ]; then
         RUNNING=1
         break
@@ -355,16 +360,38 @@ fi
 
 cat <<EOF >> /etc/kong/kong_env.conf
 %{ if lookup(kong_config, "KONG_ROLE", null) == "control_plane" ~}
-KONG_CLUSTER_MTLS="shared"
+KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"
+%{ if kong_hybrid_conf.ca_cert != "" ~}
+KONG_CLUSTER_CA_CERT="/etc/kong_clustering/cluster_ca.crt"
+%{ endif ~}
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
+KONG_CLUSTER_SERVER_NAME="${kong_hybrid_conf.endpoint}"
+
+# ADMIN API
+KONG_ADMIN_SSL_CERT="/etc/kong_clustering/cluster.crt"
+KONG_ADMIN_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
+
+# ADMIN GUI
+KONG_ADMIN_GUI_SSL_CERT="/etc/kong_clustering/cluster.crt"
+KONG_ADMIN_GUI_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
+
+# PORTAL API
+KONG_PORTAL_API_SSL_CERT="/etc/kong_clustering/cluster.crt"
+KONG_PORTAL_API_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
+
+# PORTAL GUI
+KONG_PORTAL_GUI_SSL_CERT="/etc/kong_clustering/cluster.crt"
+KONG_PORTAL_GUI_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 %{ endif ~}
 
 %{ if lookup(kong_config, "KONG_ROLE", null) == "data_plane" ~}
-KONG_CLUSTER_MTLS="shared"
+KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
 KONG_LUA_SSL_TRUSTED_CERTIFICATE="/etc/kong_clustering/cluster.crt"
+KONG_SSL_CERT="/etc/kong_clustering/cluster.crt"
+KONG_SSL_CERT_KEY="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CONTROL_PLANE="${kong_hybrid_conf.endpoint}:${kong_ports.cluster}"
 KONG_CLUSTER_TELEMETRY_ENDPOINT="${kong_hybrid_conf.endpoint}:${kong_ports.telemetry}"
 %{ endif ~}
