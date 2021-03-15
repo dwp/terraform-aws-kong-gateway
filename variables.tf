@@ -472,11 +472,15 @@ variable "kong_hybrid_conf" {
   type = object({
     cluster_cert = string
     cluster_key  = string
+    mtls         = string
+    ca_cert      = string
     endpoint     = string
   })
   default = {
     cluster_cert = ""
     cluster_key  = ""
+    mtls         = "shared"
+    ca_cert      = ""
     endpoint     = ""
   }
 }
@@ -491,11 +495,11 @@ variable "kong_ssl_uris" {
     portal_cors_origins = string
   })
   default = {
-    protocol            = "https"
-    admin_api_uri       = "https://localhost:8444"
-    admin_gui_url       = "https://localhost:8445"
-    portal_gui_host     = "https://localhost:8446"
-    portal_api_url      = "https://localhost:8447"
+    protocol            = "http"
+    admin_api_uri       = "http://localhost:8001"
+    admin_gui_url       = "http://localhost:8002"
+    portal_gui_host     = "http://localhost:8003"
+    portal_api_url      = "http://localhost:8004"
     portal_cors_origins = null
   }
 }
