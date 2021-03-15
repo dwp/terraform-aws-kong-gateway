@@ -391,7 +391,7 @@ KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
 KONG_LUA_SSL_TRUSTED_CERTIFICATE="/etc/kong_clustering/cluster.crt"
 KONG_SSL_CERT="/etc/kong_clustering/cluster.crt"
-KONG_SSL_CERT_KEY="/etc/kong_clustering/cluster.crt"
+KONG_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 KONG_CLUSTER_CONTROL_PLANE="${kong_hybrid_conf.endpoint}:${kong_ports.cluster}"
 KONG_CLUSTER_TELEMETRY_ENDPOINT="${kong_hybrid_conf.endpoint}:${kong_ports.telemetry}"
 %{ endif ~}
