@@ -470,6 +470,7 @@ variable "kong_ports" {
 variable "kong_hybrid_conf" {
   description = "An object defining the kong http ports"
   type = object({
+    server_name  = string
     cluster_cert = string
     cluster_key  = string
     mtls         = string
@@ -477,6 +478,7 @@ variable "kong_hybrid_conf" {
     endpoint     = string
   })
   default = {
+    server_name  = ""
     cluster_cert = ""
     cluster_key  = ""
     mtls         = "shared"

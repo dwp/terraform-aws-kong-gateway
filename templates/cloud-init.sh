@@ -366,7 +366,7 @@ KONG_CLUSTER_CA_CERT="/etc/kong_clustering/cluster_ca.crt"
 %{ endif ~}
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
-KONG_CLUSTER_SERVER_NAME="${kong_hybrid_conf.endpoint}"
+KONG_CLUSTER_SERVER_NAME="${kong_hybrid_conf.server_name}"
 
 # ADMIN API
 KONG_ADMIN_SSL_CERT="/etc/kong_clustering/cluster.crt"
@@ -389,6 +389,7 @@ KONG_PORTAL_GUI_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
+KONG_CLUSTER_SERVER_NAME="${kong_hybrid_conf.server_name}"
 KONG_LUA_SSL_TRUSTED_CERTIFICATE="/etc/kong_clustering/cluster.crt"
 KONG_SSL_CERT="/etc/kong_clustering/cluster.crt"
 KONG_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
