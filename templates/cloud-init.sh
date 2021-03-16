@@ -387,6 +387,9 @@ KONG_PORTAL_GUI_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 
 %{ if lookup(kong_config, "KONG_ROLE", null) == "data_plane" ~}
 KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"
+%{ if kong_hybrid_conf.ca_cert != "" ~}
+KONG_CLUSTER_CA_CERT="/etc/kong_clustering/cluster_ca.crt"
+%{ endif ~}
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
 KONG_CLUSTER_SERVER_NAME="${kong_hybrid_conf.server_name}"
