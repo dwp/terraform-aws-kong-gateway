@@ -11,7 +11,6 @@ jobs:
   format:
     name: Terraform-Format
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -23,10 +22,29 @@ jobs:
         run: terraform fmt -recursive
         continue-on-error: true
 
+  check-aws-credentials:
+    name: Test AWS Credentials
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install AWS CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install awscli
+      - name: Test AWS Credentials
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
+        run: aws ec2 describe-availability-zones --region us-east-1
+
   test:
     name: Kitchen-Terraform
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
+    needs: check-aws-credentials
     env:
       GEMFILE_DIR: .
       AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
@@ -38,6 +56,13 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install AWS CLI
+        run: |
+          python -m pip install --upgrade pip
+          pip install awscli
       - name: Kitchen Test hybrid-external-database
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
@@ -50,3 +75,9 @@ jobs:
           TF_VAR_environment: GHA-${{ env.GITHUB_RUN_NUMBER }}
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
+      - name: Deactivate AWS Credentials
+        if: ${{ always() }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
+        run: aws iam update-access-key --access-key-id ${{ secrets.ACTIONS_ACCESS_KEY_ID }} --status Inactive
