@@ -19,7 +19,7 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
       - name: Terraform Format
         id: fmt
-        run: terraform fmt -recursive
+        run: terraform fmt -recursive -check
         continue-on-error: true
 
   check-aws-credentials:
