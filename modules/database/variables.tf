@@ -1,17 +1,20 @@
+variable "allowed_security_groups" {
+  description = "The ids of the security groups to allow db access from"
+  type        = list(string)
+}
+
+variable "database_credentials" {
+  description = "Credentials to set for database master user"
+
+  type = object({
+    username = string,
+    password = string,
+  })
+}
+
 variable "name" {
   description = "Common name. Used as part of resource names"
   type        = string
-}
-
-variable "environment" {
-  description = "Resource environment tag (i.e. dev, stage, prod). Used in resource names"
-  type        = string
-  default     = "test"
-}
-
-variable "tags" {
-  description = "Tags to apply to aws resources"
-  type        = map(string)
 }
 
 variable "vpc" {
@@ -23,8 +26,14 @@ variable "vpc" {
   })
 }
 
+variable "environment" {
+  description = "(Optional) Resource environment tag (i.e. dev, stage, prod). Used in resource names"
+  type        = string
+  default     = "test"
+}
+
 variable "database" {
-  description = "Database configuration options"
+  description = "(Optional) Database configuration options"
 
   type = object({
     instance_type           = string
@@ -45,28 +54,20 @@ variable "database" {
   }
 }
 
-variable "database_credentials" {
-  description = "Credentials to set for database master user"
-
-  type = object({
-    username = string,
-    password = string,
-  })
-}
-
-variable "allowed_security_groups" {
-  description = "The ids of the security groups to allow db access from"
-  type        = list(string)
-}
-
 variable "skip_final_snapshot" {
   type        = bool
-  description = "true/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"
+  description = "(Optional) true/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"
   default     = true
 }
 
 variable "encrypt_storage" {
   type        = bool
-  description = "true/false value to set whether storage within the RDS Database should be encrypted"
+  description = "(Optional) true/false value to set whether storage within the RDS Database should be encrypted"
   default     = true
+}
+
+variable "tags" {
+  description = "Tags to apply to aws resources"
+  type        = map(string)
+  default = {}
 }
