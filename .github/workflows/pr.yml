@@ -27,18 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     steps:
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install AWS CLI
-        run: |
-          python -m pip install --upgrade pip
-          pip install awscli
       - name: Test AWS Credentials
+        uses: docker://amazon/aws-cli
+        with:
+          args: ec2 describe-availability-zones --region us-east-1
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
-        run: aws ec2 describe-availability-zones --region us-east-1
 
   test:
     name: Kitchen-Terraform
@@ -56,13 +51,6 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
-      - name: Install AWS CLI
-        run: |
-          python -m pip install --upgrade pip
-          pip install awscli
       - name: Kitchen Test hybrid-external-database
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
@@ -77,7 +65,9 @@ jobs:
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
       - name: Deactivate AWS Credentials
         if: ${{ always() }}
+        uses: docker://amazon/aws-cli
+        with:
+          args: iam update-access-key --access-key-id ${{ secrets.ACTIONS_ACCESS_KEY_ID }} --status Inactive
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
-        run: aws iam update-access-key --access-key-id ${{ secrets.ACTIONS_ACCESS_KEY_ID }} --status Inactive
