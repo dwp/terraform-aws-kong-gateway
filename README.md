@@ -170,4 +170,4 @@ module "kong_control_plane" {
 
 ## Testing
 
-For details refer to [CONTRIBUTING.md](CONTRIBUTING.md#Testing and linting)
+For details refer to [CONTRIBUTING.md](CONTRIBUTING.md#testing-and-linting)
