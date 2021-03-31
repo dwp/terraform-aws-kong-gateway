@@ -12,7 +12,7 @@ The module can deploy Kong Gateway in several ways:
 :warning: The module is currently only tested for Hybrid control planes and data planes. Use of embedded has not been tested. 
 
 ## Status
-Maturing - Some scenarios tested, but not all. Module in use, but not for a limited number of configurations. Looking for more consumers to raise issues they find with additional scenarios.
+Maturing - Some scenarios tested, but not all. Module in use, but only for a limited number of configurations. Looking for more consumers to raise issues they find with additional scenarios.
 
 ## Examples
 Examples of how to use the module are in the [examples](examples) directory.
@@ -170,4 +170,4 @@ module "kong_control_plane" {
 
 ## Testing
 
-For details refer to [CONTRIBUTING.md](CONTRIBUTING.md#Testing and linting)
+For details refer to [CONTRIBUTING.md](CONTRIBUTING.md#testing-and-linting)
