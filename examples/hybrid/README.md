@@ -1,6 +1,6 @@
 # Hybrid Example
 
-![architecture-diagram](https://github.com/dwp/terraform-aws-kong-gateway/tree/main/examples/hybrid/hybrid.png)
+![architecture-diagram](https://raw.githubusercontent.com/dwp/terraform-aws-kong-gateway/main/examples/hybrid/hybrid.png)
 
 ## Description
 
