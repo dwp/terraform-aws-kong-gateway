@@ -1,6 +1,6 @@
 # Hybrid Example With External Database
 
-![architecture-diagram](https://github.com/dwp/terraform-aws-kong-gateway/tree/main/examples/hybrid_http_proxy/hybrid_http_proxy.png)
+![architecture-diagram](https://raw.githubusercontent.com/dwp/terraform-aws-kong-gateway/main/examples/hybrid_http_proxy/hybrid_http_proxy.png)
 
 ## Description
 
