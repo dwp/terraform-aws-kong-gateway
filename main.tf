@@ -6,7 +6,8 @@ locals {
   tags = merge(var.tags, {
     "service"     = var.service,
     "environment" = var.environment,
-    "role"        = local.role
+    "role"        = local.role,
+    "new-tag"     = "testing"
   })
 
   # If the module user has specified a postgres_host then we use
