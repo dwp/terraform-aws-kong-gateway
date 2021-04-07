@@ -22,6 +22,24 @@ jobs:
         run: terraform fmt -recursive -check
         continue-on-error: true
 
+  kics-scan:
+    name: KICS Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: 'repo'
+      - name: KICS Github Action
+        uses: checkmarx/kics-action@docker-runner
+        with:
+          path: 'repo'
+          output_path: 'results.json'
+          platform_type: terraform
+      - name: Display KICS Results
+        run: |
+          cat results.json
+
   check-aws-credentials:
     name: Test AWS Credentials
     runs-on: ubuntu-latest
