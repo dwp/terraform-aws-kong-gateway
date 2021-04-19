@@ -1,43 +1,55 @@
 #!/bin/bash
 
 set -x
-
 %{ for config_key, config_value in proxy_config ~}
 %{ if config_value != null ~}
 export ${config_key}="${config_value}"
 %{ endif ~}
 %{ endfor ~}
+# Set up firewalld
+setenforce 0;
+firewall-cmd --add-port=5432/tcp --permanent --zone=public;
+firewall-cmd --add-port=8443/tcp --permanent --zone=public;
+firewall-cmd --add-port=8444/tcp --permanent --zone=public;
+firewall-cmd --add-port=8445/tcp --permanent --zone=public;
+firewall-cmd --add-port=8446/tcp --permanent --zone=public;
+firewall-cmd --add-port=8447/tcp --permanent --zone=public;
+firewall-cmd --add-port=8005/tcp --permanent --zone=public;
+firewall-cmd --add-port=8006/tcp --permanent --zone=public;
+# firewall-cmd --add-port=8000/tcp --permanent --zone=public;
+# firewall-cmd --add-port=8001/tcp --permanent --zone=public;
+# firewall-cmd --add-port=8002/tcp --permanent --zone=public;
+# firewall-cmd --add-port=8003/tcp --permanent --zone=public;
+# firewall-cmd --add-port=8004/tcp --permanent --zone=public;
+firewall-cmd --reload;
+setenforce 1;
 
 # Proxy Setting
 echo "Checking and setting Proxy configuration..."
-
 # Checking if HTTP Proxy(s) provided and setting
 %{ if proxy_config.http_proxy != null ~}
-  echo "http_proxy=${proxy_config.http_proxy}" >> /etc/environment
-  touch /etc/apt/apt.conf.d/proxy.conf
-  echo "Acquire::http::Proxy \"${proxy_config.http_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
+  echo "export http_proxy=${proxy_config.http_proxy}" >> /etc/environment
   echo "HTTP Proxy configured"
 %{ else ~}
   echo "No HTTP Proxy configuration found. Skipping"
 %{ endif ~}
-
 # Checking if HTTPS Proxy(s) provided and setting
 %{ if proxy_config.https_proxy != null ~}
-  echo "https_proxy=${proxy_config.https_proxy}" >> /etc/environment
-  touch /etc/apt/apt.conf.d/proxy.conf
-  echo "Acquire::https::Proxy \"${proxy_config.https_proxy}\";" >> /etc/apt/apt.conf.d/proxy.conf
+  echo "export https_proxy=${proxy_config.https_proxy}" >> /etc/environment
   echo "HTTPS Proxy configured"
 %{ else ~}
   echo "No HTTPS Proxy configuration found. Skipping"
 %{ endif ~}
-
 # Checking if No Proxy configuration provided and setting
 %{ if proxy_config.no_proxy != null ~}
-  echo "no_proxy=${proxy_config.no_proxy}" >> /etc/environment
-  echo "No-Proxy settings configured"
+  echo "export no_proxy=${proxy_config.no_proxy}" >> /etc/environment
+  echo "export NO_PROXY=${proxy_config.no_proxy}" >> /etc/environment
+  # echo "No-Proxy settings configured"
 %{ else ~}
   echo "No No-Proxy configuration found. Skipping"
 %{ endif ~}
+
+source /etc/environment
 
 exec &> /tmp/cloud-init.log
 
@@ -53,6 +65,7 @@ for ((i=1;i<=300;i++)); do
   sleep 1
 done
 
+
 # Function to grab SSM parameters
 aws_get_parameter() {
     aws ssm --region ${region} get-parameter \
@@ -62,19 +75,15 @@ aws_get_parameter() {
         --query Parameter.Value 2>/dev/null
 }
 
-apt-get update
-
-apt-get upgrade -y
-
-apt-get install -y apt-listchanges unattended-upgrades \
-  ntp runit runit-systemd dnsutils curl telnet pwgen \
-  postgresql-client perl libpcre3 awscli jq
+yum update
+yum install -y wget unzip curl openssl python python2-pip postgresql-server
+pip install awscli jq
 
 # Enable auto updates
-echo "Enabling auto updates"
-echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true \
-    | debconf-set-selections
-dpkg-reconfigure -f noninteractive unattended-upgrades
+####### echo "Enabling auto updates"
+####### echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true \
+#######    | debconf-set-selections
+####### dpkg-reconfigure -f noninteractive unattended-upgrades
 
 # Installing decK
 # https://github.com/hbagdi/deck
@@ -108,6 +117,7 @@ ${kong_hybrid_conf.cluster_key}
 EOF
 %{ endif ~}
 %{ endif ~}
+
 # Install Kong
 %{ if ee_creds_ssm_param.license != null && ee_creds_ssm_param.bintray_username != null && ee_creds_ssm_param.bintray_password != null && ee_creds_ssm_param.admin_token != null ~}
 EE_LICENSE=$(aws_get_parameter ${ee_creds_ssm_param.license})
@@ -119,16 +129,14 @@ EE_LICENSE="placeholder"
 %{ endif ~}
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Installing Kong EE"
-    curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
+    curl -sL https://kong.bintray.com/kong-enterprise-edition-rpm/rhel/7/${ee_pkg} \
         -u $EE_BINTRAY_USERNAME:$EE_BINTRAY_PASSWORD \
         -o ${ee_pkg}
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
         exit 1
     fi
-    dpkg -i ${ee_pkg}
-    apt-get -f install -y
-
+    yum install -y ${ee_pkg}
     cat <<EOF > /etc/kong/license.json
 $EE_LICENSE
 EOF
@@ -136,13 +144,13 @@ EOF
     chmod 640 /etc/kong/license.json
 else
     echo "Installing Kong CE"
-    curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
+    curl -sL "https://bintray.com/kong/kong-gateway-rpm/download_file?file_path=${ce_pkg}" \
         -o ${ce_pkg}
-    dpkg -i ${ce_pkg}
-    apt-get -f install -y
+    yum install -y ${ce_pkg}
 fi
 
 %{ if lookup(kong_config, "KONG_ROLE", "embedded") != "data_plane" ~}
+
 # Setup database
 echo "Setting up Kong database"
 PGPASSWORD=$(aws_get_parameter "${parameter_path}/db/password/master")
@@ -175,6 +183,7 @@ EOF
 fi
 unset PGPASSWORD
 %{ endif }
+
 # Setup systemd unit file
 cat <<EOF > /etc/systemd/system/kong-gw.service
 [Unit]
@@ -189,19 +198,17 @@ ExecReload=/usr/local/bin/kong prepare -p /usr/local/kong
 ExecReload=/usr/local/openresty/nginx/sbin/nginx -p /usr/local/kong -c nginx.conf -s reload
 ExecStop=/bin/kill -s QUIT $MAINPID
 PrivateTmp=true
-
 Environment=KONG_NGINX_DAEMON=off
 Environment=KONG_PROXY_ACCESS_LOG=syslog:server=unix:/dev/log
 Environment=KONG_PROXY_ERROR_LOG=syslog:server=unix:/dev/log
 Environment=KONG_ADMIN_ACCESS_LOG=syslog:server=unix:/dev/log
 Environment=KONG_ADMIN_ERROR_LOG=syslog:server=unix:/dev/log
 EnvironmentFile=/etc/kong/kong_env.conf
-
 LimitNOFILE=infinity
-
 [Install]
 WantedBy=multi-user.target
 EOF
+
 # Setup Configuration file
 cat <<EOF > /etc/kong/kong_env.conf
 %{if lookup(kong_config, "KONG_ROLE", "embedded") == "embedded" || lookup(kong_config, "KONG_ROLE", "embedded") == "control_plane" ~}
@@ -323,12 +330,10 @@ fi
 
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Configuring enterprise edition settings"
-
     # Monitor role, endpoints, user, for healthcheck
     curl -s -X GET -I http://localhost:${kong_ports.admin_api}/rbac/roles/monitor | grep -q "200 OK"
     if [ $? != 0 ]; then
         COMMENT="Load balancer access to /status"
-
         curl -s -X POST http://localhost:${kong_ports.admin_api}/rbac/roles \
             -d name=monitor \
             -d comment="$COMMENT" > /dev/null
@@ -340,7 +345,7 @@ if [ "$EE_LICENSE" != "placeholder" ]; then
             -d comment="$COMMENT" > /dev/null
         curl -s -X POST http://localhost:${kong_ports.admin_api}/rbac/users/monitor/roles \
             -d roles=monitor > /dev/null
-
+        
         # Add authentication token for /status
         curl -s -X POST http://localhost:${kong_ports.admin_api}/services/status/plugins \
             -d name=request-transformer \
@@ -362,7 +367,7 @@ cat <<EOF >> /etc/kong/kong_env.conf
 %{ if lookup(kong_config, "KONG_ROLE", null) == "control_plane" ~}
 KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"
 %{ if kong_hybrid_conf.ca_cert != "" ~}
-KONG_CLUSTER_CA_CERT="/etc/kong_clustering/cluster_ca.crt"
+KONG_CLUSTER_CA_CERT="/etc/ssl/certs/ca-bundle.crt"
 %{ endif ~}
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"
@@ -388,7 +393,7 @@ KONG_PORTAL_GUI_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 %{ if lookup(kong_config, "KONG_ROLE", null) == "data_plane" ~}
 KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"
 %{ if kong_hybrid_conf.ca_cert != "" ~}
-KONG_CLUSTER_CA_CERT="/etc/kong_clustering/cluster_ca.crt"
+KONG_CLUSTER_CA_CERT="/etc/ssl/certs/ca-bundle.crt"
 %{ endif ~}
 KONG_CLUSTER_CERT="/etc/kong_clustering/cluster.crt"
 KONG_CLUSTER_CERT_KEY="/etc/kong_clustering/cluster.key"

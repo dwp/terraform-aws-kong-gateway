@@ -1,5 +1,4 @@
 ### required Variables
-
 variable "ami_id" {
   description = "AMI image id to use for the deployments"
   type        = string
@@ -25,9 +24,7 @@ variable "vpc_id" {
   type        = string
 }
 
-
 ### Optional Variables
-
 variable "asg_desired_capacity" {
   description = "(Optional) The number of instances that should be running in the group"
   type        = string
@@ -67,7 +64,7 @@ variable "availability_zones" {
 variable "ce_pkg" {
   description = "(Optional) Filename of the Community Edition package"
   type        = string
-  default     = "kong-2.3.2.focal.amd64.deb"
+  default     = "kong-community-edition-2.3.2.0.rhel7.noarch.rpm"
 }
 
 variable "deck_version" {
@@ -91,7 +88,7 @@ variable "description" {
 variable "ec2_root_volume_size" {
   description = "(Optional) Size of the root volume (in Gigabytes)"
   type        = string
-  default     = 8
+  default     = 10
 }
 
 variable "ec2_root_volume_type" {
@@ -119,7 +116,7 @@ variable "ee_creds_ssm_param" {
 variable "ee_pkg" {
   description = "(Optional) Filename of the Enterprise Edition package"
   type        = string
-  default     = "kong-enterprise-edition-2.3.2.0.focal.all.deb"
+  default     = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm"
 }
 
 variable "enable_monitoring" {
@@ -137,7 +134,7 @@ variable "encrypt_storage" {
 variable "environment" {
   description = "(Optional) Resource environment tag (i.e. dev, stage, prod)"
   type        = string
-  default = "dev"
+  default     = "dev"
 }
 
 variable "force_delete" {
@@ -469,7 +466,6 @@ variable "rules_with_source_cidr_blocks" {
     }
   }
 }
-
 
 variable "rules_with_source_security_groups" {
   description = "(Optional) Security rules for the Kong instance that have another security group for their source"
