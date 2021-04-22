@@ -228,6 +228,8 @@ module "create_kong_cp" {
     no_proxy    = "localhost,169.254.169.254,127.0.0.1"
   }
 
+  rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
+
   postgres_config = {
     master_user     = var.postgres_master_user
     master_password = random_string.master_password.result
@@ -268,6 +270,14 @@ module "create_kong_dp" {
   asg_desired_capacity = var.asg_desired_capacity
   asg_max_size         = var.asg_max_size
   asg_min_size         = var.asg_min_size
+
+  proxy_config = {
+    http_proxy  = "http://${aws_instance.external_proxy.private_ip}:3128"
+    https_proxy = "http://${aws_instance.external_proxy.private_ip}:3128"
+    no_proxy    = "localhost,169.254.169.254,127.0.0.1"
+  }
+
+  rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 
   target_group_arns = local.target_group_dp
 

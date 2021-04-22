@@ -23,4 +23,5 @@ sleep 10
 docker run -d  \
   --restart=always \
   -p 3128:3128 \
+  -v /etc/squid/squid.conf:/etc/squid/squid.conf \
   sameersbn/squid:3.5.27-2
