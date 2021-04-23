@@ -201,8 +201,11 @@ locals {
   }
 
   kong_hybrid_conf = {
+    server_name  = ""
     cluster_cert = tls_locally_signed_cert.cert.cert_pem
     cluster_key  = tls_private_key.cert.private_key_pem
+    mtls         = "shared"
+    ca_cert      = ""
     endpoint     = aws_lb.internal.dns_name
   }
 }
