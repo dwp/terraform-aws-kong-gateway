@@ -4,6 +4,17 @@ variable "ami_id" {
   type        = string
 }
 
+variable "ami_operating_system" {
+  description = "Operating system present on supplied `ami_id` AMI. Supported values are `amazon-linux` and `ubuntu`"
+  type        = string
+  default     = "ubuntu"
+
+  validation {
+    condition = can(regex("^(amazon-linux|ubuntu)$", var.ami_operating_system))
+    error_message = "Supported values are `amazon-linux` and `ubuntu`"
+  }
+}
+
 variable "iam_instance_profile_name" {
   description = "The name of an IAM instance profile to apply to this deployment"
   type        = string
