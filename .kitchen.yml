@@ -39,3 +39,12 @@ suites:
           backend: local
           attrs:
             - test/integration/hybrid_http_proxy/attrs.yml
+  - name: hybrid_amazon_linux
+    driver:
+      root_module_directory: examples/hybrid_amazon_linux
+    verifier:
+      systems:
+        - name: default
+          backend: local
+          attrs:
+            - test/integration/hybrid_amazon_linux/attrs.yml

@@ -5,13 +5,13 @@ variable "ami_id" {
 }
 
 variable "ami_operating_system" {
-  description = "Operating system present on supplied `ami_id` AMI. Supported values are `amazon-linux` and `ubuntu`"
+  description = "(Optional) Operating system present on supplied `ami_id` AMI. Supported values are `amazon-linux` and `ubuntu`"
   type        = string
   default     = "ubuntu"
 
   validation {
     condition = can(regex("^(amazon-linux|ubuntu)$", var.ami_operating_system))
-    error_message = "Supported values are `amazon-linux` and `ubuntu`"
+    error_message = "Supported values are `amazon-linux` and `ubuntu`."
   }
 }
 
