@@ -6,35 +6,27 @@ default: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-.PHONY: bootstrap
-bootstrap: ## Bootstrap local environment for first use
-	@make git-hooks
-
-.PHONY: git-hooks
-git-hooks: ## Set up hooks in .githooks
-	@git submodule update --init .githooks ; \
-	git config core.hooksPath .githooks \
-
 .PHONY: test
 test: ## Build, test, and destroy default scenario with Kitchen Terraform
-	docker run --rm -e AWS_PROFILE=default -v $(pwd):/usr/action -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test default --destroy=always"
-
-.PHONY: test-hybrid-external-database
-test-hybrid-external-database: ## Build, test, and destroy hybrid-external-database scenario with Kitchen Terraform
-	docker run --rm -e AWS_PROFILE=default -v $(pwd):/usr/action -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test hybrid-external-database --destroy=always"
+	docker run --rm -e AWS_PROFILE=default -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ -v $(shell pwd):/usr/action -v ~/.ssh:/root/.ssh -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test hybrid-external-database --destroy=always" \
 
 .PHONY: build
 build: ## Build default scenario with Kitchen Terraform
-	docker run --rm -e AWS_PROFILE=default -v $(pwd):/usr/action -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test default converge"
+	@make copy-test-dir ; \
+	docker run --rm -e AWS_PROFILE=default -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ -v $(shell pwd):/usr/action -v ~/.ssh:/root/.ssh -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test hybrid-external-database converge" \
 
-.PHONY: build-hybrid-external-database
-build-hybrid-external-database: ## Test hybrid-external-database scenario with Kitchen Terraform
-	docker run --rm -e AWS_PROFILE=default -v $(pwd):/usr/action -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "converge hybrid-external-database"
 
 .PHONY: destroy
 destroy: ## Build default scenario with Kitchen Terraform
-	docker run --rm -e AWS_PROFILE=default -v $(pwd):/usr/action -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test default destroy"
+	docker run --rm -e AWS_PROFILE=default -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ -v $(shell pwd):/usr/action -v ~/.ssh:/root/.ssh -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "test hybrid-external-database destroy"
+	@make delete-test-dir
 
-.PHONY: destroy-hybrid-external-database
-destroy-hybrid-external-database: ## Test hybrid-external-database scenario with Kitchen Terraform
-	docker run --rm -e AWS_PROFILE=default -v $(pwd):/usr/action -v ~/.aws:/root/.aws quay.io/dwp/kitchen-terraform:0.14.7 "destroy hybrid-external-database"
+
+.PHONY: copy-test-dir
+copy-test-dir: ## Copy the test directory to match the unique workspace for Kitchen Terraform
+	cp -r test/integration/hybrid_external_database test/integration/hybrid_external_database
+
+
+.PHONY: delete-test-dir
+delete-test-dir: ## Copy the test directory to match the unique workspace for Kitchen Terraform
+	rm -rf test/integration/hybrid_external_database

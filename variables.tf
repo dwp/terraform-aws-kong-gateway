@@ -67,7 +67,7 @@ variable "availability_zones" {
 variable "ce_pkg" {
   description = "(Optional) Filename of the Community Edition package"
   type        = string
-  default     = "kong-2.3.2.focal.amd64.deb"
+  default     = "kong_2.3.2_amd64.deb"
 }
 
 variable "deck_version" {
@@ -119,7 +119,7 @@ variable "ee_creds_ssm_param" {
 variable "ee_pkg" {
   description = "(Optional) Filename of the Enterprise Edition package"
   type        = string
-  default     = "kong-enterprise-edition-2.3.2.0.focal.all.deb"
+  default     = "kong-enterprise-edition_2.3.2.0_all.deb"
 }
 
 variable "enable_monitoring" {

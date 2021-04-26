@@ -119,8 +119,7 @@ EE_LICENSE="placeholder"
 %{ endif ~}
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Installing Kong EE"
-    curl -sL https://kong.bintray.com/kong-enterprise-edition-deb/dists/${ee_pkg} \
-        -u $EE_BINTRAY_USERNAME:$EE_BINTRAY_PASSWORD \
+    curl -sL https://download.konghq.com/gateway-2.x-ubuntu-focal/pool/all/k/kong-enterprise-edition/${ee_pkg} \
         -o ${ee_pkg}
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."
@@ -136,7 +135,7 @@ EOF
     chmod 640 /etc/kong/license.json
 else
     echo "Installing Kong CE"
-    curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
+    curl -sL "https://download.konghq.com/gateway-2.x-ubuntu-focal/pool/all/k/kong/${ce_pkg}" \
         -o ${ce_pkg}
     dpkg -i ${ce_pkg}
     apt-get -f install -y
