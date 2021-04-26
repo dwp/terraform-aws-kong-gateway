@@ -3,6 +3,12 @@ variable "region" {
   type        = string
 }
 
+variable "instance_type" {
+  description = "The instance type to use for the kong deployments"
+  type        = string
+  default     = "t3.small"
+}
+
 variable "key_name" {
   description = "The name of an AWS ssh key pari to associate with the instances in the ASG"
   type        = string
@@ -49,10 +55,22 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
+variable "asg_max_size" {
+  description = "The maximum size of the auto scale group"
+  type        = string
+  default     = 1
+}
+
+variable "asg_min_size" {
+  description = "The minimum size of the auto scale group"
+  type        = string
+  default     = 1
+}
+
 variable "asg_desired_capacity" {
   description = "The size of the autoscaling group"
   type        = string
-  default     = 2
+  default     = 1
 }
 
 variable "postgres_master_user" {
@@ -73,22 +91,136 @@ variable "kong_database_user" {
   default     = "kong"
 }
 
+variable "external_cidr_blocks" { default = ["0.0.0.0/0"] }
+
 variable "tags" {
+  type = map(string)
   default = {
-    "Dept" = "Testing",
+    "Dept" = "Testing"
   }
 }
 
-variable "proxy_config" {
-  description = "(optional) Configure HTTP, HTTPS, and NO_PROXY"
-  type = object({
-    http_proxy  = string
-    https_proxy = string
-    no_proxy    = string
-  })
+variable "rules_with_source_cidr_blocks" {
+  description = "Security rules for the Kong instance that have a cidr range for their source"
+  type = map(object({
+    type        = string,
+    from_port   = number,
+    to_port     = number,
+    protocol    = string,
+    cidr_blocks = list(string)
+  }))
   default = {
-    http_proxy  = null
-    https_proxy = null
-    no_proxy    = null
+    "kong-ingress-proxy-http" = {
+      type        = "ingress",
+      from_port   = 8000,
+      to_port     = 8000,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-api-http" = {
+      type        = "ingress",
+      from_port   = 8001,
+      to_port     = 8001,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-manager-http" = {
+      type        = "ingress",
+      from_port   = 8002,
+      to_port     = 8002,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-portal-gui-http" = {
+      type        = "ingress",
+      from_port   = 8003,
+      to_port     = 8003,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-portal-http" = {
+      type        = "ingress",
+      from_port   = 8004,
+      to_port     = 8004,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-ssh" = {
+      type        = "ingress",
+      from_port   = 22,
+      to_port     = 22,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-8005" = {
+      type        = "ingress",
+      from_port   = 8005,
+      to_port     = 8005,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-8006" = {
+      type        = "ingress",
+      from_port   = 8006,
+      to_port     = 8006,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-80" = {
+      type        = "egress",
+      from_port   = 80,
+      to_port     = 80,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-443" = {
+      type        = "egress",
+      from_port   = 443,
+      to_port     = 443,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8000" = {
+      type        = "egress",
+      from_port   = 8000,
+      to_port     = 8000,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8001" = {
+      type        = "egress",
+      from_port   = 8001,
+      to_port     = 8001,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8005" = {
+      type        = "egress",
+      from_port   = 8005,
+      to_port     = 8005,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8006" = {
+      type        = "egress",
+      from_port   = 8006,
+      to_port     = 8006,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-postgresq" = {
+      type        = "egress",
+      from_port   = 5432,
+      to_port     = 5432,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-proxy" = {
+      type        = "egress",
+      from_port   = 3128,
+      to_port     = 3128,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 }

@@ -1,10 +1,10 @@
 resource "aws_kms_key" "kong" {
-  description = format("%s-%s", var.service, var.environment)
+  description = format("%s-%s", var.service, local.environment)
 
   tags = merge(
     {
-      "Name"        = format("%s-%s", var.service, var.environment),
-      "Environment" = var.environment,
+      "Name"        = format("%s-%s", var.service, local.environment),
+      "Environment" = local.environment,
       "Description" = var.description,
       "Service"     = var.service,
     },
@@ -13,12 +13,12 @@ resource "aws_kms_key" "kong" {
 }
 
 resource "aws_kms_alias" "kong" {
-  name          = format("alias/%s-%s", var.service, var.environment)
+  name          = format("alias/%s-%s", var.service, local.environment)
   target_key_id = aws_kms_key.kong.key_id
 }
 
 resource "aws_ssm_parameter" "ee-bintray-auth" {
-  name  = format("/%s/%s/ee/bintray-auth", var.service, var.environment)
+  name  = format("/%s/%s/ee/bintray-auth", var.service, local.environment)
   type  = "SecureString"
   value = var.ee_bintray_auth
 
@@ -30,7 +30,7 @@ resource "aws_ssm_parameter" "ee-bintray-auth" {
 }
 
 resource "aws_ssm_parameter" "ee-license" {
-  name  = format("/%s/%s/ee/license", var.service, var.environment)
+  name  = format("/%s/%s/ee/license", var.service, local.environment)
   type  = "SecureString"
   value = var.ee_license
 
@@ -47,7 +47,7 @@ resource "random_string" "admin_token" {
 }
 
 resource "aws_ssm_parameter" "ee-admin-token" {
-  name  = format("/%s/%s/ee/admin/token", var.service, var.environment)
+  name  = format("/%s/%s/ee/admin/token", var.service, local.environment)
   type  = "SecureString"
   value = random_string.admin_token.result
 
@@ -59,7 +59,7 @@ resource "aws_ssm_parameter" "ee-admin-token" {
 }
 
 resource "aws_ssm_parameter" "db-password" {
-  name  = format("/%s/%s/db/password", var.service, var.environment)
+  name  = format("/%s/%s/db/password", var.service, local.environment)
   type  = "SecureString"
   value = var.kong_database_password
 
@@ -78,7 +78,7 @@ resource "random_string" "master_password" {
 }
 
 resource "aws_ssm_parameter" "db-master-password" {
-  name  = format("/%s/%s/db/password/master", var.service, var.environment)
+  name  = format("/%s/%s/db/password/master", var.service, local.environment)
   type  = "SecureString"
   value = random_string.master_password.result
 
