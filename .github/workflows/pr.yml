@@ -30,6 +30,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: 'repo'
+      - name: debug
+        run: |
+          ls -la
+          dir -R
       - name: KICS Github Action
         uses: checkmarx/kics-action@docker-runner
         with:
