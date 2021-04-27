@@ -30,17 +30,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: 'repo'
-      - name: debug
+      - name: Remove Examples # KICS exclude_paths did not work
         run: |
-          ls -la
-          dir -R
+          rm -rf repo/examples
       - name: KICS Github Action
         uses: checkmarx/kics-action@docker-runner
         with:
           path: 'repo'
           output_path: 'results.json'
           platform_type: terraform
-          exclude_paths: "**/examples/**/*.tf"
       - name: Display KICS Results
         run: |
           cat results.json
