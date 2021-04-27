@@ -20,6 +20,22 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
+# Used for supporting infra
+data "aws_ami" "ubuntu" {
+  most_recent = true
+  owners      = ["099720109477"]
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_vpc" "vpc" {
   cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
@@ -54,6 +70,29 @@ resource "aws_security_group" "allow_postgres" {
     to_port     = 22
     protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
+
+resource "aws_security_group" "allow_proxy" {
+  name        = "allow_proxy"
+  description = "Allow proxy inbound traffic"
+  vpc_id      = aws_vpc.vpc.id
+
+  ingress {
+    description = "proxy from VPC"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = [aws_vpc.vpc.cidr_block]
   }
 
   egress {
@@ -101,8 +140,8 @@ resource "aws_route_table_association" "public" {
 }
 
 locals {
-  user_data = templatefile("${path.module}/templates/cloud-init.cfg", {})
-  user_data_script = templatefile("${path.module}/templates/cloud-init.sh", {
+  user_data = templatefile("${path.module}/templates/db/cloud-init.cfg", {})
+  user_data_script = templatefile("${path.module}/templates/db/cloud-init.sh", {
     db_master_pass = random_string.master_password.result
     db_master_user = var.postgres_master_user
   })
@@ -132,6 +171,32 @@ resource "aws_instance" "external_postgres" {
   vpc_security_group_ids = [aws_security_group.allow_postgres.id]
   user_data              = data.template_cloudinit_config.cloud-init.rendered
   tags                   = var.tags
+}
+
+data "template_cloudinit_config" "proxy_cloud_init" {
+  gzip          = true
+  base64_encode = true
+
+  part {
+    filename     = "init.cfg"
+    content_type = "text/cloud-config"
+    content      = templatefile("${path.module}/templates/proxy/cloud-init.cfg", {})
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = templatefile("${path.module}/templates/proxy/cloud-init.sh", {})
+  }
+}
+
+resource "aws_instance" "external_proxy" {
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = "t3.small"
+  key_name               = var.key_name
+  subnet_id              = aws_subnet.public_subnets.0.id
+  vpc_security_group_ids = [aws_security_group.allow_proxy.id]
+  user_data              = data.template_cloudinit_config.proxy_cloud_init.rendered
+  tags                   = merge( {Name = "proxy"}, var.tags)
 }
 
 locals {
@@ -170,6 +235,8 @@ module "create_kong_cp" {
   instance_type             = var.instance_type
   vpc_id                    = aws_vpc.vpc.id
   ami_id                    = data.aws_ami.amazon_linux_2.id
+  ami_operating_system      = "amazon-linux"
+  ce_pkg                    = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
   key_name                  = var.key_name
   region                    = var.region
   vpc_cidr_block            = aws_vpc.vpc.cidr_block
@@ -185,6 +252,14 @@ module "create_kong_cp" {
   asg_desired_capacity = var.asg_desired_capacity
   asg_max_size         = var.asg_max_size
   asg_min_size         = var.asg_min_size
+
+  proxy_config = {
+    http_proxy  = "http://${aws_instance.external_proxy.private_ip}:3128"
+    https_proxy = "http://${aws_instance.external_proxy.private_ip}:3128"
+    no_proxy    = "localhost,169.254.169.254,127.0.0.1"
+  }
+
+  rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 
   postgres_config = {
     master_user     = var.postgres_master_user
@@ -216,7 +291,9 @@ module "create_kong_dp" {
 
   instance_type  = var.instance_type
   vpc_id         = aws_vpc.vpc.id
-  ami_id         = data.aws_ami.ubuntu.id
+  ami_id                    = data.aws_ami.amazon_linux_2.id
+  ami_operating_system = "amazon-linux"
+  ce_pkg = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
   key_name       = var.key_name
   region         = var.region
   vpc_cidr_block = aws_vpc.vpc.cidr_block
@@ -227,6 +304,14 @@ module "create_kong_dp" {
   asg_desired_capacity = var.asg_desired_capacity
   asg_max_size         = var.asg_max_size
   asg_min_size         = var.asg_min_size
+
+  proxy_config = {
+    http_proxy  = "http://${aws_instance.external_proxy.private_ip}:3128"
+    https_proxy = "http://${aws_instance.external_proxy.private_ip}:3128"
+    no_proxy    = "localhost,169.254.169.254,127.0.0.1"
+  }
+
+  rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 
   target_group_arns = local.target_group_dp
 
