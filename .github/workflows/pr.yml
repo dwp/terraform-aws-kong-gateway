@@ -84,7 +84,7 @@ jobs:
           TF_VAR_environment: GHA-${{ env.GITHUB_RUN_NUMBER }}
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
-      - name: Kitchen Test Amazon linux 2
+      - name: Kitchen Test Amazon Linux 2
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
           kitchen-command: test hybrid-amazon-linux --destroy=always

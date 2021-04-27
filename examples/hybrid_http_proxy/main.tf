@@ -177,7 +177,7 @@ resource "aws_instance" "external_proxy" {
   subnet_id              = aws_subnet.public_subnets.0.id
   vpc_security_group_ids = [aws_security_group.allow_proxy.id]
   user_data              = data.template_cloudinit_config.proxy_cloud_init.rendered
-  tags                   = merge( {Name = "proxy"}, var.tags)
+  tags                   = merge({ Name = "proxy" }, var.tags)
 }
 
 locals {

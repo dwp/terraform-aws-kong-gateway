@@ -4,7 +4,7 @@ provider "aws" {
 
 data "aws_ami" "amazon_linux_2" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
 
   filter {
     name   = "name"
@@ -16,7 +16,7 @@ data "aws_ami" "amazon_linux_2" {
   }
   filter {
     name   = "architecture"
-    values = [ "x86_64" ]
+    values = ["x86_64"]
   }
 }
 
@@ -196,7 +196,7 @@ resource "aws_instance" "external_proxy" {
   subnet_id              = aws_subnet.public_subnets.0.id
   vpc_security_group_ids = [aws_security_group.allow_proxy.id]
   user_data              = data.template_cloudinit_config.proxy_cloud_init.rendered
-  tags                   = merge( {Name = "proxy"}, var.tags)
+  tags                   = merge({ Name = "proxy" }, var.tags)
 }
 
 locals {
@@ -289,14 +289,14 @@ module "create_kong_cp" {
 module "create_kong_dp" {
   source = "../../"
 
-  instance_type  = var.instance_type
-  vpc_id         = aws_vpc.vpc.id
-  ami_id                    = data.aws_ami.amazon_linux_2.id
+  instance_type        = var.instance_type
+  vpc_id               = aws_vpc.vpc.id
+  ami_id               = data.aws_ami.amazon_linux_2.id
   ami_operating_system = "amazon-linux"
-  ce_pkg = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
-  key_name       = var.key_name
-  region         = var.region
-  vpc_cidr_block = aws_vpc.vpc.cidr_block
+  ce_pkg               = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
+  key_name             = var.key_name
+  region               = var.region
+  vpc_cidr_block       = aws_vpc.vpc.cidr_block
 
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
 

@@ -69,5 +69,5 @@ variable "encrypt_storage" {
 variable "tags" {
   description = "Tags to apply to aws resources"
   type        = map(string)
-  default = {}
+  default     = {}
 }

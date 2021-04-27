@@ -10,7 +10,7 @@ variable "ami_operating_system" {
   default     = "ubuntu"
 
   validation {
-    condition = can(regex("^(amazon-linux|ubuntu)$", var.ami_operating_system))
+    condition     = can(regex("^(amazon-linux|ubuntu)$", var.ami_operating_system))
     error_message = "Supported values are `amazon-linux` and `ubuntu`."
   }
 }
