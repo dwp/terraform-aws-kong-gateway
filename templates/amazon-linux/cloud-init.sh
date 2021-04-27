@@ -6,23 +6,6 @@ set -x
 export ${config_key}="${config_value}"
 %{ endif ~}
 %{ endfor ~}
-# Set up firewalld
-setenforce 0;
-firewall-cmd --add-port=5432/tcp --permanent --zone=public;
-firewall-cmd --add-port=8443/tcp --permanent --zone=public;
-firewall-cmd --add-port=8444/tcp --permanent --zone=public;
-firewall-cmd --add-port=8445/tcp --permanent --zone=public;
-firewall-cmd --add-port=8446/tcp --permanent --zone=public;
-firewall-cmd --add-port=8447/tcp --permanent --zone=public;
-firewall-cmd --add-port=8005/tcp --permanent --zone=public;
-firewall-cmd --add-port=8006/tcp --permanent --zone=public;
-# firewall-cmd --add-port=8000/tcp --permanent --zone=public;
-# firewall-cmd --add-port=8001/tcp --permanent --zone=public;
-# firewall-cmd --add-port=8002/tcp --permanent --zone=public;
-# firewall-cmd --add-port=8003/tcp --permanent --zone=public;
-# firewall-cmd --add-port=8004/tcp --permanent --zone=public;
-firewall-cmd --reload;
-setenforce 1;
 
 # Proxy Setting
 echo "Checking and setting Proxy configuration..."
@@ -53,6 +36,15 @@ source /etc/environment
 
 exec &> /tmp/cloud-init.log
 
+## Set up firewalld
+setenforce 0;
+firewall-cmd --add-port=5432/tcp --permanent --zone=public;
+%{ for kong_port in kong_ports ~}
+firewall-cmd --add-port=${kong_port}/tcp --permanent --zone=public;
+%{ endfor ~}
+firewall-cmd --reload;
+setenforce 1;
+
 # Pause: in testing we need this
 # to make sure we wait to be routed out
 # the internet before trying to get
@@ -76,8 +68,7 @@ aws_get_parameter() {
 }
 
 yum update
-yum install -y wget unzip curl openssl python python2-pip postgresql-server
-pip install awscli jq
+yum install -y wget unzip curl openssl python python2-pip postgresql-server jq
 
 # Enable auto updates
 ####### echo "Enabling auto updates"
@@ -144,7 +135,7 @@ EOF
     chmod 640 /etc/kong/license.json
 else
     echo "Installing Kong CE"
-    curl -sL "https://bintray.com/kong/kong-gateway-rpm/download_file?file_path=${ce_pkg}" \
+    curl -sL "https://bintray.com/kong/kong-gateway-rpm/download_file?file_path=rhel/7/${ce_pkg}" \
         -o ${ce_pkg}
     yum install -y ${ce_pkg}
 fi
