@@ -2,6 +2,25 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["*amzn2-ami-hvm*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+
+# Used for supporting infra
 data "aws_ami" "ubuntu" {
   most_recent = true
   owners      = ["099720109477"]
@@ -121,26 +140,26 @@ resource "aws_route_table_association" "public" {
 }
 
 locals {
-  db_user_data = templatefile("${path.module}/templates/db/cloud-init.cfg", {})
-  db_user_data_script = templatefile("${path.module}/templates/db/cloud-init.sh", {
+  user_data = templatefile("${path.module}/templates/db/cloud-init.cfg", {})
+  user_data_script = templatefile("${path.module}/templates/db/cloud-init.sh", {
     db_master_pass = random_string.master_password.result
     db_master_user = var.postgres_master_user
   })
 }
 
-data "template_cloudinit_config" "db_cloud_init" {
+data "template_cloudinit_config" "cloud-init" {
   gzip          = true
   base64_encode = true
 
   part {
     filename     = "init.cfg"
     content_type = "text/cloud-config"
-    content      = local.db_user_data
+    content      = local.user_data
   }
 
   part {
     content_type = "text/x-shellscript"
-    content      = local.db_user_data_script
+    content      = local.user_data_script
   }
 }
 
@@ -150,7 +169,7 @@ resource "aws_instance" "external_postgres" {
   key_name               = var.key_name
   subnet_id              = aws_subnet.public_subnets.0.id
   vpc_security_group_ids = [aws_security_group.allow_postgres.id]
-  user_data              = data.template_cloudinit_config.db_cloud_init.rendered
+  user_data              = data.template_cloudinit_config.cloud-init.rendered
   tags                   = var.tags
 }
 
@@ -215,11 +234,20 @@ module "create_kong_cp" {
 
   instance_type             = var.instance_type
   vpc_id                    = aws_vpc.vpc.id
-  ami_id                    = data.aws_ami.ubuntu.id
+  ami_id                    = data.aws_ami.amazon_linux_2.id
+  ami_operating_system      = "amazon-linux"
+  ce_pkg                    = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
   key_name                  = var.key_name
   region                    = var.region
   vpc_cidr_block            = aws_vpc.vpc.cidr_block
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
+
+  ee_creds_ssm_param = {
+    license          = aws_ssm_parameter.ee-license.name
+    bintray_username = aws_ssm_parameter.ee_bintray_username.name
+    bintray_password = aws_ssm_parameter.ee_bintray_password.name
+    admin_token      = aws_ssm_parameter.ee-admin-token.name
+  }
 
   asg_desired_capacity = var.asg_desired_capacity
   asg_max_size         = var.asg_max_size
@@ -261,14 +289,17 @@ module "create_kong_cp" {
 module "create_kong_dp" {
   source = "../../"
 
-  instance_type  = var.instance_type
-  vpc_id         = aws_vpc.vpc.id
-  ami_id         = data.aws_ami.ubuntu.id
-  key_name       = var.key_name
-  region         = var.region
-  vpc_cidr_block = aws_vpc.vpc.cidr_block
+  instance_type        = var.instance_type
+  vpc_id               = aws_vpc.vpc.id
+  ami_id               = data.aws_ami.amazon_linux_2.id
+  ami_operating_system = "amazon-linux"
+  ce_pkg               = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
+  key_name             = var.key_name
+  region               = var.region
+  vpc_cidr_block       = aws_vpc.vpc.cidr_block
 
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
+
 
   asg_desired_capacity = var.asg_desired_capacity
   asg_max_size         = var.asg_max_size
