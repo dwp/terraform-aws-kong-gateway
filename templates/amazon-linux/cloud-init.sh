@@ -134,7 +134,7 @@ EOF
     chmod 640 /etc/kong/license.json
 else
     echo "Installing Kong CE"
-    curl -sL "https://bintray.com/kong/kong-gateway-rpm/download_file?file_path=rhel/7/${ce_pkg}" \
+    curl -sL "https://download.konghq.com/gateway-2.x-amazonlinux-2/Packages/k/${ce_pkg}" \
         -o ${ce_pkg}
     yum install -y ${ce_pkg}
 fi

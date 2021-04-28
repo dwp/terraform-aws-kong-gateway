@@ -135,7 +135,7 @@ EOF
     chmod 640 /etc/kong/license.json
 else
     echo "Installing Kong CE"
-    curl -sL "https://bintray.com/kong/kong-deb/download_file?file_path=${ce_pkg}" \
+    curl -sL "https://download.konghq.com/gateway-2.x-ubuntu-focal/pool/all/k/kong/${ce_pkg}" \
         -o ${ce_pkg}
     dpkg -i ${ce_pkg}
     apt-get -f install -y

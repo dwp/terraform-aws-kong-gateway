@@ -75,7 +75,7 @@ variable "availability_zones" {
 variable "ce_pkg" {
   description = "(Optional) Filename of the Community Edition package"
   type        = string
-  default     = "kong-2.3.2.focal.amd64.deb"
+  default     = "kong_2.3.2_amd64.deb"
 }
 
 variable "deck_version" {
