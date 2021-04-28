@@ -120,8 +120,7 @@ EE_LICENSE="placeholder"
 %{ endif ~}
 if [ "$EE_LICENSE" != "placeholder" ]; then
     echo "Installing Kong EE"
-    curl -sL https://kong.bintray.com/kong-enterprise-edition-rpm/rhel/7/${ee_pkg} \
-        -u $EE_BINTRAY_USERNAME:$EE_BINTRAY_PASSWORD \
+    curl -sL https://download.konghq.com/gateway-2.x-amazonlinux-2/Packages/k/${ee_pkg} \
         -o ${ee_pkg}
     if [ ! -f ${ee_pkg} ]; then
         echo "Error: Enterprise edition download failed, aborting."

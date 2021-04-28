@@ -127,7 +127,7 @@ variable "ee_creds_ssm_param" {
 variable "ee_pkg" {
   description = "(Optional) Filename of the Enterprise Edition package"
   type        = string
-  default     = "kong-enterprise-edition-2.3.2.0.focal.all.deb"
+  default     = "kong-enterprise-edition_2.3.2.0_all.deb"
 }
 
 variable "enable_monitoring" {
