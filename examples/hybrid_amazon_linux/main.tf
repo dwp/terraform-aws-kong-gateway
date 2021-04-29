@@ -236,7 +236,7 @@ module "create_kong_cp" {
   vpc_id                    = aws_vpc.vpc.id
   ami_id                    = data.aws_ami.amazon_linux_2.id
   ami_operating_system      = "amazon-linux"
-  ce_pkg                    = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
+  ce_pkg                    = "kong-2.3.2.aws.amd64.rpm"
   key_name                  = var.key_name
   region                    = var.region
   vpc_cidr_block            = aws_vpc.vpc.cidr_block
@@ -293,7 +293,7 @@ module "create_kong_dp" {
   vpc_id               = aws_vpc.vpc.id
   ami_id               = data.aws_ami.amazon_linux_2.id
   ami_operating_system = "amazon-linux"
-  ce_pkg               = "kong-enterprise-edition-2.3.2.0.rhel7.noarch.rpm" # there is no specific CE binary on bintray
+  ce_pkg               = "kong-2.3.2.aws.amd64.rpm"
   key_name             = var.key_name
   region               = var.region
   vpc_cidr_block       = aws_vpc.vpc.cidr_block
