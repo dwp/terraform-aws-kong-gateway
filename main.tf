@@ -33,8 +33,8 @@ locals {
   }
 
   user_data = {
-    amazon-linux = templatefile("${path.module}/templates/ubuntu/cloud-init.cfg", {})
-    ubuntu       = templatefile("${path.module}/templates/amazon-linux/cloud-init.cfg", {})
+    amazon-linux = templatefile("${path.module}/templates/amazon-linux/cloud-init.cfg", {})
+    ubuntu       = templatefile("${path.module}/templates/ubuntu/cloud-init.cfg", {})
   }
   user_data_script = {
     amazon-linux = templatefile("${path.module}/templates/amazon-linux/cloud-init.sh", {
