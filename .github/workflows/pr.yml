@@ -34,7 +34,7 @@ jobs:
         run: |
           rm -rf repo/examples
       - name: KICS Github Action
-        uses: checkmarx/kics-action@docker-runner
+        uses: checkmarx/kics-action@v1.2
         with:
           path: 'repo'
           output_path: 'results.json'
