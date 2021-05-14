@@ -21,6 +21,11 @@ locals {
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
+  database        = var.skip_rds_creation ? null : {
+    endpoint          = module.database.0.outputs.endpoint
+    database_name     = module.database.0.outputs.database_name
+    security_group_id = module.database.0.outputs.security_group_id
+  }
 
   azs = length(var.availability_zones) > 0 ? var.availability_zones : module.private_subnets.0.azs
 
@@ -146,7 +151,7 @@ resource "aws_launch_configuration" "kong" {
   associate_public_ip_address = false
   enable_monitoring           = true
   placement_tenancy           = "default"
-  user_data                   = var.custom_user_data == "false" ? data.template_cloudinit_config.cloud_init.rendered : var.user_data
+  user_data                   = var.user_data == null ? data.template_cloudinit_config.cloud_init.rendered : var.user_data
 
   root_block_device {
     volume_size = var.ec2_root_volume_size

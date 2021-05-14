@@ -1,5 +1,5 @@
 variable "vpc_id" {
-  description = "The vpc to associate the security group to"
+  description = "The vpc to associate the subnet to"
   type        = string
 }
 
@@ -9,7 +9,7 @@ variable "region" {
 }
 
 variable "tags" {
-  description = "A map of key values to tag the security group with"
+  description = "A map of key values to tag the subnet with"
   type        = map(any)
   default     = {}
 }
