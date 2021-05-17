@@ -179,7 +179,7 @@ variable "key_name" {
 }
 
 variable "user_data" {
-  description = "(Optional) The user data to provide when launching the instance if 'custom_user_data' is set to 'true'"
+  description = "(Optional) The user data to provide when launching the instance. N.B if set, this will overide the user_data provided by this module"
   type        = string
   default     = null
 }
