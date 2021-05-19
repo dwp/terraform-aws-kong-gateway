@@ -21,7 +21,7 @@ locals {
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
-  database        = var.skip_rds_creation ? null : {
+  database = var.skip_rds_creation ? null : {
     endpoint          = module.database.0.outputs.endpoint
     database_name     = module.database.0.outputs.database_name
     security_group_id = module.database.0.outputs.security_group_id

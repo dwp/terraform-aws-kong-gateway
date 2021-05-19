@@ -17,7 +17,7 @@ output "private_subnet_ids" {
 }
 
 output "db_outputs" {
-  value = local.database
+  value       = local.database
   description = "The DNS address and database name of the RDS instance, and security group ID from the database module."
   sensitive   = false
 }
