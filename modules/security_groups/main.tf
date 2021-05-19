@@ -1,7 +1,7 @@
 resource "aws_security_group" "sec-grp" {
   description = "Kong Security Groups"
   vpc_id      = var.vpc_id
-  tags        = var.tags
+  tags        = merge(var.tags, { Name = "kong-security-group" })
 }
 
 resource "aws_security_group_rule" "this-sec-rule-source-cidr-blocks" {

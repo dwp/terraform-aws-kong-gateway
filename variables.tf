@@ -178,6 +178,12 @@ variable "key_name" {
   default     = null
 }
 
+variable "user_data" {
+  description = "(Optional) The user data to provide when launching the instance. N.B if set, this will overide the user_data provided by this module"
+  type        = string
+  default     = null
+}
+
 variable "kong_clear_database" {
   description = "(Optional) If set to true then the database contents will be replaced when control plane instance starts. Typically only used during development."
   type        = bool

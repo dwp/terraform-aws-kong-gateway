@@ -1,5 +1,6 @@
 resource "aws_db_subnet_group" "cluster" {
   subnet_ids = var.vpc.subnets
+  tags       = merge(var.tags, { Name = "${var.name}-subnet-group" })
 }
 
 resource "aws_kms_key" "aurora" {
@@ -48,7 +49,7 @@ resource "aws_rds_cluster_instance" "cluster" {
   availability_zone  = local.zone_names[count.index]
   cluster_identifier = aws_rds_cluster.cluster.id
   instance_class     = var.database.instance_type
-  tags               = var.tags
+  tags               = merge(var.tags, { Name = "${var.name}-db" })
 
   lifecycle {
     create_before_destroy = true

@@ -15,3 +15,9 @@ output "private_subnet_ids" {
   description = "List of private subnet IDs. These are either supplied in the optional `private_subnets` input variable or created in `subnets` submodule."
   sensitive   = false
 }
+
+output "db_outputs" {
+  value       = local.database
+  description = "The DNS address and database name of the RDS instance, and security group ID from the database module."
+  sensitive   = false
+}
