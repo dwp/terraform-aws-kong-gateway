@@ -43,11 +43,6 @@ resource "aws_iam_instance_profile" "kong" {
   role = aws_iam_role.kong.id
 }
 
-resource "aws_iam_role_policy_attachment" "ingestion_ecs_ssm" {
-  role       = aws_iam_role.kong.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
-}
-
 resource "aws_iam_role_policy_attachment" "ingestion_ssm_managed" {
   role       = aws_iam_role.kong.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
