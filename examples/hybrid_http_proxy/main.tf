@@ -23,6 +23,12 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = true
 }
 
+resource "aws_vpc" "vpc" {
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+}
+
 resource "aws_internet_gateway" "ig" {
   vpc_id = aws_vpc.vpc.id
 }
