@@ -184,6 +184,13 @@ resource "aws_autoscaling_group" "kong" {
     ignore_changes = [load_balancers, target_group_arns]
   }
 
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = var.min_healthy_percentage
+    }
+  }
+
   dynamic "tag" {
     for_each = local.tags
     content {
