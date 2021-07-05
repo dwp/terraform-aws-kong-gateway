@@ -531,3 +531,9 @@ variable "target_group_arns" {
   type        = list(string)
   default     = []
 }
+
+variable "min_healthy_percentage" {
+  description = "(Optional) The minimum percentage"
+  type        = number
+  default     = 30
+}
