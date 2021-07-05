@@ -533,7 +533,7 @@ variable "target_group_arns" {
 }
 
 variable "min_healthy_percentage" {
-  description = "(Optional) The minimum percentage"
+  description = "(Optional) The minimum percentage of healthy instances in Auto Scaling Gorup during inastnce refresh"
   type        = number
   default     = 30
 }
