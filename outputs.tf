@@ -4,6 +4,12 @@ output "asg_outputs" {
   sensitive   = false
 }
 
+output "launch_config_outputs" {
+  value       = aws_launch_configuration.kong
+  description = "Full `aws_launch_configuration` resource details for the launch configuration created for Kong."
+  sensitive   = false
+}
+
 output "private_subnet_azs" {
   value       = local.azs
   description = "List of availability zones used for the private subnets, either supplied in the optional `supplied in the optional `private_subnets` input variable or created in `subnets` submodule` input variable or defined in `subnets` submodule."

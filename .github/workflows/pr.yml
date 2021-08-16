@@ -37,11 +37,12 @@ jobs:
         uses: checkmarx/kics-action@v1.2
         with:
           path: 'repo'
-          output_path: 'results.json'
+          output_path: 'results'
           platform_type: terraform
+          fail_on: high,medium
       - name: Display KICS Results
         run: |
-          cat results.json
+          cat results/results.json
 
   check-aws-credentials:
     name: Test AWS Credentials
