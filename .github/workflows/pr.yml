@@ -42,7 +42,7 @@ jobs:
           fail_on: high,medium
       - name: Display KICS Results
         run: |
-          cat results.json
+          cat results.json/results.json
 
   check-aws-credentials:
     name: Test AWS Credentials
