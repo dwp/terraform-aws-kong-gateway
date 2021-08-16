@@ -39,6 +39,7 @@ jobs:
           path: 'repo'
           output_path: 'results.json'
           platform_type: terraform
+          fail_on: high,medium
       - name: Display KICS Results
         run: |
           cat results.json
