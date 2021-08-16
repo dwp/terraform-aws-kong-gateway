@@ -2,7 +2,7 @@ locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
-  role = lookup(var.kong_config, "KONG_ROLE", "ebedded")
+  role = lookup(var.kong_config, "KONG_ROLE", "embedded")
   tags = merge(var.tags, {
     "service"     = var.service,
     "environment" = var.environment,
@@ -86,7 +86,7 @@ locals {
     })
   }
 
-  name = format("%s-%s-%s", var.service, var.environment, random_string.prefix.result)
+  name = format("%s-%s-%s", var.service, var.environment, local.role)
 }
 
 module "security_groups" {
@@ -167,7 +167,7 @@ resource "aws_launch_configuration" "kong" {
 
 
 resource "aws_autoscaling_group" "kong" {
-  name_prefix         = local.name
+  name                = local.name
   vpc_zone_identifier = local.private_subnets
 
   launch_configuration = aws_launch_configuration.kong.name
@@ -192,11 +192,6 @@ resource "aws_autoscaling_group" "kong" {
       propagate_at_launch = true
     }
   }
-}
-
-resource "random_string" "prefix" {
-  length  = 6
-  special = false
 }
 
 resource "random_string" "session_secret" {
