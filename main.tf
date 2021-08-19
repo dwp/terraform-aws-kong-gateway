@@ -3,11 +3,6 @@ locals {
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
   role = lookup(var.kong_config, "KONG_ROLE", "embedded")
-  tags = merge(var.tags, {
-    "service"     = var.service,
-    "environment" = var.environment,
-    "role"        = local.role
-  })
 
   # If the module user has specified a postgres_host then we use
   # that as our endpoint, as we will not be triggering the database module
@@ -192,7 +187,7 @@ resource "aws_autoscaling_group" "kong" {
   }
 
   dynamic "tag" {
-    for_each = local.tags
+    for_each = var.tags_asg
     content {
       key                 = tag.key
       value               = tag.value
