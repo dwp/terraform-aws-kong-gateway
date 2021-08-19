@@ -515,19 +515,25 @@ variable "skip_final_snapshot" {
 }
 
 variable "skip_rds_creation" {
-  description = "(Optional) If set to true then this module will not create its own rds instance"
+  description = "(Optional) If set to true then this module will not create its own RDS instance"
   type        = bool
   default     = false
 }
 
 variable "tags" {
-  description = "(Optional) Tags to apply to aws resources"
+  description = "(Optional) Tags to apply to AWS resources, except Auto Scaling Group"
+  type        = map(string)
+  default     = {}
+}
+
+variable "tags_asg" {
+  description = "(Optional) Tags to apply to Auto Scaling Group resources"
   type        = map(string)
   default     = {}
 }
 
 variable "target_group_arns" {
-  description = "(Optional) A list of target groups to associate with the kong asg"
+  description = "(Optional) A list of target groups to associate with the Kong ASG"
   type        = list(string)
   default     = []
 }
