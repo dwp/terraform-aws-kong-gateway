@@ -2,7 +2,7 @@ locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
-  role = lookup(var.kong_config, "KONG_ROLE", "embedded")
+  role = var.role != null ? var.role : lookup(var.kong_config, "KONG_ROLE", "embedded")
 
   # If the module user has specified a postgres_host then we use
   # that as our endpoint, as we will not be triggering the database module
