@@ -543,3 +543,9 @@ variable "min_healthy_percentage" {
   type        = number
   default     = 30
 }
+
+variable "role" {
+  description = "(Optional) The role name for the Kong Instance, used in the ASG name. Defaults to use the KONG_ROLE"
+  type        = string
+  default     = null
+}
