@@ -37,6 +37,7 @@ resource "aws_rds_cluster" "cluster" {
     ignore_changes = [
       engine_version,
       snapshot_identifier,
+      master_password,
     ]
   }
 }
