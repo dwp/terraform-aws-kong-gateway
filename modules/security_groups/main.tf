@@ -1,5 +1,6 @@
 resource "aws_security_group" "security_group" {
   description = "Kong Security Groups"
+  name_prefix = "kong-security-group"
   vpc_id      = var.vpc_id
   tags        = merge(var.tags, { Name = "kong-security-group" })
 }
