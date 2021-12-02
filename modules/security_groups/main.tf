@@ -1,10 +1,10 @@
-resource "aws_security_group" "sec-grp" {
+resource "aws_security_group" "security_group" {
   description = "Kong Security Groups"
   vpc_id      = var.vpc_id
   tags        = merge(var.tags, { Name = "kong-security-group" })
 }
 
-resource "aws_security_group_rule" "this-sec-rule-source-cidr-blocks" {
+resource "aws_security_group_rule" "security_group_with_cidr_block" {
   for_each          = var.rules_with_source_cidr_blocks
   description       = each.key
   security_group_id = aws_security_group.sec-grp.id
@@ -15,7 +15,7 @@ resource "aws_security_group_rule" "this-sec-rule-source-cidr-blocks" {
   cidr_blocks       = each.value.cidr_blocks
 }
 
-resource "aws_security_group_rule" "this-sec-rule-source-security-group" {
+resource "aws_security_group_rule" "security_group_with_security_group" {
   for_each                 = var.rules_with_source_security_groups
   description              = each.key
   security_group_id        = aws_security_group.sec-grp.id

@@ -14,7 +14,7 @@ locals {
   ]
 }
 
-resource "aws_subnet" "this-subnet" {
+resource "aws_subnet" "subnet" {
   for_each                = { for s in local.subnets : s.cidr_block => s }
   vpc_id                  = var.vpc_id
   cidr_block              = each.value.cidr_block
