@@ -1,3 +1,6 @@
+# kics-scan disable=1e434b25-8763-4b00-a5ca-ca03b7abbb66
+# The above line disables rule "Name Is Not Snake Case" in KICS
+
 ### required Variables
 variable "ami_id" {
   description = "AMI image id to use for the deployments"
@@ -108,6 +111,7 @@ variable "ec2_root_volume_type" {
   default     = "gp2"
 }
 
+# kics-scan ignore-block
 variable "ee_creds_ssm_param" {
   description = "(Optional) SSM parameter names where customer's Kong enterprise license credentials are stored"
   type = object({
@@ -196,6 +200,7 @@ variable "kong_config" {
   default     = {}
 }
 
+# kics-scan ignore-block
 variable "kong_database_config" {
   description = "(Optional) Configuration for the kong database"
   type = object({
@@ -290,6 +295,7 @@ variable "portal_host" {
   default     = ""
 }
 
+# kics-scan ignore-block
 variable "postgres_config" {
   description = "(Optional) Configuration settings for the postgres database engine"
   type = object({

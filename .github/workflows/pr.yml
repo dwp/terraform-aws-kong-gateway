@@ -30,16 +30,15 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: 'repo'
-      - name: Remove Examples # KICS exclude_paths did not work
-        run: |
-          rm -rf repo/examples
       - name: KICS Github Action
-        uses: checkmarx/kics-action@v1.2
+        uses: checkmarx/kics-action@v1.4
         with:
           path: 'repo'
+          exclude_paths: 'repo/examples'
           output_path: 'results'
           platform_type: terraform
           fail_on: high,medium
+          exclude_queries: 8e94dced-9bcc-4203-8eb7-7e41202b2505 # Excludes 'Auto Scaling Group With No Associated ELB' query
       - name: Display KICS Results
         run: |
           cat results/results.json
