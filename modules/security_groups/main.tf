@@ -1,5 +1,6 @@
 resource "aws_security_group" "security_group" {
   description = "Kong Security Groups"
+  name_prefix = "kong-security-group"
   vpc_id      = var.vpc_id
   tags        = merge(var.tags, { Name = "kong-security-group" })
 }
@@ -7,7 +8,7 @@ resource "aws_security_group" "security_group" {
 resource "aws_security_group_rule" "security_group_with_cidr_block" {
   for_each          = var.rules_with_source_cidr_blocks
   description       = each.key
-  security_group_id = aws_security_group.sec-grp.id
+  security_group_id = aws_security_group.security_group.id
   type              = each.value.type
   from_port         = each.value.from_port
   to_port           = each.value.to_port
@@ -18,7 +19,7 @@ resource "aws_security_group_rule" "security_group_with_cidr_block" {
 resource "aws_security_group_rule" "security_group_with_security_group" {
   for_each                 = var.rules_with_source_security_groups
   description              = each.key
-  security_group_id        = aws_security_group.sec-grp.id
+  security_group_id        = aws_security_group.security_group.id
   type                     = each.value.type
   from_port                = each.value.from_port
   to_port                  = each.value.to_port

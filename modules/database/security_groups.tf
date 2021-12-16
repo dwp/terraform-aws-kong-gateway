@@ -1,4 +1,5 @@
 resource "aws_security_group" "db" {
+  name_prefix = "${var.name}-db"
   description = "Kong database security group"
   vpc_id      = var.vpc.id
   tags        = merge(var.tags, { Name = "${var.name}-db" })
