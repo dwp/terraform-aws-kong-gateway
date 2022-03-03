@@ -32,3 +32,15 @@ variable "rules_with_source_security_groups" {
   }))
   default = {}
 }
+
+variable "rules_with_source_prefix_list_id" {
+  description = "Security rules for the Kong instance that have a Prefix List ID as their Source"
+  type = map(object({
+    type                     = string,
+    from_port                = number,
+    to_port                  = number,
+    protocol                 = string,
+    prefix_list_id           = string
+  }))
+  default = {}
+}

@@ -26,3 +26,14 @@ resource "aws_security_group_rule" "security_group_with_security_group" {
   protocol                 = each.value.protocol
   source_security_group_id = each.value.source_security_group_id
 }
+
+resource "aws_security_group_rule" "security_group_with_prefix_list_id" {
+  for_each                 = var.rules_with_source_prefix_list_id
+  description              = each.key
+  security_group_id        = aws_security_group.security_group.id
+  type                     = each.value.type
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  protocol                 = each.value.protocol
+  prefix_list_ids          = each.value.source_prefix_list_id
+}
