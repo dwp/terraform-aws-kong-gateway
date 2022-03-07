@@ -3,10 +3,23 @@ resource "aws_db_subnet_group" "cluster" {
   tags       = merge(var.tags, { Name = "${var.name}-subnet-group" })
 }
 
+data "aws_iam_policy_document" "kms_key_policy" {
+  statement {
+    sid = "KMS"
+    actions = ["kms:*"]
+    resources = ["*"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current}:root"]
+    }
+  }
+}
+
 resource "aws_kms_key" "aurora" {
   enable_key_rotation     = true
   deletion_window_in_days = 7
   tags                    = merge(var.tags, { Name = "${var.name}-db-key", ProtectsSensitiveData = true })
+  policy                  = var.kms_key_policy != null ? var.kms_key_policy : data.aws_iam_policy_document.kms_key_policy
 }
 
 resource "aws_kms_alias" "aurora" {

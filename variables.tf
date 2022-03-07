@@ -509,7 +509,7 @@ variable "rules_with_source_prefix_list_id" {
     from_port                = number,
     to_port                  = number,
     protocol                 = string,
-    prefix_list_id           = string
+    prefix_list_id           = string,
   }))
   default = {}
 }
