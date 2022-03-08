@@ -5,11 +5,16 @@ variable "allowed_security_groups" {
 
 variable "database_credentials" {
   description = "Credentials to set for database master user"
-
   type = object({
     username = string,
     password = string,
   })
+}
+
+variable "kms_key_policy" {
+  description = "Custom Key Policy for the Aurora KMS Key"
+  type        = string
+  default     = null
 }
 
 variable "name" {

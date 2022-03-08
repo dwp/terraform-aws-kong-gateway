@@ -90,6 +90,7 @@ module "security_groups" {
   vpc_id                            = var.vpc_id
   rules_with_source_cidr_blocks     = var.rules_with_source_cidr_blocks
   rules_with_source_security_groups = var.rules_with_source_security_groups
+  rules_with_source_prefix_list_id  = var.rules_with_source_prefix_list_id
   tags                              = var.tags
 }
 
