@@ -35,5 +35,5 @@ resource "aws_security_group_rule" "security_group_with_prefix_list_id" {
   from_port                = each.value.from_port
   to_port                  = each.value.to_port
   protocol                 = each.value.protocol
-  prefix_list_ids          = each.value.source_prefix_list_id
+  prefix_list_ids          = each.value.prefix_list_id
 }
