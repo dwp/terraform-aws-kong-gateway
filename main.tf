@@ -87,6 +87,7 @@ locals {
 module "security_groups" {
   count                             = local.create_security_groups
   source                            = "./modules/security_groups"
+  name                              = var.security_group_name
   vpc_id                            = var.vpc_id
   rules_with_source_cidr_blocks     = var.rules_with_source_cidr_blocks
   rules_with_source_security_groups = var.rules_with_source_security_groups
