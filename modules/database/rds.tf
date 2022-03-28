@@ -5,8 +5,8 @@ resource "aws_db_subnet_group" "cluster" {
 
 data "aws_iam_policy_document" "kms_key_policy" {
   statement {
-    sid = "KMS"
-    actions = ["kms:*"]
+    sid       = "KMS"
+    actions   = ["kms:*"]
     resources = ["*"]
     principals {
       type        = "AWS"
