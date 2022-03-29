@@ -37,7 +37,7 @@ resource "aws_rds_cluster" "cluster" {
   master_password           = var.database_credentials.password
   backup_retention_period   = 14
   preferred_backup_window   = "06:00-08:00"
-  apply_immediately         = true
+  apply_immediately         = var.cluster_apply_immediately
   db_subnet_group_name      = aws_db_subnet_group.cluster.id
   final_snapshot_identifier = "${var.name}-final-snapshot"
   skip_final_snapshot       = var.skip_final_snapshot
@@ -63,6 +63,7 @@ resource "aws_rds_cluster_instance" "cluster" {
   availability_zone  = local.zone_names[count.index]
   cluster_identifier = aws_rds_cluster.cluster.id
   instance_class     = var.database.instance_type
+  apply_immediately  = var.instance_apply_immediately
   tags               = merge(var.tags, { Name = "${var.name}-db" })
 
   lifecycle {
