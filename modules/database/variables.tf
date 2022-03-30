@@ -59,6 +59,18 @@ variable "database" {
   }
 }
 
+variable "cluster_apply_immediately" {
+  type        = bool
+  description = "(Optional) When set to true, changes to database cluster is applied immediately. This can cause disruption"
+  default     = false
+}
+
+variable "instance_apply_immediately" {
+  type        = bool
+  description = "(Optional) When set to true, changes to database instance is applied immediately. This can cause disruption"
+  default     = false
+}
+
 variable "skip_final_snapshot" {
   type        = bool
   description = "(Optional) true/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"
