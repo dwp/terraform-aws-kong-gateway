@@ -1,7 +1,7 @@
 require 'net/http'
 require 'uri'
 
-def wait(url, max=500)
+def wait(url, max=5)
   count = 0
   while count <= max
     begin
