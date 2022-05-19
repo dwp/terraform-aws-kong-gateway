@@ -5,8 +5,8 @@ require_relative '../../libraries/kong_util'
 
 wait("#{api}/clustering/status")
 
-describe cluster_members do
-  it { should_not be_empty }
+describe http("#{api}/services/test") do
+  its('status') { should cmp 200 }
 end
 
 control 'Cluster Size' do
@@ -16,11 +16,6 @@ control 'Cluster Size' do
     its('body') { should_not be_empty }
     its('status') { should cmp 200 }
   end
-end
-
-
-describe http("#{api}/services/test") do
-  its('status') { should cmp 200 }
 end
 
 control 'Test Services' do
