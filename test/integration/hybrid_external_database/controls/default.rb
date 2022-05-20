@@ -25,7 +25,7 @@ describe http("#{api}/services/test/routes/testRoute",
                 its('status') { should cmp 200 }
               end
 
-sleep(10) # wait for route to propergate
+sleep(10) # wait for route to propagate
 describe http("#{proxy}/test/get",
               method: 'GET') do
                 its('status') { should cmp 200 }
