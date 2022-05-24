@@ -5,7 +5,7 @@ require_relative '../../libraries/kong_util'
 
 wait("#{api}/clustering/status")
 
-describe http("#{api}/services/test") do
+describe http("#{api}/services/test", method: 'POST') do
   its('status') { should cmp 200 }
 end
 
