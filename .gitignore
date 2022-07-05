@@ -36,3 +36,7 @@ examples/*/terraform.tfstate*
 examples/*/terraform.tfstate.d/*
 examples/*/.terraform*
 .kitchen/
+
+# Editor files
+.DS_Store
+.vscode

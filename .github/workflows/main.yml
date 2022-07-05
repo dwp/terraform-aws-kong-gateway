@@ -31,7 +31,6 @@ jobs:
         id: get-publish-version
         run: echo "::set-output name=publish-version::${{ steps.semver.outputs.semver }}"
 
-
   publish-github-release:
     runs-on: ubuntu-latest
     needs: [get-publish-version]
