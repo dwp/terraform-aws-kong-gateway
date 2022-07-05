@@ -25,6 +25,8 @@ jobs:
   kics-scan:
     name: KICS Scan
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
