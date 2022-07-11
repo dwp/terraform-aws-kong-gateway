@@ -2,20 +2,9 @@
 # The above line disables rule "Name Is Not Snake Case" in KICS
 
 ### required Variables
-variable "deployment_type" {
-  type        = string
-  description = "Define the deployment type of either EC2 or ECS"
-
-  validation {
-    condition     = contains(["ec2", "ecs"], var.deployment_type)
-    error_message = "Invalid value - please choose ec2 or ecs."
-  }
-}
-
 variable "ami_id" {
-  description = "(Optional) AMI image id to use for the deployments"
+  description = "AMI image id to use for the deployments"
   type        = string
-  default     = null
 }
 
 variable "ami_operating_system" {
@@ -30,9 +19,8 @@ variable "ami_operating_system" {
 }
 
 variable "iam_instance_profile_name" {
-  description = "(Optional) The name of an IAM instance profile to apply to this deployment"
+  description = "The name of an IAM instance profile to apply to this deployment"
   type        = string
-  default     = null
 }
 
 variable "region" {

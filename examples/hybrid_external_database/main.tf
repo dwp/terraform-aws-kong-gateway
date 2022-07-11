@@ -164,6 +164,7 @@ locals {
 module "create_kong_cp" {
   source = "../../"
 
+  deployment_type           = "ec2"
   instance_type             = var.instance_type
   vpc_id                    = aws_vpc.vpc.id
   ami_id                    = data.aws_ami.ubuntu.id
@@ -211,12 +212,13 @@ module "create_kong_cp" {
 module "create_kong_dp" {
   source = "../../"
 
-  instance_type  = var.instance_type
-  vpc_id         = aws_vpc.vpc.id
-  ami_id         = data.aws_ami.ubuntu.id
-  key_name       = var.key_name
-  region         = var.region
-  vpc_cidr_block = aws_vpc.vpc.cidr_block
+  deployment_type = "ec2"
+  instance_type   = var.instance_type
+  vpc_id          = aws_vpc.vpc.id
+  ami_id          = data.aws_ami.ubuntu.id
+  key_name        = var.key_name
+  region          = var.region
+  vpc_cidr_block  = aws_vpc.vpc.cidr_block
 
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
 

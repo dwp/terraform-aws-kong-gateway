@@ -232,6 +232,7 @@ locals {
 module "create_kong_cp" {
   source = "../../"
 
+  deployment_type           = "ec2"
   instance_type             = var.instance_type
   vpc_id                    = aws_vpc.vpc.id
   ami_id                    = data.aws_ami.amazon_linux_2.id
@@ -289,6 +290,7 @@ module "create_kong_cp" {
 module "create_kong_dp" {
   source = "../../"
 
+  deployment_type      = "ec2"
   instance_type        = var.instance_type
   vpc_id               = aws_vpc.vpc.id
   ami_id               = data.aws_ami.amazon_linux_2.id
