@@ -27,6 +27,38 @@ test-hybrid-external-database: ## Build, test, and destroy hybrid-external-datab
 build: ## Build default scenario with Kitchen Terraform
 	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "test default converge"
 
+.PHONY: build-al
+build-al: ## Build default scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "converge hybrid-amazon-linux"
+
+.PHONY: verify-al
+verify-al: ## Build default scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "verify hybrid-amazon-linux"
+
+.PHONY: destroy-al
+destroy-al: ## Build default scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "destroy hybrid-amazon-linux"
+
+.PHONY: test-al
+test-al: ## Build default scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "test hybrid-amazon-linux --destroy=always"
+
+.PHONY: build-ecs
+build-al: ## Build ecs scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "converge hybrid-ecs"
+
+.PHONY: verify-ecs
+verify-al: ## Build ecs scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "verify hybrid-ecs"
+
+.PHONY: destroy-ecs
+destroy-al: ## Build ecs scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "destroy hybrid-ecs"
+
+.PHONY: test-ecs
+test-al: ## Build ecs scenario with Kitchen Terraform
+	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "test hybrid-ecs --destroy=always"
+
 .PHONY: build-hybrid-external-database
 build-hybrid-external-database: ## Test hybrid-external-database scenario with Kitchen Terraform
 	docker run --rm -e AWS_PROFILE=default -v $(shell pwd):/usr/action -v ~/.aws:/root/.aws -v /etc/ssl/certs/:/usr/local/share/ca-certificates/ quay.io/dwp/kitchen-terraform:0.14.7 "converge hybrid-external-database"
