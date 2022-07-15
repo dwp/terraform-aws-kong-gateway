@@ -53,6 +53,8 @@ PREFIX=${KONG_PREFIX:=/usr/local/kong}
 
 echo "running migrations"
 kong migrations bootstrap
+kong migrations up
+kong migrations finish
 
 echo "running kong"
 kong prepare -p "$PREFIX" "$@"
