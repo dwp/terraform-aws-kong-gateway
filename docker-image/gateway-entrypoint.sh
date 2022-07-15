@@ -14,7 +14,6 @@ echo "${LUA_SSL_CERT}" > /usr/local/kong/ssl/lua.crt
 
 mkdir -p /usr/local/kong/kong_clustering
 echo "${CLUSTER_CERT}" > /usr/local/kong/kong_clustering/cluster.crt
-echo "${CLUSTER_CA}" > /usr/local/kong/kong_clustering/cluster_ca.crt
 echo "${CLUSTER_KEY}" > /usr/local/kong/kong_clustering/cluster.key
 echo "${CUSTOM_NGINX_CONF}" | base64 -d > /usr/local/kong/custom-nginx.conf
 
