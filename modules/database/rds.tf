@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "kms_key_policy" {
     resources = ["*"]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
   }
 }
@@ -19,7 +19,7 @@ resource "aws_kms_key" "aurora" {
   enable_key_rotation     = true
   deletion_window_in_days = 7
   tags                    = merge(var.tags, { Name = "${var.name}-db-key", ProtectsSensitiveData = true })
-  policy                  = var.kms_key_policy != null ? var.kms_key_policy : data.aws_iam_policy_document.kms_key_policy
+  policy                  = var.kms_key_policy != null ? var.kms_key_policy : data.aws_iam_policy_document.kms_key_policy.json
 }
 
 resource "aws_kms_alias" "aurora" {
