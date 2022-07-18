@@ -55,7 +55,7 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_lb_target_group" "external-proxy" {
-  name     = "expernal-proxy-8000"
+  name     = "external-proxy-8000"
   port     = 8000
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id

@@ -99,12 +99,6 @@ variable "deck_version" {
   default     = "1.0.0"
 }
 
-variable "desired_capacity" {
-  description = "(Optional) The number of Amazon EC2 instances that should be running in the group"
-  type        = number
-  default     = 1
-}
-
 variable "description" {
   description = "(Optional) Resource description tag"
   type        = string
@@ -568,6 +562,12 @@ variable "target_group_arns" {
   default     = []
 }
 
+variable "desired_capacity" {
+  description = "(Optional) The number of Amazon EC2 instances that should be running in the group"
+  type        = number
+  default     = 1
+}
+
 variable "min_healthy_percentage" {
   description = "(Optional) The minimum percentage of healthy instances in Auto Scaling Gorup during inastnce refresh"
   type        = number
@@ -584,4 +584,207 @@ variable "security_group_name" {
   description = "(Optional) Common name. Used as security_group name prefix and `Name` tag"
   type        = string
   default     = "kong-security-group"
+}
+
+## ECS
+
+# variable "env" {
+#   description = "Environment name, used to namespace resources e.g. pipeline ID or local reference"
+#   type        = string
+# }
+
+# variable "vpc_name" {
+#   description = "VPC that resources should be deployed to"
+#   type        = string
+# }
+
+# variable "subnet_names" {
+#   description = "Subnets that resources should be deployed in"
+#   type        = list(string)
+# }
+
+
+variable "fargate_cpu" {
+  description = "(Optional) The CPU for the Fargate Task"
+  type        = number
+  default     = 2048
+}
+
+variable "fargate_memory" {
+  description = "(Optional) The Memory for the Fargate Task"
+  type        = number
+  default     = 4096
+}
+
+variable "admin_api_port" {
+  description = "(Optional) The port for the Exchange Gateway container"
+  type        = number
+  default     = 8444
+}
+
+variable "exchange_gateway_status_port" {
+  description = "(Optional) The port for the status endpoint of the Exchange Gateway"
+  type        = number
+  default     = 8100
+}
+
+variable "log_retention_period" {
+  description = "(Optional) The retention period for logs (in days), as described in the policy document"
+  type        = number
+  default     = 7
+}
+
+variable "enable_execute_command" {
+  description = "(Optional) Define whether to enable Amazon ECS Exec for tasks within the service."
+  type        = bool
+  default     = true
+}
+
+variable "platform_version" {
+  description = "(Optional) ECS Service platform version"
+  type        = string
+  default     = "1.4.0"
+}
+
+# variable "parent_domain" {
+#   description = "Parent DNS Domain of the Environment"
+#   type        = string
+# }
+
+# variable "acm_certificate_arn" {
+#   description = "ARN of the ACM Certificate to be used by the Load Balancer"
+#   type        = string
+# }
+
+# variable "management_plane_endpoint" {
+#   description = "Server name of the Control Plane to cluster to"
+#   type        = string
+# }
+
+variable "ssl_cert" {
+  description = "Secrets Manager or Parameter Store ARN of the Certificate used to secure traffic to the gateway"
+  type        = string
+}
+
+variable "ssl_key" {
+  description = "Secrets Manager or Parameter Store ARN of the Key used to secure traffic to the gateway"
+  type        = string
+}
+
+variable "lua_ssl_cert" {
+  description = "Secrets Manager or Parameter Store ARN of the Certificate used for Lua cosockets"
+  type        = string
+}
+
+variable "cluster_cert" {
+  description = "Secrets Manager or Parameter Store ARN of the Clustering Certificate"
+  type        = string
+}
+
+variable "cluster_key" {
+  description = "Secrets Manager or Parameter Store ARN of the Clustering Key"
+  type        = string
+}
+
+variable "kong_log_level" {
+  description = "(Optional) Level of log output for the Gateway"
+  type        = string
+  default     = "warn"
+}
+
+variable "access_log_format" {
+  description = "(Optional) Log location and format to be defined for the access logs"
+  type        = string
+  default     = "logs/access.log"
+}
+
+variable "error_log_format" {
+  description = "(Optional) Log location and format to be defined for the error logs"
+  type        = string
+  default     = "logs/error.log"
+}
+
+variable "secrets_list" {
+  description = "(Optional) List of Secret or Parameter Store ARNs to grant the ECS Task Execution Role to"
+  type        = list(string)
+  default     = ["*"]
+}
+
+variable "desired_count" {
+  description = "(Optional) Desired Task count for the Gateway ECS Task Definition"
+  type        = number
+  default     = 1
+}
+
+variable "min_capacity" {
+  description = "(Optional) Minimum Capacity for the Gateway ECS Task Definition"
+  type        = number
+  default     = 1
+}
+
+variable "max_capacity" {
+  description = "(Optional) Maximum Capacity for the Gateway ECS Task Definition"
+  type        = number
+  default     = 2
+}
+
+variable "custom_nginx_conf" {
+  description = "(Optional) Custom NGINX Config that is included in the main configuration through the variable KONG_NGINX_HTTP_INCLUDE"
+  type        = string
+  default     = "# No custom configuration required, can be ignored"
+}
+
+variable "image_url" {
+  description = "URL Image"
+  type        = string
+}
+
+variable "lb_target_group_arn" {
+  description = "Target Group ARN for ECS"
+  type        = string
+}
+
+variable "template_file" {
+  description = "Template file to use to decide if data or control plane"
+  type        = string
+}
+
+variable "execution_role_arn" {
+  type        = string
+  description = "ARN of the Task Execution Role"
+}
+
+variable "ecs_cluster_arn" {
+  type        = string
+  description = "The ARN of the ECS Cluster created"
+}
+
+variable "ecs_cluster_name" {
+  type        = string
+  description = "The ARN of the ECS Cluster created"
+}
+
+variable "public_subnets" {
+  description = "Public subnets for the ECS Task to reside in"
+  type        = list(string)
+}
+
+variable "db_password_arn" {
+  description = "The DB Password ARN that is used by the ECS Task Definition"
+  type        = string
+}
+
+variable "db_master_password_arn" {
+  description = "The Master DB Password ARN that is used by the ECS Task Definition"
+  type        = string
+}
+
+variable "log_group" {
+  description = "The Log Group for ECS to report out to"
+  type        = string
+}
+
+variable "session_secret" {
+  description = "The session secret that Kong will use"
+  type        = string
 }

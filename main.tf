@@ -61,3 +61,71 @@ module "kong_ec2" {
   role                              = var.role
   security_group_name               = var.security_group_name
 }
+
+
+module "kong_ecs" {
+  count  = var.deployment_type == "ecs" ? 1 : 0
+  source = "./modules/ecs"
+
+  #env = replace(var.env, "_", "-")
+
+  ecs_cluster_arn              = var.ecs_cluster_arn
+  ecs_cluster_name             = var.ecs_cluster_name
+  platform_version             = var.platform_version
+  service                      = var.service
+  fargate_cpu                  = var.fargate_cpu
+  fargate_memory               = var.fargate_memory
+  enable_execute_command       = var.enable_execute_command
+  admin_api_port               = var.admin_api_port # TBD
+  exchange_gateway_status_port = var.exchange_gateway_status_port
+  vpc_id                       = var.vpc_id
+  # subnet_names                 = var.subnet_names
+  # parent_domain                = var.parent_domain
+  # acm_certificate_arn          = var.acm_certificate_arn
+
+  access_log_format = var.access_log_format
+  error_log_format  = var.error_log_format
+
+  region                    = var.region
+  private_subnets           = var.private_subnets
+  private_subnets_to_create = var.private_subnets_to_create
+  tags                      = var.tags
+  public_subnets            = var.public_subnets
+
+  # Needed?
+  lb_target_group_arn = var.lb_target_group_arn
+  image_url           = var.image_url
+  execution_role_arn  = var.execution_role_arn
+
+  #DB
+  skip_final_snapshot    = var.skip_final_snapshot
+  skip_rds_creation      = var.skip_rds_creation
+  postgres_config        = var.postgres_config
+  postgres_host          = var.postgres_host
+  db_password_arn        = var.db_password_arn
+  db_master_password_arn = var.db_master_password_arn
+  
+  session_secret = var.session_secret
+
+  log_group = var.log_group
+
+  template_file = var.template_file
+
+  custom_nginx_conf = var.custom_nginx_conf
+
+  ssl_cert     = var.ssl_cert
+  ssl_key      = var.ssl_key
+  lua_ssl_cert = var.lua_ssl_cert
+
+  cluster_cert = var.cluster_cert
+  cluster_key  = var.cluster_key
+
+  kong_log_level       = var.kong_log_level
+  log_retention_period = var.log_retention_period
+
+  secrets_list = var.secrets_list
+
+  desired_count = var.desired_count
+  min_capacity  = var.min_capacity
+  max_capacity  = var.max_capacity
+}
