@@ -44,6 +44,7 @@ jobs:
           cat results/results.json
 
   docker:
+    name: Docker build and push
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
     needs: check-aws-credentials
@@ -91,7 +92,9 @@ jobs:
     name: Kitchen-Terraform
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false
-    needs: check-aws-credentials
+    needs:
+      - check-aws-credentials
+      - docker
     env:
       GEMFILE_DIR: .
       AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
