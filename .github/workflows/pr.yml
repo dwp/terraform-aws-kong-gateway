@@ -45,6 +45,8 @@ jobs:
 
   docker:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    needs: check-aws-credentials
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -56,13 +58,21 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to AWS ECR
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.eu-west-1.amazonaws.com
+          username: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
+          password: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
           context: docker-image
           build-args: 'KONG=2.8.1.1'
           push: true
-          tags: ghcr.io/dwp/terraform-aws-kong-gateway:${{ github.run_number }}
+          tags: |
+            ghcr.io/dwp/terraform-aws-kong-gateway:${{ github.run_number }}
+            ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.eu-west-1.amazonaws.com/terraform-aws-kong-gateway:${{ github.run_number }}
 
   check-aws-credentials:
     name: Test AWS Credentials
