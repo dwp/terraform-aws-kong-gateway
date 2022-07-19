@@ -68,17 +68,17 @@ module "kong_ecs" {
   source = "./modules/ecs"
 
   #env = replace(var.env, "_", "-")
-
-  ecs_cluster_arn              = var.ecs_cluster_arn
-  ecs_cluster_name             = var.ecs_cluster_name
-  platform_version             = var.platform_version
-  service                      = var.service
-  fargate_cpu                  = var.fargate_cpu
-  fargate_memory               = var.fargate_memory
-  enable_execute_command       = var.enable_execute_command
-  admin_api_port               = var.admin_api_port # TBD
-  exchange_gateway_status_port = var.exchange_gateway_status_port
-  vpc_id                       = var.vpc_id
+  role                   = var.role
+  ecs_cluster_arn        = var.ecs_cluster_arn
+  ecs_cluster_name       = var.ecs_cluster_name
+  platform_version       = var.platform_version
+  service                = var.service
+  fargate_cpu            = var.fargate_cpu
+  fargate_memory         = var.fargate_memory
+  enable_execute_command = var.enable_execute_command
+  admin_api_port         = var.admin_api_port # TBD
+  kong_status_port       = var.kong_status_port
+  vpc_id                 = var.vpc_id
   # subnet_names                 = var.subnet_names
   # parent_domain                = var.parent_domain
   # acm_certificate_arn          = var.acm_certificate_arn
@@ -90,6 +90,8 @@ module "kong_ecs" {
   private_subnets           = var.private_subnets
   private_subnets_to_create = var.private_subnets_to_create
   tags                      = var.tags
+
+  kong_ssl_uris = var.kong_ssl_uris
 
   # Needed?
   lb_target_group_arn = var.lb_target_group_arn
@@ -103,7 +105,7 @@ module "kong_ecs" {
   postgres_host          = var.postgres_host
   db_password_arn        = var.db_password_arn
   db_master_password_arn = var.db_master_password_arn
-  
+
   session_secret = var.session_secret
 
   log_group = var.log_group
@@ -127,4 +129,8 @@ module "kong_ecs" {
   desired_count = var.desired_count
   min_capacity  = var.min_capacity
   max_capacity  = var.max_capacity
+
+  control_plane_endpoint = var.control_plane_endpoint
+  clustering_endpoint    = var.clustering_endpoint
+  telemetry_endpoint     = var.telemetry_endpoint
 }

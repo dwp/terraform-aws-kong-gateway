@@ -36,11 +36,6 @@ variable "security_group_ids" {
   default     = []
 }
 
-variable "role" {
-  description = "(Optional) The role name for the Kong Instance, used in the ASG name. Defaults to use the KONG_ROLE"
-  type        = string
-  default     = null
-}
 
 variable "skip_rds_creation" {
   description = "(Optional) If set to true then this module will not create its own RDS instance"
@@ -330,7 +325,7 @@ variable "admin_api_port" {
   default     = 8444
 }
 
-variable "exchange_gateway_status_port" {
+variable "kong_status_port" {
   description = "(Optional) The port for the status endpoint of the Exchange Gateway"
   type        = number
   default     = 8100
@@ -466,6 +461,7 @@ variable "template_file" {
 variable "execution_role_arn" {
   type        = string
   description = "ARN of the Task Execution Role"
+  default     = null
 }
 
 variable "ecs_cluster_arn" {
@@ -481,11 +477,13 @@ variable "ecs_cluster_name" {
 variable "db_password_arn" {
   description = "The DB Password ARN that is used by the ECS Task Definition"
   type        = string
+  default     = null
 }
 
 variable "db_master_password_arn" {
   description = "The Master DB Password ARN that is used by the ECS Task Definition"
   type        = string
+  default     = null
 }
 
 variable "log_group" {
@@ -496,4 +494,48 @@ variable "log_group" {
 variable "session_secret" {
   description = "The session secret that Kong will use"
   type        = string
+  default     = null
+}
+
+variable "kong_ssl_uris" {
+  description = "(Optional) Object containing the ssl uris for kong, e.g. load balancer dns names and ports"
+  type = object({
+    protocol            = string
+    admin_api_uri       = string
+    admin_gui_url       = string
+    portal_gui_host     = string
+    portal_api_url      = string
+    portal_cors_origins = string
+  })
+  default = {
+    protocol            = "https"
+    admin_api_uri       = "https://localhost:8444"
+    admin_gui_url       = "https://localhost:8445"
+    portal_gui_host     = "https://localhost:8446"
+    portal_api_url      = "https://localhost:8447"
+    portal_cors_origins = null
+  }
+}
+
+variable "role" {
+  description = "Role of the Kong Task"
+  type        = string
+}
+
+variable "control_plane_endpoint" {
+  type        = string
+  description = ""
+  default     = null
+}
+
+variable "clustering_endpoint" {
+  type        = string
+  description = ""
+  default     = null
+}
+
+variable "telemetry_endpoint" {
+  type        = string
+  description = ""
+  default     = null
 }

@@ -66,6 +66,18 @@
       "value": "0.0.0.0:${admin_api_port} ssl"
     },
     {
+      "name": "KONG_ADMIN_API_URI",
+      "value": "${kong_admin_api_uri}"
+    },
+    {
+      "name": "KONG_CLUSTER_SERVER_NAME",
+      "value": ""
+    },
+    {
+      "name": "KONG_AUDIT_LOG",
+      "value": "on"
+    },
+    {
       "name": "KONG_STATUS_LISTEN",
       "value": "0.0.0.0:${status_port} ssl"
     },

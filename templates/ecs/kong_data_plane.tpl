@@ -18,10 +18,6 @@
       "value": "pki"
     },
     {
-      "name": "KONG_CLUSTER_CA_CERT",
-      "value": "/usr/local/kong/kong_clustering/cluster_ca.crt"
-    },
-    {
       "name": "KONG_CLUSTER_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
     },
@@ -31,7 +27,7 @@
     },
     {
       "name": "KONG_CLUSTER_TELEMETRY_SERVER_NAME",
-      "value": "${management_plane_endpoint}"
+      "value": "${control_plane_endpoint}"
     },
     {
       "name": "KONG_LUA_SSL_TRUSTED_CERTIFICATE",
@@ -110,10 +106,6 @@
     {
     "name": "LUA_SSL_CERT",
     "valueFrom": "${lua_ssl_cert}"
-    },
-    {
-    "name": "CLUSTER_CA",
-    "valueFrom": "${cluster_ca_cert}"
     },
     {
     "name": "CLUSTER_CERT",

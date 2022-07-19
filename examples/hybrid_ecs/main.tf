@@ -128,8 +128,8 @@ locals {
   user_data_script = templatefile("${path.module}/templates/db/cloud-init.sh", {
     db_master_pass = random_string.master_password.result
     db_master_user = var.postgres_master_user
-    db_pass = var.kong_database_password
-    db_user = var.kong_database_user
+    db_pass        = var.kong_database_password
+    db_user        = var.kong_database_user
   })
 }
 
@@ -198,19 +198,20 @@ resource "aws_cloudwatch_log_group" "kong_dp" {
   }
 }
 
-# resource "aws_cloudwatch_log_group" "kong_cp" {
-#   name              = "${var.environment}-cp"
-#   retention_in_days = 7
+resource "aws_cloudwatch_log_group" "kong_cp" {
+  name              = "${var.environment}-cp"
+  retention_in_days = 7
 
-#   tags = {
-#     Name = "${var.environment}-cp"
-#   }
-# }
+  tags = {
+    Name = "${var.environment}-cp"
+  }
+}
 
 module "create_kong_cp" {
   source = "../../"
 
   deployment_type  = "ecs"
+  role             = "control_plane"
   ecs_cluster_arn  = aws_ecs_cluster.kong.arn
   ecs_cluster_name = aws_ecs_cluster.kong.name
   instance_type    = var.instance_type
@@ -228,7 +229,7 @@ module "create_kong_cp" {
   cluster_cert = aws_ssm_parameter.cert.arn
   cluster_key  = aws_ssm_parameter.key.arn
 
-  session_secret   = random_string.session_secret.result
+  session_secret = random_string.session_secret.result
 
   kong_log_level = "debug" # TBD
 
@@ -238,7 +239,7 @@ module "create_kong_cp" {
 
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
-  log_group = aws_cloudwatch_log_group.kong_dp.name
+  log_group = aws_cloudwatch_log_group.kong_cp.name
 
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
@@ -277,6 +278,7 @@ module "create_kong_cp" {
 #   source = "../../"
 
 #   deployment_type  = "ecs"
+#   role = "data_plane"
 #   ecs_cluster_arn  = aws_ecs_cluster.kong.arn
 #   ecs_cluster_name = aws_ecs_cluster.kong.name
 #   instance_type    = var.instance_type
@@ -290,6 +292,11 @@ module "create_kong_cp" {
 
 #   cluster_cert = aws_ssm_parameter.cert.arn
 #   cluster_key  = aws_ssm_parameter.key.arn
+
+#   # DP Specific
+#   control_plane_endpoint = aws_lb.external.dns_name
+#   clustering_endpoint = local.cluster
+#   telemetry_endpoint = local.telemetry
 
 #   kong_log_level = "debug" # TBD
 

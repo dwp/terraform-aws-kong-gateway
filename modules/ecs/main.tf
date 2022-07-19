@@ -2,16 +2,11 @@ locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
-  role = "control_plane"
-
   # If the module user has specified a postgres_host then we use
   # that as our endpoint, as we will not be triggering the database module
-  db_info = var.postgres_host != "" ? {
+  db_info = {
     endpoint      = var.postgres_host
     database_name = var.kong_database_config.name
-    } : {
-    endpoint      = local.role == "data_plane" ? "" : module.database.0.outputs.endpoint,
-    database_name = local.role == "data_plane" ? "" : module.database.0.outputs.database_name
   }
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
@@ -31,7 +26,7 @@ locals {
     subnets = local.private_subnets
     azs     = local.azs
   }
-  name = format("%s-%s-%s", var.service, var.environment, local.role)
+  name = format("%s-%s-%s", var.service, var.environment, var.role)
 }
 
 resource "aws_ecs_task_definition" "kong" {
@@ -42,7 +37,7 @@ resource "aws_ecs_task_definition" "kong" {
   memory                   = var.fargate_memory
   task_role_arn            = aws_iam_role.kong_task_role.arn
   execution_role_arn       = var.execution_role_arn #aws_iam_role.ecs_task_execution_role.arn
-  container_definitions    = "[${data.template_file.exchange_gateway_task_definition.rendered}]"
+  container_definitions    = var.role == "control_plane" ? "[${data.template_file.kong_task_definition_cp[0].rendered}]" : var.role == "data_plane" ? "[${data.template_file.kong_task_definition_dp[0].rendered}]" : null
 
   tags = {
     Name = local.name
@@ -79,8 +74,9 @@ resource "aws_ecs_service" "kong" {
   }
 }
 
-data "template_file" "exchange_gateway_task_definition" {
-  template = file("${path.module}/../../templates/ecs/kong_${var.template_file}.tpl")
+data "template_file" "kong_task_definition_cp" {
+  count    = var.role == "control_plane" ? 1 : 0
+  template = file("${path.module}/../../templates/ecs/kong_control_plane.tpl")
   vars = {
     name                   = local.name
     group_name             = local.name
@@ -94,17 +90,18 @@ data "template_file" "exchange_gateway_task_definition" {
     db_name                = local.db_info.database_name
     db_password_arn        = var.db_password_arn
     db_master_password_arn = var.db_master_password_arn
-    status_port            = var.exchange_gateway_status_port
+    status_port            = var.kong_status_port
     session_secret         = var.session_secret
     log_group              = var.log_group
     admin_api_port         = var.admin_api_port
-    ports                  = jsonencode([var.admin_api_port, var.exchange_gateway_status_port])
+    ports                  = jsonencode([var.admin_api_port, var.kong_status_port])
     ulimits                = jsonencode([4096])
     region                 = var.region
     access_log_format      = var.access_log_format
     error_log_format       = var.error_log_format
     ssl_cert               = var.ssl_cert
     ssl_key                = var.ssl_key
+    kong_admin_api_uri     = var.kong_ssl_uris.admin_api_uri
     lua_ssl_cert           = var.lua_ssl_cert
     cluster_cert           = var.cluster_cert
     cluster_key            = var.cluster_key
@@ -114,7 +111,37 @@ data "template_file" "exchange_gateway_task_definition" {
   }
 }
 
-
+data "template_file" "kong_task_definition_dp" {
+  count    = var.role == "data_plane" ? 1 : 0
+  template = file("${path.module}/../../templates/ecs/kong_data_plane.tpl")
+  vars = {
+    name                   = local.name
+    group_name             = local.name
+    cpu                    = var.fargate_cpu
+    image_url              = var.image_url # To be updated
+    memory                 = var.fargate_memory
+    user                   = "kong"
+    parameter_path         = local.ssm_parameter_path
+    status_port            = var.kong_status_port
+    log_group              = var.log_group
+    ports                  = jsonencode([var.admin_api_port, var.kong_status_port])
+    ulimits                = jsonencode([4096])
+    region                 = var.region
+    access_log_format      = var.access_log_format
+    error_log_format       = var.error_log_format
+    control_plane_endpoint = var.control_plane_endpoint
+    clustering_endpoint    = var.clustering_endpoint
+    telemetry_endpoint     = var.telemetry_endpoint
+    ssl_cert               = var.ssl_cert
+    ssl_key                = var.ssl_key
+    lua_ssl_cert           = var.lua_ssl_cert
+    cluster_cert           = var.cluster_cert
+    cluster_key            = var.cluster_key
+    kong_log_level         = var.kong_log_level
+    entrypoint             = "/gateway-entrypoint.sh"
+    custom_nginx_conf      = base64encode(var.custom_nginx_conf)
+  }
+}
 data "aws_iam_policy_document" "ecs_assume_role_policy" {
   statement {
     sid     = "EcsAssumeRole"
