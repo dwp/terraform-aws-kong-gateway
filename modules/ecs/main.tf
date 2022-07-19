@@ -64,8 +64,7 @@ resource "aws_ecs_service" "kong" {
 
   network_configuration {
     security_groups = local.security_groups
-    subnets         = var.public_subnets #local.private_subnets # TBD
-    assign_public_ip = true # TBD
+    subnets         = local.private_subnets
   }
 
   # TBD

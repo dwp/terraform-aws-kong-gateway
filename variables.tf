@@ -387,113 +387,6 @@ variable "rules_with_source_cidr_blocks" {
     protocol    = string,
     cidr_blocks = list(string)
   }))
-  default = {
-    "kong-ingress-proxy-http" = {
-      type        = "ingress",
-      from_port   = 8000,
-      to_port     = 8000,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-api-http" = {
-      type        = "ingress",
-      from_port   = 8001,
-      to_port     = 8001,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-manager-http" = {
-      type        = "ingress",
-      from_port   = 8002,
-      to_port     = 8002,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-portal-gui-http" = {
-      type        = "ingress",
-      from_port   = 8003,
-      to_port     = 8003,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-portal-http" = {
-      type        = "ingress",
-      from_port   = 8004,
-      to_port     = 8004,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-ssh" = {
-      type        = "ingress",
-      from_port   = 22,
-      to_port     = 22,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-8005" = {
-      type        = "ingress",
-      from_port   = 8005,
-      to_port     = 8005,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-8006" = {
-      type        = "ingress",
-      from_port   = 8006,
-      to_port     = 8006,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-80" = {
-      type        = "egress",
-      from_port   = 80,
-      to_port     = 80,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-443" = {
-      type        = "egress",
-      from_port   = 443,
-      to_port     = 443,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8000" = {
-      type        = "egress",
-      from_port   = 8000,
-      to_port     = 8000,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8001" = {
-      type        = "egress",
-      from_port   = 8001,
-      to_port     = 8001,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8005" = {
-      type        = "egress",
-      from_port   = 8005,
-      to_port     = 8005,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8006" = {
-      type        = "egress",
-      from_port   = 8006,
-      to_port     = 8006,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-postgresq" = {
-      type        = "egress",
-      from_port   = 5432,
-      to_port     = 5432,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
 }
 
 variable "rules_with_source_security_groups" {
@@ -762,11 +655,6 @@ variable "ecs_cluster_arn" {
 variable "ecs_cluster_name" {
   type        = string
   description = "The ARN of the ECS Cluster created"
-}
-
-variable "public_subnets" {
-  description = "Public subnets for the ECS Task to reside in"
-  type        = list(string)
 }
 
 variable "db_password_arn" {

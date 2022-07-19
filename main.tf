@@ -90,7 +90,6 @@ module "kong_ecs" {
   private_subnets           = var.private_subnets
   private_subnets_to_create = var.private_subnets_to_create
   tags                      = var.tags
-  public_subnets            = var.public_subnets
 
   # Needed?
   lb_target_group_arn = var.lb_target_group_arn

@@ -128,6 +128,8 @@ locals {
   user_data_script = templatefile("${path.module}/templates/db/cloud-init.sh", {
     db_master_pass = random_string.master_password.result
     db_master_user = var.postgres_master_user
+    db_pass = var.kong_database_password
+    db_user = var.kong_database_user
   })
 }
 
@@ -196,6 +198,15 @@ resource "aws_cloudwatch_log_group" "kong_dp" {
   }
 }
 
+# resource "aws_cloudwatch_log_group" "kong_cp" {
+#   name              = "${var.environment}-cp"
+#   retention_in_days = 7
+
+#   tags = {
+#     Name = "${var.environment}-cp"
+#   }
+# }
+
 module "create_kong_cp" {
   source = "../../"
 
@@ -206,8 +217,6 @@ module "create_kong_cp" {
   vpc_id           = aws_vpc.vpc.id
   region           = var.region
   vpc_cidr_block   = aws_vpc.vpc.cidr_block
-
-  public_subnets = aws_subnet.public_subnets.*.id # TBD
 
   db_password_arn        = aws_ssm_parameter.db_password.arn
   db_master_password_arn = aws_ssm_parameter.db_master_password.arn
@@ -267,6 +276,52 @@ module "create_kong_cp" {
 # module "create_kong_dp" {
 #   source = "../../"
 
+#   deployment_type  = "ecs"
+#   ecs_cluster_arn  = aws_ecs_cluster.kong.arn
+#   ecs_cluster_name = aws_ecs_cluster.kong.name
+#   instance_type    = var.instance_type
+#   vpc_id           = aws_vpc.vpc.id
+#   region           = var.region
+#   vpc_cidr_block   = aws_vpc.vpc.cidr_block
+
+#   ssl_cert     = aws_ssm_parameter.cert.arn
+#   ssl_key      = aws_ssm_parameter.key.arn
+#   lua_ssl_cert = aws_ssm_parameter.cert.arn
+
+#   cluster_cert = aws_ssm_parameter.cert.arn
+#   cluster_key  = aws_ssm_parameter.key.arn
+
+#   kong_log_level = "debug" # TBD
+
+#   desired_count = var.desired_capacity
+#   min_capacity  = var.min_capacity
+#   max_capacity  = var.max_capacity
+
+#   log_group = aws_cloudwatch_log_group.kong_dp.name
+
+#   access_log_format = var.access_log_format
+#   error_log_format  = var.error_log_format
+
+#   custom_nginx_conf = var.custom_nginx_conf
+
+#   rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
+
+#   image_url = var.image_url
+
+#   lb_target_group_arn = aws_lb_target_group.external-admin-api.arn
+
+#   skip_rds_creation = true
+#   template_file     = "data_plane"
+
+#   environment = local.environment
+#   service     = var.service
+#   description = var.description
+#   tags        = var.tags
+# }
+
+# module "create_kong_dp" {
+#   source = "../../"
+
 #   deployment_type      = "ec2"
 #   instance_type        = var.instance_type
 #   vpc_id               = aws_vpc.vpc.id
@@ -307,18 +362,18 @@ module "create_kong_cp" {
 #   tags        = var.tags
 # }
 
-# resource "aws_route_table" "private" {
-#   vpc_id = aws_vpc.vpc.id
-# }
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.vpc.id
+}
 
-# resource "aws_route" "private_nat_gateway" {
-#   route_table_id         = aws_route_table.private.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   nat_gateway_id         = aws_nat_gateway.nat.id
-# }
+resource "aws_route" "private_nat_gateway" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.nat.id
+}
 
-# resource "aws_route_table_association" "private" {
-#   count          = length(module.create_kong_cp.private_subnet_ids)
-#   subnet_id      = element(module.create_kong_cp.private_subnet_ids, count.index)
-#   route_table_id = aws_route_table.private.id
-# }
+resource "aws_route_table_association" "private" {
+  count          = length(module.create_kong_cp.private_subnet_ids)
+  subnet_id      = element(module.create_kong_cp.private_subnet_ids, count.index)
+  route_table_id = aws_route_table.private.id
+}

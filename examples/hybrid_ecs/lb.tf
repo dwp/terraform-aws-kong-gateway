@@ -9,8 +9,8 @@ resource "aws_security_group_rule" "external-lb-ingress-proxy" {
   security_group_id = aws_security_group.external-lb.id
 
   type      = "ingress"
-  from_port = 8443
-  to_port   = 8443
+  from_port = 8000
+  to_port   = 8000
   protocol  = "tcp"
 
   cidr_blocks = var.external_cidr_blocks
@@ -21,14 +21,26 @@ resource "aws_security_group_rule" "external-lb-ingress-admin" {
   security_group_id = aws_security_group.external-lb.id
 
   type      = "ingress"
-  from_port = 8444
-  to_port   = 8444
+  from_port = 8001
+  to_port   = 8001
   protocol  = "tcp"
 
   cidr_blocks = var.external_cidr_blocks
 
 }
 
+# TBD
+resource "aws_security_group_rule" "external-lb-status" {
+  security_group_id = aws_security_group.external-lb.id
+
+  type      = "ingress"
+  from_port = 8100
+  to_port   = 8100
+  protocol  = "tcp"
+
+  cidr_blocks = var.external_cidr_blocks
+
+}
 resource "aws_security_group_rule" "external-lb-egress" {
   security_group_id = aws_security_group.external-lb.id
 
@@ -63,6 +75,7 @@ resource "aws_lb_target_group" "external-proxy" {
     healthy_threshold   = 4
     interval            = 10
     path                = "/status"
+    protocol            = "HTTPS"
     port                = 8100
     unhealthy_threshold = 2
   }
@@ -78,6 +91,7 @@ resource "aws_lb_target_group" "external-admin-api" {
     healthy_threshold   = 4
     interval            = 10
     path                = "/status"
+    protocol            = "HTTPS"
     port                = 8100
     unhealthy_threshold = 2
   }
@@ -89,10 +103,7 @@ resource "aws_lb_target_group" "external-admin-api" {
 resource "aws_lb_listener" "external-proxy" {
 
   load_balancer_arn = aws_lb.external.arn
-  port              = 8443
-  # protocol          = "HTTPS"
-  # ssl_policy        = "ELBSecurityPolicy-2016-08"
-  # certificate_arn   = aws_acm_certificate.kong.arn
+  port              = 8000
 
   default_action {
     target_group_arn = aws_lb_target_group.external-proxy.arn
@@ -103,11 +114,7 @@ resource "aws_lb_listener" "external-proxy" {
 resource "aws_lb_listener" "admin" {
 
   load_balancer_arn = aws_lb.external.arn
-  port              = 8444
-  # protocol          = "HTTPS"
-  # ssl_policy        = "ELBSecurityPolicy-2016-08"
-  # certificate_arn   = aws_acm_certificate.kong.arn
-
+  port              = 8001
   default_action {
     target_group_arn = aws_lb_target_group.external-admin-api.arn
     type             = "forward"
