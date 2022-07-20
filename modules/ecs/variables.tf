@@ -99,7 +99,7 @@ variable "kong_database_config" {
   })
   default = {
     name     = "kong"
-    user     = "kong" # TBD
+    user     = "kong"
     password = null
   }
 }
@@ -319,16 +319,24 @@ variable "fargate_memory" {
   }
 }
 
-variable "admin_api_port" {
-  description = "(Optional) The port for the Kong Admin API"
-  type        = number
-  default     = 8444
+variable "kong_dp_ports" {
+  description = "The ports for the Kong Data Plane"
+  type        = map(string)
+  default = {
+    "admin-api"  = 8444,
+    "status"     = 8100,
+    "clustering" = 8005,
+    "telemetry"  = 8006
+  }
 }
 
-variable "kong_status_port" {
-  description = "(Optional) The port for the status endpoint of the Exchange Gateway"
-  type        = number
-  default     = 8100
+variable "kong_cp_ports" {
+  description = "The ports for the Kong Control Plane"
+  type        = map(string)
+  default = {
+    "proxy"      = 8443,
+    "status"     = 8100
+  }
 }
 
 variable "log_retention_period" {
@@ -443,9 +451,10 @@ variable "custom_nginx_conf" {
   type        = string
 }
 
-variable "lb_target_group_arn" {
+variable "ecs_target_group_arns" {
   description = "Target Group ARN for ECS"
-  type        = string
+  type        = map(string)
+  default     = null
 }
 
 variable "image_url" {
@@ -507,8 +516,8 @@ variable "kong_ssl_uris" {
     portal_api_url      = string
     portal_cors_origins = string
   })
-  default = {
-    protocol            = "https"
+  default = { # TBD
+    protocol            = "http"
     admin_api_uri       = "https://localhost:8444"
     admin_gui_url       = "https://localhost:8445"
     portal_gui_host     = "https://localhost:8446"
@@ -535,6 +544,12 @@ variable "clustering_endpoint" {
 }
 
 variable "telemetry_endpoint" {
+  type        = string
+  description = ""
+  default     = null
+}
+
+variable "admin_token" {
   type        = string
   description = ""
   default     = null

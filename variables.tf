@@ -274,7 +274,7 @@ variable "kong_ssl_uris" {
     portal_cors_origins = string
   })
   default = {
-    protocol            = "https"
+    protocol            = "http"
     admin_api_uri       = "https://localhost:8444"
     admin_gui_url       = "https://localhost:8445"
     portal_gui_host     = "https://localhost:8446"
@@ -470,8 +470,8 @@ variable "min_healthy_percentage" {
 variable "role" {
   description = "Role of the Kong Task"
   type        = string
+  default     = null
 }
-
 
 variable "security_group_name" {
   description = "(Optional) Common name. Used as security_group name prefix and `Name` tag"
@@ -509,16 +509,24 @@ variable "fargate_memory" {
   default     = 4096
 }
 
-variable "admin_api_port" {
-  description = "(Optional) The port for the Exchange Gateway container"
-  type        = number
-  default     = 8444
+variable "kong_dp_ports" {
+  description = "The ports for the Kong Data Plane"
+  type        = map(string)
+  default = {
+    "admin-api"  = 8444,
+    "status"     = 8100,
+    "clustering" = 8005,
+    "telemetry"  = 8006
+  }
 }
 
-variable "kong_status_port" {
-  description = "(Optional) The port for the status endpoint of the Exchange Gateway"
-  type        = number
-  default     = 8100
+variable "kong_cp_ports" {
+  description = "The ports for the Kong Control Plane"
+  type        = map(string)
+  default = {
+    "proxy"      = 8443,
+    "status"     = 8100
+  }
 }
 
 variable "log_retention_period" {
@@ -557,26 +565,31 @@ variable "platform_version" {
 variable "ssl_cert" {
   description = "Secrets Manager or Parameter Store ARN of the Certificate used to secure traffic to the gateway"
   type        = string
+  default     = null
 }
 
 variable "ssl_key" {
   description = "Secrets Manager or Parameter Store ARN of the Key used to secure traffic to the gateway"
   type        = string
+  default     = null
 }
 
 variable "lua_ssl_cert" {
   description = "Secrets Manager or Parameter Store ARN of the Certificate used for Lua cosockets"
   type        = string
+  default     = null
 }
 
 variable "cluster_cert" {
   description = "Secrets Manager or Parameter Store ARN of the Clustering Certificate"
   type        = string
+  default     = null
 }
 
 variable "cluster_key" {
   description = "Secrets Manager or Parameter Store ARN of the Clustering Key"
   type        = string
+  default     = null
 }
 
 variable "kong_log_level" {
@@ -630,16 +643,19 @@ variable "custom_nginx_conf" {
 variable "image_url" {
   description = "URL Image"
   type        = string
+  default     = null
 }
 
-variable "lb_target_group_arn" {
+variable "ecs_target_group_arns" {
   description = "Target Group ARN for ECS"
-  type        = string
+  type        = map(string)
+  default     = null
 }
 
 variable "template_file" {
   description = "Template file to use to decide if data or control plane"
   type        = string
+  default     = null
 }
 
 variable "execution_role_arn" {
@@ -651,11 +667,13 @@ variable "execution_role_arn" {
 variable "ecs_cluster_arn" {
   type        = string
   description = "The ARN of the ECS Cluster created"
+  default     = null
 }
 
 variable "ecs_cluster_name" {
   type        = string
   description = "The ARN of the ECS Cluster created"
+  default     = null
 }
 
 variable "db_password_arn" {
@@ -673,6 +691,7 @@ variable "db_master_password_arn" {
 variable "log_group" {
   description = "The Log Group for ECS to report out to"
   type        = string
+  default     = null
 }
 
 variable "session_secret" {
@@ -694,6 +713,12 @@ variable "clustering_endpoint" {
 }
 
 variable "telemetry_endpoint" {
+  type        = string
+  description = ""
+  default     = null
+}
+
+variable "admin_token" {
   type        = string
   description = ""
   default     = null

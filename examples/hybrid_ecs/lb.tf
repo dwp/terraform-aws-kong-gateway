@@ -1,3 +1,15 @@
+locals {
+  target_group_cp = {
+    (aws_lb_target_group.external-admin-api.arn) = 8444
+    (aws_lb_target_group.internal-cluster.arn)   = 8005
+    (aws_lb_target_group.internal-telemetry.arn) = 8006
+    (aws_lb_target_group.internal-admin-api.arn) = 8444
+  }
+  target_group_dp = [
+    aws_lb_target_group.external-proxy.arn
+  ]
+}
+
 resource "aws_security_group" "external-lb" {
   description = "Kong External Load Balancer"
   name        = "external-lb-sg"
@@ -67,16 +79,16 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_lb_target_group" "external-proxy" {
-  name     = "external-proxy-8443"
-  port     = 8443
-  protocol = "HTTPS"
+  name     = "external-proxy-8000"
+  port     = 8000
+  protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
   health_check {
-    healthy_threshold   = 4
-    interval            = 10
+    healthy_threshold   = 5
+    interval            = 5
     path                = "/status"
-    protocol            = "HTTPS"
-    port                = 8100
+    port                = 8000
+    timeout             = 3
     unhealthy_threshold = 2
   }
 }
@@ -132,10 +144,11 @@ resource "aws_lb" "internal" {
 }
 
 resource "aws_lb_target_group" "internal-cluster" {
-  name     = "internal-cluster-8005"
-  port     = 8005
-  protocol = "TCP"
-  vpc_id   = aws_vpc.vpc.id
+  name        = "internal-cluster-8005"
+  port        = 8005
+  protocol    = "TCP"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
 
   health_check {
     healthy_threshold   = 5
@@ -147,10 +160,12 @@ resource "aws_lb_target_group" "internal-cluster" {
 }
 
 resource "aws_lb_target_group" "internal-telemetry" {
-  name     = "internal-telemetry-8006"
-  port     = 8006
-  protocol = "TCP"
-  vpc_id   = aws_vpc.vpc.id
+  name        = "internal-telemetry-8006"
+  port        = 8006
+  protocol    = "TCP"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
+
   health_check {
     healthy_threshold   = 5
     interval            = 30
@@ -161,10 +176,11 @@ resource "aws_lb_target_group" "internal-telemetry" {
 }
 
 resource "aws_lb_target_group" "internal-admin-api" {
-  name     = "internal-admin-api-8444" # FIX
-  port     = 8444
-  protocol = "TCP"
-  vpc_id   = aws_vpc.vpc.id
+  name        = "internal-admin-api-8444" # FIX
+  port        = 8444
+  protocol    = "TCP"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
   health_check {
     healthy_threshold   = 5
     interval            = 30

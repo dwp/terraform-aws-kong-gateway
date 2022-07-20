@@ -106,8 +106,8 @@ variable "rules_with_source_cidr_blocks" {
   default = {
     "kong-ingress-proxy-https" = {
       type        = "ingress",
-      from_port   = 8443,
-      to_port     = 8443,
+      from_port   = 8000,
+      to_port     = 8000,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
@@ -181,17 +181,17 @@ variable "rules_with_source_cidr_blocks" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-egress-8443" = {
+    "kong-egress-8000" = {
       type        = "egress",
-      from_port   = 8443,
-      to_port     = 8443,
+      from_port   = 8000,
+      to_port     = 8000,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
     "kong-egress-8444" = {
       type        = "egress",
-      from_port   = 8443,
-      to_port     = 8443,
+      from_port   = 8444,
+      to_port     = 8444,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
@@ -247,4 +247,22 @@ variable "custom_nginx_conf" {
 variable "image_url" {
   description = "URL Image"
   type        = string
+}
+
+variable "asg_max_size" {
+  description = "The maximum size of the auto scale group"
+  type        = string
+  default     = 1
+}
+
+variable "asg_min_size" {
+  description = "The minimum size of the auto scale group"
+  type        = string
+  default     = 1
+}
+
+variable "asg_desired_capacity" {
+  description = "The size of the autoscaling group"
+  type        = string
+  default     = 1
 }

@@ -11,11 +11,11 @@ locals {
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
-  database = var.skip_rds_creation ? null : {
-    endpoint          = module.database.0.outputs.endpoint
-    database_name     = module.database.0.outputs.database_name
-    security_group_id = module.database.0.outputs.security_group_id
-  }
+  #  database = var.skip_rds_creation ? null : {
+  #    endpoint          = module.database.0.outputs.endpoint
+  #    database_name     = module.database.0.outputs.database_name
+  #    security_group_id = module.database.0.outputs.security_group_id
+  #  }
 
   azs = length(var.availability_zones) > 0 ? var.availability_zones : module.private_subnets.0.azs
 
@@ -36,7 +36,7 @@ resource "aws_ecs_task_definition" "kong" {
   cpu                      = var.fargate_cpu
   memory                   = var.fargate_memory
   task_role_arn            = aws_iam_role.kong_task_role.arn
-  execution_role_arn       = var.execution_role_arn #aws_iam_role.ecs_task_execution_role.arn
+  execution_role_arn       = var.execution_role_arn
   container_definitions    = var.role == "control_plane" ? "[${data.template_file.kong_task_definition_cp[0].rendered}]" : var.role == "data_plane" ? "[${data.template_file.kong_task_definition_dp[0].rendered}]" : null
 
   tags = {
@@ -62,11 +62,13 @@ resource "aws_ecs_service" "kong" {
     subnets         = local.private_subnets
   }
 
-  # TBD
-  load_balancer {
-    target_group_arn = var.lb_target_group_arn
-    container_name   = local.name
-    container_port   = var.admin_api_port # TBD
+  dynamic "load_balancer" {
+    for_each = var.ecs_target_group_arns
+    content {
+      target_group_arn = load_balancer.key
+      container_name   = local.name
+      container_port   = load_balancer.value
+    }
   }
 
   tags = {
@@ -90,11 +92,12 @@ data "template_file" "kong_task_definition_cp" {
     db_name                = local.db_info.database_name
     db_password_arn        = var.db_password_arn
     db_master_password_arn = var.db_master_password_arn
-    status_port            = var.kong_status_port
     session_secret         = var.session_secret
     log_group              = var.log_group
-    admin_api_port         = var.admin_api_port
-    ports                  = jsonencode([var.admin_api_port, var.kong_status_port])
+    admin_api_port         = var.kong_dp_ports.admin-api
+    status_port            = var.kong_dp_ports.status
+    ports = jsonencode([8444, 8100, 8005, 8006]) # TBD
+    #ports                  = jsonencode([for k, v in var.kong_dp_ports : v])
     ulimits                = jsonencode([4096])
     region                 = var.region
     access_log_format      = var.access_log_format
@@ -102,6 +105,8 @@ data "template_file" "kong_task_definition_cp" {
     ssl_cert               = var.ssl_cert
     ssl_key                = var.ssl_key
     kong_admin_api_uri     = var.kong_ssl_uris.admin_api_uri
+    kong_admin_gui_url     = var.kong_ssl_uris.admin_gui_url
+    admin_token            = var.admin_token
     lua_ssl_cert           = var.lua_ssl_cert
     cluster_cert           = var.cluster_cert
     cluster_key            = var.cluster_key
@@ -122,9 +127,8 @@ data "template_file" "kong_task_definition_dp" {
     memory                 = var.fargate_memory
     user                   = "kong"
     parameter_path         = local.ssm_parameter_path
-    status_port            = var.kong_status_port
     log_group              = var.log_group
-    ports                  = jsonencode([var.admin_api_port, var.kong_status_port])
+    ports = jsonencode([8443, 8100]) # TBD
     ulimits                = jsonencode([4096])
     region                 = var.region
     access_log_format      = var.access_log_format
@@ -192,18 +196,18 @@ module "private_subnets" {
   tags              = var.tags
 }
 
-module "database" {
-  count                   = var.skip_rds_creation ? 0 : 1
-  source                  = "../database"
-  name                    = var.kong_database_config.name
-  environment             = var.environment
-  vpc                     = local.vpc_object
-  allowed_security_groups = local.security_groups
-  skip_final_snapshot     = var.skip_final_snapshot
-  encrypt_storage         = var.encrypt_storage
-  database_credentials = { # FIXME: secrets_manager
-    username = var.postgres_config.master_user
-    password = var.postgres_config.master_password
-  }
-  tags = var.tags
-}
+#module "database" {
+#  count                   = var.skip_rds_creation ? 0 : 1
+#  source                  = "../database"
+#  name                    = var.kong_database_config.name
+#  environment             = var.environment
+#  vpc                     = local.vpc_object
+#  allowed_security_groups = local.security_groups
+#  skip_final_snapshot     = var.skip_final_snapshot
+#  encrypt_storage         = var.encrypt_storage
+#  database_credentials = { # FIXME: secrets_manager
+#    username = var.postgres_config.master_user
+#    password = var.postgres_config.master_password
+#  }
+#  tags = var.tags
+#}

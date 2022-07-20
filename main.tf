@@ -76,12 +76,9 @@ module "kong_ecs" {
   fargate_cpu            = var.fargate_cpu
   fargate_memory         = var.fargate_memory
   enable_execute_command = var.enable_execute_command
-  admin_api_port         = var.admin_api_port # TBD
-  kong_status_port       = var.kong_status_port
+  kong_dp_ports          = var.kong_dp_ports
+  kong_cp_ports          = var.kong_cp_ports
   vpc_id                 = var.vpc_id
-  # subnet_names                 = var.subnet_names
-  # parent_domain                = var.parent_domain
-  # acm_certificate_arn          = var.acm_certificate_arn
 
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
@@ -93,12 +90,10 @@ module "kong_ecs" {
 
   kong_ssl_uris = var.kong_ssl_uris
 
-  # Needed?
-  lb_target_group_arn = var.lb_target_group_arn
-  image_url           = var.image_url
-  execution_role_arn  = var.execution_role_arn
+  ecs_target_group_arns = var.ecs_target_group_arns
+  image_url             = var.image_url
+  execution_role_arn    = var.execution_role_arn
 
-  #DB
   skip_final_snapshot    = var.skip_final_snapshot
   skip_rds_creation      = var.skip_rds_creation
   postgres_config        = var.postgres_config
@@ -117,6 +112,8 @@ module "kong_ecs" {
   ssl_cert     = var.ssl_cert
   ssl_key      = var.ssl_key
   lua_ssl_cert = var.lua_ssl_cert
+
+  admin_token = var.admin_token
 
   cluster_cert = var.cluster_cert
   cluster_key  = var.cluster_key

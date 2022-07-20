@@ -238,7 +238,7 @@ module "create_kong_cp" {
   ami_id                    = data.aws_ami.amazon_linux_2.id
   ami_operating_system      = "amazon-linux"
   ce_pkg                    = "kong-2.3.2.aws.amd64.rpm"
-  key_name                  = var.key_name
+  key_name                  = "mh_key"
   region                    = var.region
   vpc_cidr_block            = aws_vpc.vpc.cidr_block
   iam_instance_profile_name = aws_iam_instance_profile.kong.name
@@ -296,7 +296,7 @@ module "create_kong_dp" {
   ami_id               = data.aws_ami.amazon_linux_2.id
   ami_operating_system = "amazon-linux"
   ce_pkg               = "kong-2.3.2.aws.amd64.rpm"
-  key_name             = var.key_name
+  key_name             = "mh_key"
   region               = var.region
   vpc_cidr_block       = aws_vpc.vpc.cidr_block
 

@@ -46,6 +46,10 @@
       "value": "${clustering_endpoint}"
     },
     {
+      "name": "KONG_CLUSTER_SERVER_NAME",
+      "value": "${cluster_server_name}"
+    },
+    {
       "name": "KONG_CLUSTER_TELEMETRY_ENDPOINT",
       "value": "${telemetry_endpoint}"
     },

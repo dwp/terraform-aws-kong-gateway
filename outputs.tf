@@ -11,6 +11,12 @@ output "launch_config_outputs" {
   sensitive   = false
 }
 
+output "db_outputs" {
+  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].db_outputs : null
+  description = "The DNS address and database name of the RDS instance, and security group ID from the database module."
+  sensitive   = false
+}
+
 ## All
 output "private_subnet_azs" {
   value       = var.deployment_type == "ec2" ? module.kong_ec2[0].private_subnet_azs : var.deployment_type == "ecs" ? module.kong_ecs[0].private_subnet_azs : null
@@ -23,13 +29,6 @@ output "private_subnet_ids" {
   description = "List of private subnet IDs. These are either supplied in the optional `private_subnets` input variable or created in `subnets` submodule."
   sensitive   = false
 }
-
-output "db_outputs" {
-  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].db_outputs : var.deployment_type == "ecs" ? module.kong_ecs[0].db_outputs : null
-  description = "The DNS address and database name of the RDS instance, and security group ID from the database module."
-  sensitive   = false
-}
-
 
 ## ECS
 

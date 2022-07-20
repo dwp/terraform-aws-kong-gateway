@@ -70,6 +70,10 @@
       "value": "${kong_admin_api_uri}"
     },
     {
+      "name": "KONG_ADMIN_GUI_URL",
+      "value": "${kong_admin_gui_url}"
+    },
+    {
       "name": "KONG_CLUSTER_SERVER_NAME",
       "value": ""
     },
@@ -138,6 +142,10 @@
     {
     "name": "SSL_KEY",
     "valueFrom": "${ssl_key}"
+    },
+    {
+    "name": "KONG_ADMIN_TOKEN",
+    "valueFrom": "${admin_token}"
     },
     {
     "name": "PGPASSWORD",
