@@ -524,8 +524,8 @@ variable "kong_cp_ports" {
   description = "The ports for the Kong Control Plane"
   type        = map(string)
   default = {
-    "proxy"      = 8443,
-    "status"     = 8100
+    "proxy"  = 8443,
+    "status" = 8100
   }
 }
 

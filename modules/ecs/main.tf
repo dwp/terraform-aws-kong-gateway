@@ -96,23 +96,23 @@ data "template_file" "kong_task_definition_cp" {
     log_group              = var.log_group
     admin_api_port         = var.kong_dp_ports.admin-api
     status_port            = var.kong_dp_ports.status
-    ports = jsonencode([8444, 8100, 8005, 8006]) # TBD
+    ports                  = jsonencode([8444, 8100, 8005, 8006]) # TBD
     #ports                  = jsonencode([for k, v in var.kong_dp_ports : v])
-    ulimits                = jsonencode([4096])
-    region                 = var.region
-    access_log_format      = var.access_log_format
-    error_log_format       = var.error_log_format
-    ssl_cert               = var.ssl_cert
-    ssl_key                = var.ssl_key
-    kong_admin_api_uri     = var.kong_ssl_uris.admin_api_uri
-    kong_admin_gui_url     = var.kong_ssl_uris.admin_gui_url
-    admin_token            = var.admin_token
-    lua_ssl_cert           = var.lua_ssl_cert
-    cluster_cert           = var.cluster_cert
-    cluster_key            = var.cluster_key
-    kong_log_level         = var.kong_log_level
-    entrypoint             = "/management-plane-entrypoint.sh"
-    custom_nginx_conf      = base64encode(var.custom_nginx_conf)
+    ulimits            = jsonencode([4096])
+    region             = var.region
+    access_log_format  = var.access_log_format
+    error_log_format   = var.error_log_format
+    ssl_cert           = var.ssl_cert
+    ssl_key            = var.ssl_key
+    kong_admin_api_uri = var.kong_ssl_uris.admin_api_uri
+    kong_admin_gui_url = var.kong_ssl_uris.admin_gui_url
+    admin_token        = var.admin_token
+    lua_ssl_cert       = var.lua_ssl_cert
+    cluster_cert       = var.cluster_cert
+    cluster_key        = var.cluster_key
+    kong_log_level     = var.kong_log_level
+    entrypoint         = "/management-plane-entrypoint.sh"
+    custom_nginx_conf  = base64encode(var.custom_nginx_conf)
   }
 }
 
@@ -128,7 +128,7 @@ data "template_file" "kong_task_definition_dp" {
     user                   = "kong"
     parameter_path         = local.ssm_parameter_path
     log_group              = var.log_group
-    ports = jsonencode([8443, 8100]) # TBD
+    ports                  = jsonencode([8443, 8100]) # TBD
     ulimits                = jsonencode([4096])
     region                 = var.region
     access_log_format      = var.access_log_format
