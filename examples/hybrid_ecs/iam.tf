@@ -59,8 +59,13 @@ resource "aws_iam_policy" "ecs_execute_command_policy" {
   policy      = data.aws_iam_policy_document.ecs_execute_command_policy.json
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_execute_command_policy_attachment" {
+resource "aws_iam_role_policy_attachment" "ecs_execute_command_policy_attachment_cp" {
   role       = module.create_kong_cp.kong_iam_role
+  policy_arn = aws_iam_policy.ecs_execute_command_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_execute_command_policy_attachment_dp" {
+  role       = module.create_kong_dp.kong_iam_role
   policy_arn = aws_iam_policy.ecs_execute_command_policy.arn
 }
 
@@ -88,9 +93,4 @@ data "aws_iam_policy_document" "ecs_execute_command_policy" {
     ]
     resources = ["*"]
   }
-}
-
-resource "random_string" "session_secret" {
-  length  = 32
-  special = false
 }

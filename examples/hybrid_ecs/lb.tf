@@ -5,9 +5,9 @@ locals {
     (aws_lb_target_group.internal-telemetry.arn) = 8006
     (aws_lb_target_group.internal-admin-api.arn) = 8444
   }
-  target_group_dp = [
-    aws_lb_target_group.external-proxy.arn
-  ]
+  target_group_dp = {
+    (aws_lb_target_group.external-proxy.arn) = 8443
+  }
 }
 
 resource "aws_security_group" "external-lb" {
@@ -79,15 +79,17 @@ resource "aws_lb" "external" {
 }
 
 resource "aws_lb_target_group" "external-proxy" {
-  name     = "external-proxy-8000"
-  port     = 8000
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.vpc.id
+  name        = "external-proxy-8443"
+  port        = 8443
+  protocol    = "HTTPS"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
   health_check {
     healthy_threshold   = 5
     interval            = 5
     path                = "/status"
-    port                = 8000
+    protocol            = "HTTPS"
+    port                = 8100
     timeout             = 3
     unhealthy_threshold = 2
   }

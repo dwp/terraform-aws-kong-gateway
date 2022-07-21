@@ -15,7 +15,7 @@
     },
     {
       "name": "KONG_CLUSTER_MTLS",
-      "value": "pki"
+      "value": "shared"
     },
     {
       "name": "KONG_CLUSTER_CERT",
@@ -26,8 +26,8 @@
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
-      "name": "KONG_CLUSTER_TELEMETRY_SERVER_NAME",
-      "value": "${control_plane_endpoint}"
+      "name": "KONG_CLUSTER_SERVER_NAME",
+      "value": "${cluster_server_name}"
     },
     {
       "name": "KONG_LUA_SSL_TRUSTED_CERTIFICATE",
@@ -44,10 +44,6 @@
     {
       "name": "KONG_CLUSTER_CONTROL_PLANE",
       "value": "${clustering_endpoint}"
-    },
-    {
-      "name": "KONG_CLUSTER_SERVER_NAME",
-      "value": "${cluster_server_name}"
     },
     {
       "name": "KONG_CLUSTER_TELEMETRY_ENDPOINT",

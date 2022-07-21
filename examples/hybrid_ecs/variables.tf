@@ -106,8 +106,8 @@ variable "rules_with_source_cidr_blocks" {
   default = {
     "kong-ingress-proxy-https" = {
       type        = "ingress",
-      from_port   = 8000,
-      to_port     = 8000,
+      from_port   = 8443,
+      to_port     = 8443,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
@@ -181,10 +181,10 @@ variable "rules_with_source_cidr_blocks" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-egress-8000" = {
+    "kong-egress-8443" = {
       type        = "egress",
-      from_port   = 8000,
-      to_port     = 8000,
+      from_port   = 8443,
+      to_port     = 8443,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },

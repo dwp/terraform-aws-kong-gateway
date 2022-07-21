@@ -26,10 +26,6 @@
       "value": "on"
     },
     {
-      "name": "KONG_ADMIN_GUI_SESSION_CONF",
-      "value": "{\"secret\":\"${session_secret}\",\"cookie_secure\":false}"
-    },
-    {
       "name": "KONG_ADMIN_SSL_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
     },
@@ -144,16 +140,16 @@
     "valueFrom": "${ssl_key}"
     },
     {
-    "name": "KONG_ADMIN_TOKEN",
+    "name": "KONG_PASSWORD",
     "valueFrom": "${admin_token}"
-    },
-    {
-    "name": "PGPASSWORD",
-    "valueFrom": "${db_master_password_arn}"
     },
     {
     "name": "KONG_PG_PASSWORD",
     "valueFrom": "${db_password_arn}"
+    },
+    {
+    "name": "KONG_ADMIN_GUI_SESSION_CONF",
+    "valueFrom": "${kong_admin_gui_session_conf}"
     },
     {
     "name": "LUA_SSL_CERT",

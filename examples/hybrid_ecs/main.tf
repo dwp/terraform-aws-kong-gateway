@@ -2,24 +2,6 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_ami" "amazon_linux_2" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["*amzn2-ami-hvm*"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
-
 # Used for supporting infra
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -203,50 +185,6 @@ resource "aws_instance" "external_proxy" {
 
 locals {
   environment = "${var.environment}-${terraform.workspace}"
-
-  kong_control_plane_config = {
-    "KONG_ROLE"              = "control_plane"
-    "KONG_PROXY_LISTEN"      = "off"
-    "KONG_ANONYMOUS_REPORTS" = "off"
-    "KONG_PORTAL"            = "on"
-    "KONG_VITALS"            = "on"
-    "KONG_AUDIT_LOG"         = "on"
-    "KONG_LOG_LEVEL"         = "debug"
-  }
-
-  kong_data_plane_config = {
-    "KONG_ROLE"              = "data_plane"
-    "KONG_DATABASE"          = "off"
-    "KONG_LOG_LEVEL"         = "debug"
-    "KONG_ANONYMOUS_REPORTS" = "off"
-  }
-
-  kong_hybrid_conf = {
-    server_name  = ""
-    cluster_cert = tls_locally_signed_cert.cert.cert_pem
-    cluster_key  = tls_private_key.cert.private_key_pem
-    mtls         = "shared"
-    ca_cert      = ""
-    endpoint     = aws_lb.internal.dns_name
-  }
-}
-
-resource "aws_cloudwatch_log_group" "kong_dp" {
-  name              = "${var.environment}-dp"
-  retention_in_days = 7
-
-  tags = {
-    Name = "${var.environment}-dp"
-  }
-}
-
-resource "aws_cloudwatch_log_group" "kong_cp" {
-  name              = "${var.environment}-cp"
-  retention_in_days = 7
-
-  tags = {
-    Name = "${var.environment}-cp"
-  }
 }
 
 module "create_kong_cp" {
@@ -261,8 +199,7 @@ module "create_kong_cp" {
   region           = var.region
   vpc_cidr_block   = aws_vpc.vpc.cidr_block
 
-  db_password_arn        = aws_ssm_parameter.db_password.arn
-  db_master_password_arn = aws_ssm_parameter.db_master_password.arn
+  db_password_arn = aws_ssm_parameter.db_password.arn
 
   ssl_cert     = aws_ssm_parameter.cert.arn
   ssl_key      = aws_ssm_parameter.key.arn
@@ -273,7 +210,7 @@ module "create_kong_cp" {
 
   admin_token = aws_ssm_parameter.ee-admin-token.arn
 
-  session_secret = random_string.session_secret.result
+  kong_admin_gui_session_conf = aws_ssm_parameter.session_conf.arn
 
   kong_log_level = "debug"
 
@@ -284,6 +221,8 @@ module "create_kong_cp" {
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
   log_group = aws_cloudwatch_log_group.kong_cp.name
+
+  kong_admin_api_uri = "${aws_lb.external.dns_name}:8444"
 
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
@@ -321,35 +260,45 @@ module "create_kong_cp" {
 module "create_kong_dp" {
   source = "../../"
 
-  deployment_type      = "ec2"
-  instance_type        = var.instance_type
-  vpc_id               = aws_vpc.vpc.id
-  ami_id               = data.aws_ami.amazon_linux_2.id
-  ami_operating_system = "amazon-linux"
-  ce_pkg               = "kong-2.8.1.aws.amd64.rpm"
-  key_name             = "mh_key"
-  region               = var.region
-  vpc_cidr_block       = aws_vpc.vpc.cidr_block
+  deployment_type  = "ecs"
+  role             = "data_plane"
+  ecs_cluster_arn  = aws_ecs_cluster.kong.arn
+  ecs_cluster_name = aws_ecs_cluster.kong.name
+  instance_type    = var.instance_type
+  vpc_id           = aws_vpc.vpc.id
+  region           = var.region
+  vpc_cidr_block   = aws_vpc.vpc.cidr_block
 
-  iam_instance_profile_name = aws_iam_instance_profile.kong.name
+  ssl_cert     = aws_ssm_parameter.cert.arn
+  ssl_key      = aws_ssm_parameter.key.arn
+  lua_ssl_cert = aws_ssm_parameter.cert.arn
 
-  asg_desired_capacity = var.asg_desired_capacity
-  asg_max_size         = var.asg_max_size
-  asg_min_size         = var.asg_min_size
+  cluster_cert = aws_ssm_parameter.cert.arn
+  cluster_key  = aws_ssm_parameter.key.arn
 
-  proxy_config = {
-    http_proxy  = "http://${aws_instance.external_proxy.private_ip}:3128"
-    https_proxy = "http://${aws_instance.external_proxy.private_ip}:3128"
-    no_proxy    = "localhost,169.254.169.254,127.0.0.1"
-  }
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+
+  # DP Specific
+  clustering_endpoint = "${aws_lb.internal.dns_name}:8005"
+  telemetry_endpoint  = "${aws_lb.internal.dns_name}:8006"
+  cluster_server_name = "" # TBD
+
+  desired_count = var.desired_capacity
+  min_capacity  = var.min_capacity
+  max_capacity  = var.max_capacity
+
+  log_group         = aws_cloudwatch_log_group.kong_dp.name
+  access_log_format = var.access_log_format
+  error_log_format  = var.error_log_format
+  custom_nginx_conf = var.custom_nginx_conf
+  kong_log_level    = "debug"
 
   rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 
-  target_group_arns = local.target_group_dp
+  image_url = var.image_url
 
-  skip_rds_creation = true
-  kong_config       = local.kong_data_plane_config
-  kong_hybrid_conf  = local.kong_hybrid_conf
+  ecs_target_group_arns = local.target_group_dp
+  skip_rds_creation     = true
 
   private_subnets    = module.create_kong_cp.private_subnet_ids
   availability_zones = module.create_kong_cp.private_subnet_azs
@@ -359,61 +308,6 @@ module "create_kong_dp" {
   description = var.description
   tags        = var.tags
 }
-
-#module "create_kong_dp" {
-#  source = "../../"
-#
-#  deployment_type  = "ecs"
-#  role             = "data_plane"
-#  ecs_cluster_arn  = aws_ecs_cluster.kong.arn
-#  ecs_cluster_name = aws_ecs_cluster.kong.name
-#  instance_type    = var.instance_type
-#  vpc_id           = aws_vpc.vpc.id
-#  region           = var.region
-#  vpc_cidr_block   = aws_vpc.vpc.cidr_block
-#
-#  ssl_cert     = aws_ssm_parameter.cert.arn
-#  ssl_key      = aws_ssm_parameter.key.arn
-#  lua_ssl_cert = aws_ssm_parameter.cert.arn
-#
-#  cluster_cert = aws_ssm_parameter.cert.arn
-#  cluster_key  = aws_ssm_parameter.key.arn
-#
-#  # DP Specific
-#  control_plane_endpoint = aws_lb.external.dns_name
-#  clustering_endpoint    = local.cluster
-#  telemetry_endpoint     = local.telemetry
-#
-#  kong_log_level = "debug" # TBD
-#
-#  desired_count = var.desired_capacity
-#  min_capacity  = var.min_capacity
-#  max_capacity  = var.max_capacity
-#
-#  log_group = aws_cloudwatch_log_group.kong_dp.name
-#
-#  access_log_format = var.access_log_format
-#  error_log_format  = var.error_log_format
-#
-#  custom_nginx_conf = var.custom_nginx_conf
-#
-#  rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
-#
-#  image_url = var.image_url
-#
-#  lb_target_group_arn = aws_lb_target_group.external-admin-api.arn
-#
-#  skip_rds_creation = true
-#  template_file     = "data_plane"
-#
-#  private_subnets    = module.create_kong_cp.private_subnet_ids
-#  availability_zones = module.create_kong_cp.private_subnet_azs
-#
-#  environment = local.environment
-#  service     = var.service
-#  description = var.description
-#  tags        = var.tags
-#}
 
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.vpc.id

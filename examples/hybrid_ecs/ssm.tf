@@ -67,3 +67,22 @@ resource "aws_ssm_parameter" "db_master_password" {
 
   overwrite = true
 }
+
+resource "random_string" "session_secret" {
+  length  = 32
+  special = false
+}
+
+resource "aws_ssm_parameter" "session_conf" {
+  name  = format("/%s/%s/ee/session/conf", var.service, local.environment)
+  type  = "SecureString"
+  value = "{\"secret\":\"${random_string.session_secret.result}\",\"cookie_secure\":false}"
+
+  key_id = aws_kms_alias.kong.target_key_arn
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+
+  overwrite = true
+}

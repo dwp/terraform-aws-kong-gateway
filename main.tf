@@ -80,6 +80,10 @@ module "kong_ecs" {
   kong_cp_ports          = var.kong_cp_ports
   vpc_id                 = var.vpc_id
 
+  security_group_ids  = var.security_group_ids
+  security_group_name = var.security_group_name
+  availability_zones  = var.availability_zones
+
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
 
@@ -88,20 +92,20 @@ module "kong_ecs" {
   private_subnets_to_create = var.private_subnets_to_create
   tags                      = var.tags
 
-  kong_ssl_uris = var.kong_ssl_uris
+  kong_admin_api_uri = var.kong_admin_api_uri
+  kong_admin_gui_url = var.kong_admin_gui_url
 
   ecs_target_group_arns = var.ecs_target_group_arns
   image_url             = var.image_url
   execution_role_arn    = var.execution_role_arn
 
-  skip_final_snapshot    = var.skip_final_snapshot
-  skip_rds_creation      = var.skip_rds_creation
-  postgres_config        = var.postgres_config
-  postgres_host          = var.postgres_host
-  db_password_arn        = var.db_password_arn
-  db_master_password_arn = var.db_master_password_arn
+  skip_final_snapshot = var.skip_final_snapshot
+  skip_rds_creation   = var.skip_rds_creation
+  postgres_config     = var.postgres_config
+  postgres_host       = var.postgres_host
+  db_password_arn     = var.db_password_arn
 
-  session_secret = var.session_secret
+  kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
 
   log_group = var.log_group
 
@@ -118,16 +122,13 @@ module "kong_ecs" {
   cluster_cert = var.cluster_cert
   cluster_key  = var.cluster_key
 
-  kong_log_level       = var.kong_log_level
-  log_retention_period = var.log_retention_period
-
-  secrets_list = var.secrets_list
+  kong_log_level = var.kong_log_level
 
   desired_count = var.desired_count
   min_capacity  = var.min_capacity
   max_capacity  = var.max_capacity
 
-  control_plane_endpoint = var.control_plane_endpoint
-  clustering_endpoint    = var.clustering_endpoint
-  telemetry_endpoint     = var.telemetry_endpoint
+  clustering_endpoint = var.clustering_endpoint
+  telemetry_endpoint  = var.telemetry_endpoint
+  cluster_server_name = var.cluster_server_name
 }

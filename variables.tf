@@ -275,10 +275,10 @@ variable "kong_ssl_uris" {
   })
   default = {
     protocol            = "http"
-    admin_api_uri       = "https://localhost:8444"
-    admin_gui_url       = "https://localhost:8445"
-    portal_gui_host     = "https://localhost:8446"
-    portal_api_url      = "https://localhost:8447"
+    admin_api_uri       = "http://localhost:8001"
+    admin_gui_url       = "http://localhost:8002"
+    portal_gui_host     = "http://localhost:8003"
+    portal_api_url      = "http://localhost:8004"
     portal_cors_origins = null
   }
 }
@@ -481,22 +481,6 @@ variable "security_group_name" {
 
 ## ECS
 
-# variable "env" {
-#   description = "Environment name, used to namespace resources e.g. pipeline ID or local reference"
-#   type        = string
-# }
-
-# variable "vpc_name" {
-#   description = "VPC that resources should be deployed to"
-#   type        = string
-# }
-
-# variable "subnet_names" {
-#   description = "Subnets that resources should be deployed in"
-#   type        = list(string)
-# }
-
-
 variable "fargate_cpu" {
   description = "(Optional) The CPU for the Fargate Task"
   type        = number
@@ -509,9 +493,9 @@ variable "fargate_memory" {
   default     = 4096
 }
 
-variable "kong_dp_ports" {
+variable "kong_cp_ports" {
   description = "The ports for the Kong Data Plane"
-  type        = map(string)
+  type        = map(number)
   default = {
     "admin-api"  = 8444,
     "status"     = 8100,
@@ -520,19 +504,13 @@ variable "kong_dp_ports" {
   }
 }
 
-variable "kong_cp_ports" {
+variable "kong_dp_ports" {
   description = "The ports for the Kong Control Plane"
-  type        = map(string)
+  type        = map(number)
   default = {
     "proxy"  = 8443,
     "status" = 8100
   }
-}
-
-variable "log_retention_period" {
-  description = "(Optional) The retention period for logs (in days), as described in the policy document"
-  type        = number
-  default     = 7
 }
 
 variable "enable_execute_command" {
@@ -546,21 +524,6 @@ variable "platform_version" {
   type        = string
   default     = "1.4.0"
 }
-
-# variable "parent_domain" {
-#   description = "Parent DNS Domain of the Environment"
-#   type        = string
-# }
-
-# variable "acm_certificate_arn" {
-#   description = "ARN of the ACM Certificate to be used by the Load Balancer"
-#   type        = string
-# }
-
-# variable "management_plane_endpoint" {
-#   description = "Server name of the Control Plane to cluster to"
-#   type        = string
-# }
 
 variable "ssl_cert" {
   description = "Secrets Manager or Parameter Store ARN of the Certificate used to secure traffic to the gateway"
@@ -610,12 +573,6 @@ variable "error_log_format" {
   default     = "logs/error.log"
 }
 
-variable "secrets_list" {
-  description = "(Optional) List of Secret or Parameter Store ARNs to grant the ECS Task Execution Role to"
-  type        = list(string)
-  default     = ["*"]
-}
-
 variable "desired_count" {
   description = "(Optional) Desired Task count for the Gateway ECS Task Definition"
   type        = number
@@ -641,13 +598,13 @@ variable "custom_nginx_conf" {
 }
 
 variable "image_url" {
-  description = "URL Image"
+  description = "The URL where the Docker image resides"
   type        = string
   default     = null
 }
 
 variable "ecs_target_group_arns" {
-  description = "Target Group ARN for ECS"
+  description = "Target Group ARNs for the ECS Service"
   type        = map(string)
   default     = null
 }
@@ -682,44 +639,50 @@ variable "db_password_arn" {
   default     = null
 }
 
-variable "db_master_password_arn" {
-  description = "The Master DB Password ARN that is used by the ECS Task Definition"
-  type        = string
-  default     = null
-}
-
 variable "log_group" {
   description = "The Log Group for ECS to report out to"
   type        = string
   default     = null
 }
 
-variable "session_secret" {
-  description = "The session secret that Kong will use"
+variable "kong_admin_gui_session_conf" {
+  description = "The session configuration that Kong will use"
   type        = string
-  default     = null
-}
-
-variable "control_plane_endpoint" {
-  type        = string
-  description = ""
   default     = null
 }
 
 variable "clustering_endpoint" {
   type        = string
-  description = ""
+  description = "Address of the control plane node from which configuration updates will be fetched"
   default     = null
 }
 
 variable "telemetry_endpoint" {
   type        = string
-  description = ""
+  description = "Telemetry address of the control plane node to which telemetry updates will be posted"
+  default     = null
+}
+
+variable "cluster_server_name" {
+  type        = string
+  description = "The server name used in the SNI of the TLS connection from a DP node to a CP node"
   default     = null
 }
 
 variable "admin_token" {
   type        = string
-  description = ""
+  description = "The ARN of the admin token to be used within the ECS Task Definition."
   default     = null
+}
+
+variable "kong_admin_api_uri" {
+  description = "The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
+  type        = string
+  default     = ""
+}
+
+variable "kong_admin_gui_url" {
+  description = "The Admin GUI URL of the Kong Manager."
+  type        = string
+  default     = ""
 }

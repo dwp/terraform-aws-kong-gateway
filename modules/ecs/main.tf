@@ -11,11 +11,6 @@ locals {
 
   security_groups = length(var.security_group_ids) > 0 ? var.security_group_ids : module.security_groups.0.ids
   private_subnets = length(var.private_subnets) > 0 ? var.private_subnets : module.private_subnets.0.ids
-  #  database = var.skip_rds_creation ? null : {
-  #    endpoint          = module.database.0.outputs.endpoint
-  #    database_name     = module.database.0.outputs.database_name
-  #    security_group_id = module.database.0.outputs.security_group_id
-  #  }
 
   azs = length(var.availability_zones) > 0 ? var.availability_zones : module.private_subnets.0.azs
 
@@ -80,39 +75,37 @@ data "template_file" "kong_task_definition_cp" {
   count    = var.role == "control_plane" ? 1 : 0
   template = file("${path.module}/../../templates/ecs/kong_control_plane.tpl")
   vars = {
-    name                   = local.name
-    group_name             = local.name
-    cpu                    = var.fargate_cpu
-    image_url              = var.image_url # To be updated
-    memory                 = var.fargate_memory
-    user                   = "kong"
-    parameter_path         = local.ssm_parameter_path
-    db_user                = var.kong_database_config.user
-    db_host                = local.db_info.endpoint
-    db_name                = local.db_info.database_name
-    db_password_arn        = var.db_password_arn
-    db_master_password_arn = var.db_master_password_arn
-    session_secret         = var.session_secret
-    log_group              = var.log_group
-    admin_api_port         = var.kong_dp_ports.admin-api
-    status_port            = var.kong_dp_ports.status
-    ports                  = jsonencode([8444, 8100, 8005, 8006]) # TBD
-    #ports                  = jsonencode([for k, v in var.kong_dp_ports : v])
-    ulimits            = jsonencode([4096])
-    region             = var.region
-    access_log_format  = var.access_log_format
-    error_log_format   = var.error_log_format
-    ssl_cert           = var.ssl_cert
-    ssl_key            = var.ssl_key
-    kong_admin_api_uri = var.kong_ssl_uris.admin_api_uri
-    kong_admin_gui_url = var.kong_ssl_uris.admin_gui_url
-    admin_token        = var.admin_token
-    lua_ssl_cert       = var.lua_ssl_cert
-    cluster_cert       = var.cluster_cert
-    cluster_key        = var.cluster_key
-    kong_log_level     = var.kong_log_level
-    entrypoint         = "/management-plane-entrypoint.sh"
-    custom_nginx_conf  = base64encode(var.custom_nginx_conf)
+    name                        = local.name
+    group_name                  = local.name
+    cpu                         = var.fargate_cpu
+    image_url                   = var.image_url # TBD
+    memory                      = var.fargate_memory
+    user                        = "kong"
+    parameter_path              = local.ssm_parameter_path
+    db_user                     = var.kong_database_config.user
+    db_host                     = local.db_info.endpoint
+    db_name                     = local.db_info.database_name
+    db_password_arn             = var.db_password_arn
+    kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
+    log_group                   = var.log_group
+    admin_api_port              = var.kong_cp_ports.admin-api
+    status_port                 = var.kong_cp_ports.status
+    ports                       = jsonencode([for k, v in var.kong_cp_ports : v])
+    ulimits                     = jsonencode([4096])
+    region                      = var.region
+    access_log_format           = var.access_log_format
+    error_log_format            = var.error_log_format
+    ssl_cert                    = var.ssl_cert
+    ssl_key                     = var.ssl_key
+    kong_admin_api_uri          = var.kong_admin_api_uri
+    kong_admin_gui_url          = var.kong_admin_gui_url
+    admin_token                 = var.admin_token
+    lua_ssl_cert                = var.lua_ssl_cert
+    cluster_cert                = var.cluster_cert
+    cluster_key                 = var.cluster_key
+    kong_log_level              = var.kong_log_level
+    entrypoint                  = "/management-plane-entrypoint.sh"
+    custom_nginx_conf           = base64encode(var.custom_nginx_conf)
   }
 }
 
@@ -120,30 +113,31 @@ data "template_file" "kong_task_definition_dp" {
   count    = var.role == "data_plane" ? 1 : 0
   template = file("${path.module}/../../templates/ecs/kong_data_plane.tpl")
   vars = {
-    name                   = local.name
-    group_name             = local.name
-    cpu                    = var.fargate_cpu
-    image_url              = var.image_url # To be updated
-    memory                 = var.fargate_memory
-    user                   = "kong"
-    parameter_path         = local.ssm_parameter_path
-    log_group              = var.log_group
-    ports                  = jsonencode([8443, 8100]) # TBD
-    ulimits                = jsonencode([4096])
-    region                 = var.region
-    access_log_format      = var.access_log_format
-    error_log_format       = var.error_log_format
-    control_plane_endpoint = var.control_plane_endpoint
-    clustering_endpoint    = var.clustering_endpoint
-    telemetry_endpoint     = var.telemetry_endpoint
-    ssl_cert               = var.ssl_cert
-    ssl_key                = var.ssl_key
-    lua_ssl_cert           = var.lua_ssl_cert
-    cluster_cert           = var.cluster_cert
-    cluster_key            = var.cluster_key
-    kong_log_level         = var.kong_log_level
-    entrypoint             = "/gateway-entrypoint.sh"
-    custom_nginx_conf      = base64encode(var.custom_nginx_conf)
+    name                = local.name
+    group_name          = local.name
+    cpu                 = var.fargate_cpu
+    image_url           = var.image_url # To be updated
+    memory              = var.fargate_memory
+    user                = "kong"
+    parameter_path      = local.ssm_parameter_path
+    log_group           = var.log_group
+    ports               = jsonencode([for k, v in var.kong_dp_ports : v])
+    ulimits             = jsonencode([4096])
+    region              = var.region
+    access_log_format   = var.access_log_format
+    error_log_format    = var.error_log_format
+    clustering_endpoint = var.clustering_endpoint
+    telemetry_endpoint  = var.telemetry_endpoint
+    cluster_server_name = var.cluster_server_name
+    status_port         = var.kong_dp_ports.status
+    ssl_cert            = var.ssl_cert
+    ssl_key             = var.ssl_key
+    lua_ssl_cert        = var.lua_ssl_cert
+    cluster_cert        = var.cluster_cert
+    cluster_key         = var.cluster_key
+    kong_log_level      = var.kong_log_level
+    entrypoint          = "/gateway-entrypoint.sh"
+    custom_nginx_conf   = base64encode(var.custom_nginx_conf)
   }
 }
 data "aws_iam_policy_document" "ecs_assume_role_policy" {
@@ -195,19 +189,3 @@ module "private_subnets" {
   subnets_to_create = var.private_subnets_to_create
   tags              = var.tags
 }
-
-#module "database" {
-#  count                   = var.skip_rds_creation ? 0 : 1
-#  source                  = "../database"
-#  name                    = var.kong_database_config.name
-#  environment             = var.environment
-#  vpc                     = local.vpc_object
-#  allowed_security_groups = local.security_groups
-#  skip_final_snapshot     = var.skip_final_snapshot
-#  encrypt_storage         = var.encrypt_storage
-#  database_credentials = { # FIXME: secrets_manager
-#    username = var.postgres_config.master_user
-#    password = var.postgres_config.master_password
-#  }
-#  tags = var.tags
-#}
