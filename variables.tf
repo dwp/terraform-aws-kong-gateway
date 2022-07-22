@@ -690,4 +690,5 @@ variable "kong_admin_gui_url" {
 variable "entrypoint" {
   description = "The entrypoint file used for the Task definition."
   type        = string
+  default     = null
 }
