@@ -48,3 +48,12 @@ suites:
           backend: local
           attrs:
             - test/integration/hybrid_amazon_linux/attrs.yml
+  - name: hybrid_ecs
+    driver:
+      root_module_directory: examples/hybrid_ecs
+    verifier:
+      systems:
+        - name: default
+          backend: local
+          attrs:
+            - test/integration/hybrid_ecs/attrs.yml
