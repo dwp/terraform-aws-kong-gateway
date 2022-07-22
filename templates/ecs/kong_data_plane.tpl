@@ -116,7 +116,7 @@
     "valueFrom": "${cluster_key}"
     }
   ],
-  "entryPoint": ["/gateway-entrypoint.sh"],
+  "entryPoint": ["${entrypoint}"],
   "portMappings": ${jsonencode([
     for port in jsondecode(ports) : {
       containerPort = port,

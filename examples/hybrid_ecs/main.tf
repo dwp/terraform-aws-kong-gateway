@@ -214,6 +214,8 @@ module "create_kong_cp" {
 
   kong_log_level = "debug"
 
+  entrypoint = "/management-plane-entrypoint.sh"
+
   desired_count = var.desired_capacity
   min_capacity  = var.min_capacity
   max_capacity  = var.max_capacity
@@ -291,6 +293,8 @@ module "create_kong_dp" {
   error_log_format  = var.error_log_format
   custom_nginx_conf = var.custom_nginx_conf
   kong_log_level    = "debug"
+
+  entrypoint = "/gateway-entrypoint.sh"
 
   rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 

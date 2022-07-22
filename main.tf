@@ -67,7 +67,6 @@ module "kong_ecs" {
   count  = var.deployment_type == "ecs" ? 1 : 0
   source = "./modules/ecs"
 
-  #env = replace(var.env, "_", "-")
   role                   = var.role
   ecs_cluster_arn        = var.ecs_cluster_arn
   ecs_cluster_name       = var.ecs_cluster_name
@@ -106,6 +105,8 @@ module "kong_ecs" {
   db_password_arn     = var.db_password_arn
 
   kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
+
+  entrypoint = var.entrypoint
 
   log_group = var.log_group
 

@@ -2,8 +2,6 @@ locals {
   create_private_subnets = length(var.private_subnets) > 0 ? 0 : 1
   create_security_groups = length(var.security_group_ids) > 0 ? 0 : 1
 
-  # If the module user has specified a postgres_host then we use
-  # that as our endpoint, as we will not be triggering the database module
   db_info = {
     endpoint      = var.postgres_host
     database_name = var.kong_database_config.name
@@ -104,7 +102,7 @@ data "template_file" "kong_task_definition_cp" {
     cluster_cert                = var.cluster_cert
     cluster_key                 = var.cluster_key
     kong_log_level              = var.kong_log_level
-    entrypoint                  = "/management-plane-entrypoint.sh"
+    entrypoint                  = var.entrypoint
     custom_nginx_conf           = base64encode(var.custom_nginx_conf)
   }
 }
@@ -136,7 +134,7 @@ data "template_file" "kong_task_definition_dp" {
     cluster_cert        = var.cluster_cert
     cluster_key         = var.cluster_key
     kong_log_level      = var.kong_log_level
-    entrypoint          = "/gateway-entrypoint.sh"
+    entrypoint          = var.entrypoint
     custom_nginx_conf   = base64encode(var.custom_nginx_conf)
   }
 }
