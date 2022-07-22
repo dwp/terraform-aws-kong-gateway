@@ -78,7 +78,7 @@ data "template_file" "kong_task_definition_cp" {
     name                        = local.name
     group_name                  = local.name
     cpu                         = var.fargate_cpu
-    image_url                   = var.image_url # TBD
+    image_url                   = var.image_url
     memory                      = var.fargate_memory
     user                        = "kong"
     parameter_path              = local.ssm_parameter_path

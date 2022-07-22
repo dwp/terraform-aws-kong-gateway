@@ -60,6 +60,6 @@ data "aws_iam_policy_document" "ecs_secrets_policy" {
       "secretsmanager:GetSecretValue",
       "kms:Decrypt",
     ]
-    resources = ["*"] # TBD var.secrets_list
+    resources = ["*"]
   }
 }

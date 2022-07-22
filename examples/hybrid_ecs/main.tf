@@ -281,7 +281,6 @@ module "create_kong_dp" {
   # DP Specific
   clustering_endpoint = "${aws_lb.internal.dns_name}:8005"
   telemetry_endpoint  = "${aws_lb.internal.dns_name}:8006"
-  cluster_server_name = "" # TBD
 
   desired_count = var.desired_capacity
   min_capacity  = var.min_capacity

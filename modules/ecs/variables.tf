@@ -485,7 +485,7 @@ variable "telemetry_endpoint" {
 variable "cluster_server_name" {
   type        = string
   description = "The server name used in the SNI of the TLS connection from a DP node to a CP node"
-  default     = null
+  default     = ""
 }
 
 variable "admin_token" {

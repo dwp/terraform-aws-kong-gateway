@@ -41,7 +41,6 @@ resource "aws_security_group_rule" "external-lb-ingress-admin" {
 
 }
 
-# TBD
 resource "aws_security_group_rule" "external-lb-status" {
   security_group_id = aws_security_group.external-lb.id
 
