@@ -38,7 +38,7 @@ jobs:
           output_path: 'results'
           platform_type: terraform
           fail_on: high,medium
-          exclude_queries: '8e94dced-9bcc-4203-8eb7-7e41202b2505,e592a0c5-5bdb-414c-9066-5dba7cdea370,7ebc9038-0bde-479a-acc4-6ed7b6758899,91f16d09-689e-4926-aca7-155157f634ed,f996f3cb-00fc-480c-8973-8ab04d44a8cc' # Excludes 'Auto Scaling Group With No Associated ELB', 'IAM Access Analyzer Undefined' queries, 'Vulnerable policy for the KMS Key' ECS Service without tasks running and excludes where password equals null.
+          exclude_queries: '8e94dced-9bcc-4203-8eb7-7e41202b2505,e592a0c5-5bdb-414c-9066-5dba7cdea370,7ebc9038-0bde-479a-acc4-6ed7b6758899,91f16d09-689e-4926-aca7-155157f634ed,a88baa34-e2ad-44ea-ad6f-8cac87bc7c71' # Excludes 'Auto Scaling Group With No Associated ELB', 'IAM Access Analyzer Undefined' queries, 'Vulnerable policy for the KMS Key' ECS Service without tasks running and excludes where password equals null.
       - name: Display KICS Results
         run: |
           cat results/results.json
