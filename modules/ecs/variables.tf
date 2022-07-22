@@ -267,7 +267,7 @@ variable "rules_with_source_security_groups" {
 }
 
 variable "rules_with_source_prefix_list_id" {
-  description = "Security rules for the Kong instance that have a Prefix List ID as their Source"
+  description = "(Optional) Security rules for the Kong instance that have a Prefix List ID as their Source"
   type = map(object({
     type           = string,
     from_port      = number,
@@ -315,7 +315,7 @@ variable "fargate_memory" {
 }
 
 variable "kong_cp_ports" {
-  description = "The ports for the Kong Data Plane"
+  description = "(Optional) The ports for the Kong Data Plane"
   type        = map(number)
   default = {
     "admin-api"  = 8444,
@@ -326,7 +326,7 @@ variable "kong_cp_ports" {
 }
 
 variable "kong_dp_ports" {
-  description = "The ports for the Kong Control Plane"
+  description = "(Optional) The ports for the Kong Control Plane"
   type        = map(number)
   default = {
     "proxy"  = 8443,
@@ -335,7 +335,7 @@ variable "kong_dp_ports" {
 }
 
 variable "enable_execute_command" {
-  description = "Define whether to enable Amazon ECS Exec for tasks within the service."
+  description = "(Optional) Define whether to enable Amazon ECS Exec for tasks within the service."
   type        = bool
   default     = true
 }
@@ -357,7 +357,7 @@ variable "ssl_key" {
 }
 
 variable "lua_ssl_cert" {
-  description = "Secrets Manager or Parameter Store ARN of the Certificate used for Lua cosockets"
+  description = "Secrets Manager or Parameter Store ARN of the Certificate used for Lua"
   type        = string
 }
 
@@ -387,12 +387,6 @@ variable "error_log_format" {
   type        = string
 }
 
-variable "secrets_list" {
-  description = "(Optional) List of Secret or Parameter Store ARNs to grant the ECS Task Execution Role to"
-  type        = list(string)
-  default     = ["*"]
-}
-
 variable "desired_count" {
   description = "(Optional) Desired Task count for the Gateway ECS Task Definition"
   type        = number
@@ -419,24 +413,21 @@ variable "custom_nginx_conf" {
 variable "ecs_target_group_arns" {
   description = "Target Group ARNs for the ECS Service"
   type        = map(string)
-  default     = null
 }
 
 variable "image_url" {
   description = "The URL where the Docker image resides"
   type        = string
-  default     = null
 }
 
 variable "template_file" {
-  description = "Template file to use to decide if data or control plane"
+  description = "(Optional) Template file to use to decide if data or control plane"
   type        = string
 }
 
 variable "execution_role_arn" {
   type        = string
   description = "ARN of the Task Execution Role"
-  default     = null
 }
 
 variable "ecs_cluster_arn" {
@@ -452,7 +443,6 @@ variable "ecs_cluster_name" {
 variable "db_password_arn" {
   description = "The DB Password ARN that is used by the ECS Task Definition"
   type        = string
-  default     = null
 }
 
 variable "log_group" {
@@ -463,7 +453,6 @@ variable "log_group" {
 variable "kong_admin_gui_session_conf" {
   description = "The session configuration that Kong will use"
   type        = string
-  default     = null
 }
 
 variable "role" {
@@ -473,35 +462,33 @@ variable "role" {
 variable "clustering_endpoint" {
   type        = string
   description = "Address of the control plane node from which configuration updates will be fetched"
-  default     = null
 }
 
 variable "telemetry_endpoint" {
   type        = string
-  description = "Telemetry address of the control plane node to which telemetry updates will be posted"
-  default     = null
+  description = "(Optional) Telemetry address of the control plane node to which telemetry updates will be posted"
+  default     = ""
 }
 
 variable "cluster_server_name" {
   type        = string
-  description = "The server name used in the SNI of the TLS connection from a DP node to a CP node"
+  description = "(Optional) The server name used in the SNI of the TLS connection from a DP node to a CP node"
   default     = ""
 }
 
 variable "admin_token" {
   type        = string
   description = "The ARN of the admin token to be used within the ECS Task Definition."
-  default     = null
 }
 
 variable "kong_admin_api_uri" {
-  description = "The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
+  description = "(Optional) The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
   type        = string
   default     = ""
 }
 
 variable "kong_admin_gui_url" {
-  description = "The Admin GUI URL of the Kong Manager."
+  description = "(Optional) The Admin GUI URL of the Kong Manager."
   type        = string
   default     = ""
 }
