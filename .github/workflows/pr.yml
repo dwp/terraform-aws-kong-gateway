@@ -106,10 +106,10 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Kitchen Test Ubuntu
+      - name: Kitchen Test ECS
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
-          kitchen-command: test hybrid-http-proxy --destroy=always
+          kitchen-command: test hybrid-ecs --destroy=always
           aws-account-number: ${{ secrets.AWS_ACCOUNT }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
@@ -118,6 +118,7 @@ jobs:
           TF_VAR_environment: GHA-${{ env.GITHUB_RUN_NUMBER }}
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
+          TF_VAR_image_url: ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.eu-west-1.amazonaws.com/terraform-aws-kong-gateway:${{ github.run_number }}
       - name: Kitchen Test Amazon Linux 2
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
