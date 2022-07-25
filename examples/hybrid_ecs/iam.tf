@@ -79,7 +79,11 @@ data "aws_iam_policy_document" "ecs_execute_command_policy" {
       "secretsmanager:GetSecretValue",
       "kms:Decrypt",
     ]
-    resources = ["*"]
+    resources = [
+      "arn:aws:ssm:${var.region}:*:parameter/*",
+      "arn:aws:secretsmanager:${var.region}:*:secret:*",
+      "arn:aws:kms:${var.region}:*:key/*"
+    ]
   }
   statement {
     sid    = "ECSExec"

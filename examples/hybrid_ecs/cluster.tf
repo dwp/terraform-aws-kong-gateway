@@ -61,9 +61,9 @@ data "aws_iam_policy_document" "ecs_secrets_policy" {
       "kms:Decrypt",
     ]
     resources = [
-      "arn:aws:ssm:eu-west-1:*:parameter/*",
-      "arn:aws:secretsmanager:eu-west-1:*:secret:*",
-      "arn:aws:kms:eu-west-1:*:key/*"
+      "arn:aws:ssm:${var.region}:*:parameter/*",
+      "arn:aws:secretsmanager:${var.region}:*:secret:*",
+      "arn:aws:kms:${var.region}:*:key/*"
     ]
   }
 }

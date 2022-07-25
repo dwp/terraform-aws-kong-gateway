@@ -229,6 +229,8 @@ module "create_kong_cp" {
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
 
+  cluster_server_name = aws_lb.external.dns_name
+
   custom_nginx_conf = var.custom_nginx_conf
 
   rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
