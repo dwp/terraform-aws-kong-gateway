@@ -34,11 +34,27 @@
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
+      "name": "KONG_ADMIN_GUI_SSL_CERT",
+      "value": "/usr/local/kong/kong_clustering/cluster.crt"
+    },
+    {
+      "name": "KONG_ADMIN_GUI_SSL_CERT_KEY",
+      "value": "/usr/local/kong/kong_clustering/cluster.key"
+    },
+    {
       "name": "KONG_ADMIN_ACCESS_LOG",
       "value": "/dev/stdout"
     },
     {
       "name": "KONG_ADMIN_ERROR_LOG",
+      "value": "/dev/stderr"
+    },
+    {
+      "name": "KONG_ADMIN_GUI_ACCESS_LOG",
+      "value": "/dev/stdout"
+    },
+    {
+      "name": "KONG_ADMIN_GUI_ERROR_LOG",
       "value": "/dev/stderr"
     },
     {
@@ -60,6 +76,10 @@
     {
       "name": "KONG_ADMIN_LISTEN",
       "value": "0.0.0.0:${admin_api_port} ssl"
+    },
+    {
+      "name": "KONG_ADMIN_GUI_LISTEN",
+      "value": "0.0.0.0:${admin_gui_port} ssl"
     },
     {
       "name": "KONG_ADMIN_API_URI",

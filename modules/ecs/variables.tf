@@ -303,6 +303,7 @@ variable "kong_cp_ports" {
   type        = map(number)
   default = {
     "admin-api"  = 8444,
+    "admin-gui"  = 8445,
     "status"     = 8100,
     "clustering" = 8005,
     "telemetry"  = 8006

@@ -87,6 +87,7 @@ data "template_file" "kong_task_definition_cp" {
     kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
     log_group                   = var.log_group
     admin_api_port              = var.kong_cp_ports.admin-api
+    admin_gui_port              = var.kong_cp_ports.admin-gui
     status_port                 = var.kong_cp_ports.status
     ports                       = jsonencode([for k, v in var.kong_cp_ports : v])
     ulimits                     = jsonencode([4096])
