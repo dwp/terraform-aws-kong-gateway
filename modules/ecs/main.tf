@@ -12,8 +12,6 @@ locals {
 
   azs = length(var.availability_zones) > 0 ? var.availability_zones : module.private_subnets.0.azs
 
-  ssm_parameter_path = format("/%s/%s", var.service, var.environment)
-
   vpc_object = {
     id      = var.vpc_id
     subnets = local.private_subnets
@@ -79,7 +77,6 @@ data "template_file" "kong_task_definition_cp" {
     image_url                   = var.image_url
     memory                      = var.fargate_memory
     user                        = "kong"
-    parameter_path              = local.ssm_parameter_path
     db_user                     = var.kong_database_config.user
     db_host                     = local.db_info.endpoint
     db_name                     = local.db_info.database_name
@@ -118,7 +115,6 @@ data "template_file" "kong_task_definition_dp" {
     image_url           = var.image_url
     memory              = var.fargate_memory
     user                = "kong"
-    parameter_path      = local.ssm_parameter_path
     log_group           = var.log_group
     ports               = jsonencode([for k, v in var.kong_dp_ports : v])
     ulimits             = jsonencode([4096])
