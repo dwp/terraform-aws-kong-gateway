@@ -1,6 +1,6 @@
 data "aws_iam_policy_document" "kong-ssm" {
   statement {
-    actions   = ["ssm:DescribeParameters"]
+    actions = ["ssm:DescribeParameters"]
     resources = [
       "arn:aws:ssm:${var.region}:*:parameter/*"
     ]
