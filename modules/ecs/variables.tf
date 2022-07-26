@@ -11,23 +11,7 @@ variable "private_subnets_to_create" {
     az         = string
     public     = bool
   }))
-  default = [
-    {
-      cidr_block = "10.0.1.0/24"
-      az         = "default"
-      public     = false
-    },
-    {
-      cidr_block = "10.0.2.0/24"
-      az         = "default"
-      public     = false
-    },
-    {
-      cidr_block = "10.0.3.0/24"
-      az         = "default"
-      public     = false
-    }
-  ]
+  default = []
 }
 
 variable "security_group_ids" {

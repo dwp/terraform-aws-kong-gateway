@@ -1,12 +1,14 @@
 data "aws_iam_policy_document" "kong-ssm" {
   statement {
     actions   = ["ssm:DescribeParameters"]
-    resources = ["*"]
+    resources = [
+      "arn:aws:ssm:${var.region}:*:parameter/*"
+    ]
   }
 
   statement {
     actions   = ["ssm:GetParameter"]
-    resources = ["arn:aws:ssm:*:*:parameter/${var.service}/${local.environment}/*"]
+    resources = ["arn:aws:ssm:${var.region}:*:parameter/${var.service}/${local.environment}/*"]
   }
 
   statement {

@@ -177,7 +177,7 @@ resource "aws_lb_target_group" "internal-telemetry" {
 }
 
 resource "aws_lb_target_group" "internal-admin-api" {
-  name        = "internal-admin-api-8444" # FIX
+  name        = "internal-admin-api-8444"
   port        = 8444
   protocol    = "TCP"
   vpc_id      = aws_vpc.vpc.id
