@@ -194,7 +194,6 @@ module "create_kong_cp" {
   role             = "control_plane"
   ecs_cluster_arn  = aws_ecs_cluster.kong.arn
   ecs_cluster_name = aws_ecs_cluster.kong.name
-  instance_type    = var.instance_type
   vpc_id           = aws_vpc.vpc.id
   region           = var.region
   vpc_cidr_block   = aws_vpc.vpc.cidr_block
@@ -268,7 +267,6 @@ module "create_kong_dp" {
   role             = "data_plane"
   ecs_cluster_arn  = aws_ecs_cluster.kong.arn
   ecs_cluster_name = aws_ecs_cluster.kong.name
-  instance_type    = var.instance_type
   vpc_id           = aws_vpc.vpc.id
   region           = var.region
   vpc_cidr_block   = aws_vpc.vpc.cidr_block
