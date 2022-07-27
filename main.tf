@@ -86,6 +86,10 @@ module "kong_ecs" {
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
 
+  rules_with_source_cidr_blocks     = var.rules_with_source_cidr_blocks
+  rules_with_source_security_groups = var.rules_with_source_security_groups
+  rules_with_source_prefix_list_id  = var.rules_with_source_prefix_list_id
+
   region                    = var.region
   private_subnets           = var.private_subnets
   private_subnets_to_create = var.private_subnets_to_create

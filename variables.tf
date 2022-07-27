@@ -264,7 +264,7 @@ variable "kong_ports" {
 }
 
 variable "kong_ssl_uris" {
-  description = "Object containing the ssl uris for kong, e.g. load balancer dns names and ports"
+  description = "(Optional) Object containing the ssl uris for kong, e.g. load balancer dns names and ports"
   type = object({
     protocol            = string
     admin_api_uri       = string
@@ -387,6 +387,127 @@ variable "rules_with_source_cidr_blocks" {
     protocol    = string,
     cidr_blocks = list(string)
   }))
+  default = {
+    "kong-ingress-proxy-https" = {
+      type        = "ingress",
+      from_port   = 8443,
+      to_port     = 8443,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-api-https" = {
+      type        = "ingress",
+      from_port   = 8444,
+      to_port     = 8444,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-manager-https" = {
+      type        = "ingress",
+      from_port   = 8445,
+      to_port     = 8445,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-portal-gui-https" = {
+      type        = "ingress",
+      from_port   = 8446,
+      to_port     = 8446,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-portal-https" = {
+      type        = "ingress",
+      from_port   = 8447,
+      to_port     = 8447,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-ssh" = {
+      type        = "ingress",
+      from_port   = 22,
+      to_port     = 22,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-8005" = {
+      type        = "ingress",
+      from_port   = 8005,
+      to_port     = 8005,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-8006" = {
+      type        = "ingress",
+      from_port   = 8006,
+      to_port     = 8006,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-ingress-8100" = {
+      type        = "ingress",
+      from_port   = 8100,
+      to_port     = 8100,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-80" = {
+      type        = "egress",
+      from_port   = 80,
+      to_port     = 80,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-443" = {
+      type        = "egress",
+      from_port   = 443,
+      to_port     = 443,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8443" = {
+      type        = "egress",
+      from_port   = 8443,
+      to_port     = 8443,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8444" = {
+      type        = "egress",
+      from_port   = 8444,
+      to_port     = 8444,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8005" = {
+      type        = "egress",
+      from_port   = 8005,
+      to_port     = 8005,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-8006" = {
+      type        = "egress",
+      from_port   = 8006,
+      to_port     = 8006,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-postgresq" = {
+      type        = "egress",
+      from_port   = 5432,
+      to_port     = 5432,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-proxy" = {
+      type        = "egress",
+      from_port   = 3128,
+      to_port     = 3128,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
 }
 
 variable "rules_with_source_security_groups" {
@@ -402,7 +523,7 @@ variable "rules_with_source_security_groups" {
 }
 
 variable "rules_with_source_prefix_list_id" {
-  description = "Security rules for the Kong instance that have a Prefix List ID as their Source"
+  description = "(Optional) Security rules for the Kong instance that have a Prefix List ID as their Source"
   type = map(object({
     type           = string,
     from_port      = number,
@@ -484,13 +605,23 @@ variable "security_group_name" {
 variable "fargate_cpu" {
   description = "(Optional) The CPU for the Fargate Task"
   type        = number
-  default     = 2048
+  default     = 512
+
+  validation {
+    condition     = contains([256, 512, 1024, 2048, 4096], var.fargate_cpu)
+    error_message = "Must be one of the following values: 256, 512, 1024, 2048, 4096."
+  }
 }
 
 variable "fargate_memory" {
   description = "(Optional) The Memory for the Fargate Task"
   type        = number
-  default     = 4096
+  default     = 2048
+
+  validation {
+    condition     = contains([512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624, 27648, 28672, 29696, 30720], var.fargate_memory)
+    error_message = "Must be either 512 or a multiple of 1024, up to 30720."
+  }
 }
 
 variable "kong_cp_ports" {
@@ -661,7 +792,7 @@ variable "clustering_endpoint" {
 variable "telemetry_endpoint" {
   type        = string
   description = "Telemetry address of the control plane node to which telemetry updates will be posted"
-  default     = null
+  default     = ""
 }
 
 variable "cluster_server_name" {

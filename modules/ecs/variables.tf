@@ -50,32 +50,23 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "encrypt_storage" {
-  description = "(Optional) true/false value to set whether storage within the RDS Database should be encrypted"
-  type        = bool
-  default     = true
-}
-
 variable "tags" {
-  description = "(Optional) Tags to apply to AWS resources, except Auto Scaling Group"
+  description = "Tags to apply to AWS resources, except Auto Scaling Group"
   type        = map(string)
-  default     = {}
 }
 
 variable "skip_final_snapshot" {
-  description = "(Optional) true/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"
+  description = "True/false value to set whether a final RDS Database snapshot should be taken when RDS resource is destroyed"
   type        = bool
-  default     = true
 }
 
 variable "region" {
   description = "The aws region to access the SSM config items"
   type        = string
-  default     = "eu-central-1"
 }
 
 variable "kong_database_config" {
-  description = "(Optional) Configuration for the kong database"
+  description = "Configuration for the kong database"
   type = object({
     name     = string
     user     = string
@@ -89,25 +80,20 @@ variable "kong_database_config" {
 }
 
 variable "postgres_config" {
-  description = "(Optional) Configuration settings for the postgres database engine"
+  description = "Configuration settings for the postgres database engine"
   type = object({
     master_user     = string
     master_password = string
   })
-  default = {
-    master_user     = "root"
-    master_password = null
-  }
 }
 
 variable "postgres_host" {
-  description = "(Optional) The address or name of the postgres database host, set this variable when choosing to skip_rds_creation"
+  description = "The address or name of the postgres database host, set this variable when choosing to skip_rds_creation"
   type        = string
-  default     = ""
 }
 
 variable "rules_with_source_cidr_blocks" {
-  description = "(Optional) Security rules for the Kong instance that have a cidr range for their source"
+  description = "Security rules for the Kong instance that have a cidr range for their source"
   type = map(object({
     type        = string,
     from_port   = number,
@@ -115,131 +101,10 @@ variable "rules_with_source_cidr_blocks" {
     protocol    = string,
     cidr_blocks = list(string)
   }))
-  default = {
-    "kong-ingress-proxy-https" = {
-      type        = "ingress",
-      from_port   = 8443,
-      to_port     = 8443,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-api-https" = {
-      type        = "ingress",
-      from_port   = 8444,
-      to_port     = 8444,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-manager-https" = {
-      type        = "ingress",
-      from_port   = 8445,
-      to_port     = 8445,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-portal-gui-https" = {
-      type        = "ingress",
-      from_port   = 8446,
-      to_port     = 8446,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-portal-https" = {
-      type        = "ingress",
-      from_port   = 8447,
-      to_port     = 8447,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-ssh" = {
-      type        = "ingress",
-      from_port   = 22,
-      to_port     = 22,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-8005" = {
-      type        = "ingress",
-      from_port   = 8005,
-      to_port     = 8005,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-8006" = {
-      type        = "ingress",
-      from_port   = 8006,
-      to_port     = 8006,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-ingress-8100" = {
-      type        = "ingress",
-      from_port   = 8100,
-      to_port     = 8100,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-80" = {
-      type        = "egress",
-      from_port   = 80,
-      to_port     = 80,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-443" = {
-      type        = "egress",
-      from_port   = 443,
-      to_port     = 443,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8443" = {
-      type        = "egress",
-      from_port   = 8443,
-      to_port     = 8443,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8444" = {
-      type        = "egress",
-      from_port   = 8444,
-      to_port     = 8444,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8005" = {
-      type        = "egress",
-      from_port   = 8005,
-      to_port     = 8005,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-8006" = {
-      type        = "egress",
-      from_port   = 8006,
-      to_port     = 8006,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-postgresq" = {
-      type        = "egress",
-      from_port   = 5432,
-      to_port     = 5432,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    },
-    "kong-egress-proxy" = {
-      type        = "egress",
-      from_port   = 3128,
-      to_port     = 3128,
-      protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"]
-    }
-  }
 }
 
 variable "rules_with_source_security_groups" {
-  description = "(Optional) Security rules for the Kong instance that have another security group for their source"
+  description = "Security rules for the Kong instance that have another security group for their source"
   type = map(object({
     type                     = string,
     from_port                = number,
@@ -247,11 +112,10 @@ variable "rules_with_source_security_groups" {
     protocol                 = string,
     source_security_group_id = string
   }))
-  default = {}
 }
 
 variable "rules_with_source_prefix_list_id" {
-  description = "(Optional) Security rules for the Kong instance that have a Prefix List ID as their Source"
+  description = "Security rules for the Kong instance that have a Prefix List ID as their Source"
   type = map(object({
     type           = string,
     from_port      = number,
@@ -259,7 +123,6 @@ variable "rules_with_source_prefix_list_id" {
     protocol       = string,
     prefix_list_id = list(string),
   }))
-  default = {}
 }
 
 ###
@@ -267,7 +130,6 @@ variable "rules_with_source_prefix_list_id" {
 variable "service" {
   description = "(Optional) Resource service tag"
   type        = string
-  default     = "exchange"
 }
 
 variable "create_ecs_cluster" {
@@ -277,58 +139,33 @@ variable "create_ecs_cluster" {
 }
 
 variable "fargate_cpu" {
-  description = "(Optional) The CPU for the Fargate Task"
+  description = "The CPU for the Fargate Task"
   type        = number
-  default     = 512
-
-  validation {
-    condition     = contains([256, 512, 1024, 2048, 4096], var.fargate_cpu)
-    error_message = "Must be one of the following values: 256, 512, 1024, 2048, 4096."
-  }
 }
 
 variable "fargate_memory" {
-  description = "(Optional) The Memory for the Fargate Task"
+  description = "The Memory for the Fargate Task"
   type        = number
-  default     = 2048
-
-  validation {
-    condition     = contains([512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624, 27648, 28672, 29696, 30720], var.fargate_memory)
-    error_message = "Must be either 512 or a multiple of 1024, up to 30720."
-  }
 }
 
 variable "kong_cp_ports" {
-  description = "(Optional) The ports for the Kong Data Plane"
+  description = "The ports for the Kong Data Plane"
   type        = map(number)
-  default = {
-    "admin-api"  = 8444,
-    "admin-gui"  = 8445,
-    "status"     = 8100,
-    "clustering" = 8005,
-    "telemetry"  = 8006
-  }
 }
 
 variable "kong_dp_ports" {
-  description = "(Optional) The ports for the Kong Control Plane"
+  description = "The ports for the Kong Control Plane"
   type        = map(number)
-  default = {
-    "proxy"  = 8443,
-    "status" = 8100
-  }
 }
 
 variable "enable_execute_command" {
-  description = "(Optional) Define whether to enable Amazon ECS Exec for tasks within the service."
+  description = "Define whether to enable Amazon ECS Exec for tasks within the service."
   type        = bool
-  default     = true
 }
 
 variable "platform_version" {
-  description = "(Optional) ECS Service platform version"
+  description = "ECS Service platform version"
   type        = string
-  default     = "1.4.0"
 }
 
 variable "ssl_cert" {
@@ -359,7 +196,6 @@ variable "cluster_key" {
 variable "kong_log_level" {
   description = "(Optional) Level of log output for the Gateway"
   type        = string
-  default     = "warn"
 }
 
 variable "access_log_format" {
@@ -373,21 +209,18 @@ variable "error_log_format" {
 }
 
 variable "desired_count" {
-  description = "(Optional) Desired Task count for the Gateway ECS Task Definition"
+  description = "Desired Task count for the Gateway ECS Task Definition"
   type        = number
-  default     = 1
 }
 
 variable "min_capacity" {
-  description = "(Optional) Minimum Capacity for the Gateway ECS Task Definition"
+  description = "Minimum Capacity for the Gateway ECS Task Definition"
   type        = number
-  default     = 1
 }
 
 variable "max_capacity" {
-  description = "(Optional) Maximum Capacity for the Gateway ECS Task Definition"
+  description = "Maximum Capacity for the Gateway ECS Task Definition"
   type        = number
-  default     = 2
 }
 
 variable "custom_nginx_conf" {
@@ -451,14 +284,12 @@ variable "clustering_endpoint" {
 
 variable "telemetry_endpoint" {
   type        = string
-  description = "(Optional) Telemetry address of the control plane node to which telemetry updates will be posted"
-  default     = ""
+  description = "Telemetry address of the control plane node to which telemetry updates will be posted"
 }
 
 variable "cluster_server_name" {
   type        = string
-  description = "(Optional) The server name used in the SNI of the TLS connection from a DP node to a CP node"
-  default     = ""
+  description = "The server name used in the SNI of the TLS connection from a DP node to a CP node"
 }
 
 variable "admin_token" {
@@ -467,15 +298,13 @@ variable "admin_token" {
 }
 
 variable "kong_admin_api_uri" {
-  description = "(Optional) The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
+  description = "The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
   type        = string
-  default     = ""
 }
 
 variable "kong_admin_gui_url" {
-  description = "(Optional) The Admin GUI URL of the Kong Manager."
+  description = "The Admin GUI URL of the Kong Manager."
   type        = string
-  default     = ""
 }
 
 variable "entrypoint" {
