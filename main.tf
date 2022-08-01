@@ -1,3 +1,30 @@
+locals {
+  kong_ports = {
+    control_plane = {
+      "admin-api"  = 8444,
+      "admin-gui"  = 8445,
+      "status"     = 8100,
+      "clustering" = 8005,
+      "telemetry"  = 8006,
+      "status"     = 8100
+    }
+    data_plane = {
+      "proxy"  = 8443,
+      "status" = 8100
+    }
+    stand_alone = {
+      proxy      = 8000,
+      admin_api  = 8001,
+      admin_gui  = 8002,
+      portal_gui = 8003,
+      portal_api = 8004,
+      cluster    = 8005,
+      telemetry  = 8006,
+      status     = 8100
+    }
+  }
+}
+
 module "kong_ec2" {
   count  = var.deployment_type == "ec2" ? 1 : 0
   source = "./modules/ec2"
@@ -35,7 +62,7 @@ module "kong_ec2" {
   kong_config                       = var.kong_config
   kong_database_config              = var.kong_database_config
   kong_hybrid_conf                  = var.kong_hybrid_conf
-  kong_ports                        = var.kong_ports
+  kong_ports                        = var.kong_ports != null ? var.kong_ports : local.kong_ports["stand_alone"]
   kong_ssl_uris                     = var.kong_ssl_uris
   manager_host                      = var.manager_host
   placement_tenancy                 = var.placement_tenancy
@@ -75,8 +102,8 @@ module "kong_ecs" {
   fargate_cpu            = var.fargate_cpu
   fargate_memory         = var.fargate_memory
   enable_execute_command = var.enable_execute_command
-  kong_dp_ports          = var.kong_dp_ports
-  kong_cp_ports          = var.kong_cp_ports
+  kong_cp_ports          = var.kong_ports != null ? var.kong_ports : local.kong_ports[var.role]
+  kong_dp_ports          = var.kong_ports != null ? var.kong_ports : local.kong_ports[var.role]
   vpc_id                 = var.vpc_id
 
   security_group_ids  = var.security_group_ids

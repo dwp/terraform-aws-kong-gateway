@@ -243,24 +243,8 @@ variable "kong_hybrid_conf" {
 
 variable "kong_ports" {
   description = "(Optional) An object defining the kong http ports"
-  type = object({
-    proxy      = number
-    admin_api  = number
-    admin_gui  = number
-    portal_gui = number
-    portal_api = number
-    cluster    = number
-    telemetry  = number
-  })
-  default = {
-    proxy      = 8000
-    admin_api  = 8001
-    admin_gui  = 8002
-    portal_gui = 8003
-    portal_api = 8004
-    cluster    = 8005
-    telemetry  = 8006
-  }
+  type = map(number)
+  default = null
 }
 
 variable "kong_ssl_uris" {
@@ -624,26 +608,26 @@ variable "fargate_memory" {
   }
 }
 
-variable "kong_cp_ports" {
-  description = "The ports for the Kong Data Plane"
-  type        = map(number)
-  default = {
-    "admin-api"  = 8444,
-    "admin-gui"  = 8445,
-    "status"     = 8100,
-    "clustering" = 8005,
-    "telemetry"  = 8006
-  }
-}
-
-variable "kong_dp_ports" {
-  description = "The ports for the Kong Control Plane"
-  type        = map(number)
-  default = {
-    "proxy"  = 8443,
-    "status" = 8100
-  }
-}
+#variable "kong_cp_ports" {
+#  description = "The ports for the Kong Data Plane"
+#  type        = map(number)
+#  default = {
+#    "admin-api"  = 8444,
+#    "admin-gui"  = 8445,
+#    "status"     = 8100,
+#    "clustering" = 8005,
+#    "telemetry"  = 8006
+#  }
+#}
+#
+#variable "kong_dp_ports" {
+#  description = "The ports for the Kong Control Plane"
+#  type        = map(number)
+#  default = {
+#    "proxy"  = 8443,
+#    "status" = 8100
+#  }
+#}
 
 variable "enable_execute_command" {
   description = "(Optional) Define whether to enable Amazon ECS Exec for tasks within the service."
