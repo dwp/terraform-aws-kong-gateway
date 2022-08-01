@@ -223,7 +223,8 @@ module "create_kong_cp" {
 
   log_group = aws_cloudwatch_log_group.kong_cp.name
 
-  kong_admin_api_uri = "${aws_lb.external.dns_name}:8444"
+  kong_admin_api_uri = "${aws_lb.external.dns_name}:8001"
+  kong_admin_gui_url = "http://${aws_lb.external.dns_name}:8002"
 
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
