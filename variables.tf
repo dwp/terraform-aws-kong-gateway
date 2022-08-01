@@ -243,8 +243,8 @@ variable "kong_hybrid_conf" {
 
 variable "kong_ports" {
   description = "(Optional) An object defining the kong http ports"
-  type = map(number)
-  default = null
+  type        = map(number)
+  default     = null
 }
 
 variable "kong_ssl_uris" {
