@@ -573,7 +573,7 @@ variable "min_healthy_percentage" {
 }
 
 variable "role" {
-  description = "Role of the Kong Task"
+  description = "(Optional) Role of the Kong Task"
   type        = string
   default     = null
 }
@@ -621,31 +621,31 @@ variable "platform_version" {
 }
 
 variable "ssl_cert" {
-  description = "Secrets Manager or Parameter Store ARN of the Certificate used to secure traffic to the gateway"
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Certificate used to secure traffic to the gateway"
   type        = string
   default     = null
 }
 
 variable "ssl_key" {
-  description = "Secrets Manager or Parameter Store ARN of the Key used to secure traffic to the gateway"
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Key used to secure traffic to the gateway"
   type        = string
   default     = null
 }
 
 variable "lua_ssl_cert" {
-  description = "Secrets Manager or Parameter Store ARN of the Certificate used for Lua cosockets"
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Certificate used for Lua cosockets"
   type        = string
   default     = null
 }
 
 variable "cluster_cert" {
-  description = "Secrets Manager or Parameter Store ARN of the Clustering Certificate"
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Clustering Certificate"
   type        = string
   default     = null
 }
 
 variable "cluster_key" {
-  description = "Secrets Manager or Parameter Store ARN of the Clustering Key"
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Clustering Key"
   type        = string
   default     = null
 }
@@ -693,91 +693,91 @@ variable "custom_nginx_conf" {
 }
 
 variable "image_url" {
-  description = "The URL where the Docker image resides"
+  description = "(Optional) The URL where the Docker image resides"
   type        = string
   default     = null
 }
 
 variable "ecs_target_group_arns" {
-  description = "Target Group ARNs for the ECS Service"
+  description = "(Optional) Target Group ARNs for the ECS Service"
   type        = map(string)
   default     = null
 }
 
 variable "template_file" {
-  description = "Template file to use to decide if data or control plane"
+  description = "(Optional) Template file to use to decide if data or control plane"
   type        = string
   default     = null
 }
 
 variable "execution_role_arn" {
   type        = string
-  description = "ARN of the Task Execution Role"
+  description = "(Optional) ARN of the Task Execution Role"
   default     = null
 }
 
 variable "ecs_cluster_arn" {
   type        = string
-  description = "The ARN of the ECS Cluster created"
+  description = "(Optional) The ARN of the ECS Cluster created"
   default     = null
 }
 
 variable "ecs_cluster_name" {
   type        = string
-  description = "The ARN of the ECS Cluster created"
+  description = "(Optional) The ARN of the ECS Cluster created"
   default     = null
 }
 
 variable "db_password_arn" {
-  description = "The DB Password ARN that is used by the ECS Task Definition"
+  description = "(Optional) The DB Password ARN that is used by the ECS Task Definition"
   type        = string
   default     = null
 }
 
 variable "log_group" {
-  description = "The Log Group for ECS to report out to"
+  description = "(Optional) The Log Group for ECS to report out to"
   type        = string
   default     = null
 }
 
 variable "kong_admin_gui_session_conf" {
-  description = "The session configuration that Kong will use"
+  description = "(Optional) The session configuration that Kong will use"
   type        = string
   default     = null
 }
 
 variable "clustering_endpoint" {
   type        = string
-  description = "Address of the control plane node from which configuration updates will be fetched"
+  description = "(Optional) Address of the control plane node from which configuration updates will be fetched"
   default     = null
 }
 
 variable "telemetry_endpoint" {
   type        = string
-  description = "Telemetry address of the control plane node to which telemetry updates will be posted"
+  description = "(Optional) Telemetry address of the control plane node to which telemetry updates will be posted"
   default     = ""
 }
 
 variable "cluster_server_name" {
   type        = string
-  description = "The server name used in the SNI of the TLS connection from a DP node to a CP node"
+  description = "(Optional) The server name used in the SNI of the TLS connection from a DP node to a CP node"
   default     = ""
 }
 
 variable "admin_token" {
   type        = string
-  description = "The ARN of the admin token to be used within the ECS Task Definition."
+  description = "(Optional) The ARN of the admin token to be used within the ECS Task Definition."
   default     = null
 }
 
 variable "kong_admin_api_uri" {
-  description = "The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
+  description = "(Optional) The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
   type        = string
   default     = ""
 }
 
 variable "kong_admin_gui_url" {
-  description = "The Admin GUI URL of the Kong Manager."
+  description = "(Optional) The Admin GUI URL of the Kong Manager."
   type        = string
   default     = ""
 }

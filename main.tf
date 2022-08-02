@@ -102,8 +102,7 @@ module "kong_ecs" {
   fargate_cpu            = var.fargate_cpu
   fargate_memory         = var.fargate_memory
   enable_execute_command = var.enable_execute_command
-  kong_cp_ports          = var.kong_ports != null ? var.kong_ports : local.kong_ports[var.role]
-  kong_dp_ports          = var.kong_ports != null ? var.kong_ports : local.kong_ports[var.role]
+  kong_ports             = var.kong_ports != null ? var.kong_ports : local.kong_ports[var.role]
   vpc_id                 = var.vpc_id
 
   security_group_ids  = var.security_group_ids

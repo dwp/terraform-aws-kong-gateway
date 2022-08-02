@@ -83,10 +83,10 @@ data "template_file" "kong_task_definition_cp" {
     db_password_arn             = var.db_password_arn
     kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
     log_group                   = var.log_group
-    admin_api_port              = var.kong_cp_ports.admin-api
-    admin_gui_port              = var.kong_cp_ports.admin-gui
-    status_port                 = var.kong_cp_ports.status
-    ports                       = jsonencode([for k, v in var.kong_cp_ports : v])
+    admin_api_port              = var.kong_ports.admin-api
+    admin_gui_port              = var.kong_ports.admin-gui
+    status_port                 = var.kong_ports.status
+    ports                       = jsonencode([for k, v in var.kong_ports : v])
     ulimits                     = jsonencode([4096])
     region                      = var.region
     access_log_format           = var.access_log_format
@@ -116,7 +116,7 @@ data "template_file" "kong_task_definition_dp" {
     memory              = var.fargate_memory
     user                = "kong"
     log_group           = var.log_group
-    ports               = jsonencode([for k, v in var.kong_dp_ports : v])
+    ports               = jsonencode([for k, v in var.kong_ports : v])
     ulimits             = jsonencode([4096])
     region              = var.region
     access_log_format   = var.access_log_format
@@ -124,7 +124,7 @@ data "template_file" "kong_task_definition_dp" {
     clustering_endpoint = var.clustering_endpoint
     telemetry_endpoint  = var.telemetry_endpoint
     cluster_server_name = var.cluster_server_name
-    status_port         = var.kong_dp_ports.status
+    status_port         = var.kong_ports.status
     ssl_cert            = var.ssl_cert
     ssl_key             = var.ssl_key
     lua_ssl_cert        = var.lua_ssl_cert

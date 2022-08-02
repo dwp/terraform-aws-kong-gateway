@@ -148,13 +148,8 @@ variable "fargate_memory" {
   type        = number
 }
 
-variable "kong_cp_ports" {
-  description = "The ports for the Kong Data Plane"
-  type        = map(number)
-}
-
-variable "kong_dp_ports" {
-  description = "The ports for the Kong Control Plane"
+variable "kong_ports" {
+  description = "The ports used by Kong"
   type        = map(number)
 }
 
