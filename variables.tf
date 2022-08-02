@@ -608,27 +608,6 @@ variable "fargate_memory" {
   }
 }
 
-#variable "kong_cp_ports" {
-#  description = "The ports for the Kong Data Plane"
-#  type        = map(number)
-#  default = {
-#    "admin-api"  = 8444,
-#    "admin-gui"  = 8445,
-#    "status"     = 8100,
-#    "clustering" = 8005,
-#    "telemetry"  = 8006
-#  }
-#}
-#
-#variable "kong_dp_ports" {
-#  description = "The ports for the Kong Control Plane"
-#  type        = map(number)
-#  default = {
-#    "proxy"  = 8443,
-#    "status" = 8100
-#  }
-#}
-
 variable "enable_execute_command" {
   description = "(Optional) Define whether to enable Amazon ECS Exec for tasks within the service."
   type        = bool
@@ -804,7 +783,7 @@ variable "kong_admin_gui_url" {
 }
 
 variable "entrypoint" {
-  description = "The entrypoint file used for the Task definition."
+  description = "(Optional) The entrypoint for the Docker container. Set this to override the default behaviour."
   type        = string
   default     = null
 }
