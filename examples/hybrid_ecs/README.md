@@ -1,6 +1,6 @@
 # Hybrid Example With External Database
 
-![architecture-diagram](https://raw.githubusercontent.com/dwp/terraform-aws-kong-gateway/main/examples/hybrid_ecs/hybrid_external_ecs.png)
+![architecture-diagram](https://raw.githubusercontent.com/dwp/terraform-aws-kong-gateway/main/examples/hybrid_ecs/hybrid_ecs.png)
 
 ## Description
 
