@@ -45,3 +45,15 @@ resource "tls_locally_signed_cert" "cert" {
   ]
 
 }
+
+resource "aws_ssm_parameter" "cert" {
+  name  = format("/%s/%s/ee/selfsigned/crt", var.service, var.environment)
+  type  = "SecureString"
+  value = tls_locally_signed_cert.cert.cert_pem
+}
+
+resource "aws_ssm_parameter" "key" {
+  name  = format("/%s/%s/ee/selfsigned/key", var.service, var.environment)
+  type  = "SecureString"
+  value = tls_private_key.cert.private_key_pem
+}

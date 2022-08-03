@@ -38,7 +38,7 @@ jobs:
           output_path: 'results'
           platform_type: terraform
           fail_on: high,medium
-          exclude_queries: '8e94dced-9bcc-4203-8eb7-7e41202b2505,e592a0c5-5bdb-414c-9066-5dba7cdea370,7ebc9038-0bde-479a-acc4-6ed7b6758899' # Excludes 'Auto Scaling Group With No Associated ELB', 'IAM Access Analyzer Undefined' queries and Vulnerable policy for the KMS Key.
+          exclude_queries: '8e94dced-9bcc-4203-8eb7-7e41202b2505,e592a0c5-5bdb-414c-9066-5dba7cdea370,7ebc9038-0bde-479a-acc4-6ed7b6758899,91f16d09-689e-4926-aca7-155157f634ed,a88baa34-e2ad-44ea-ad6f-8cac87bc7c71' # Excludes 'Auto Scaling Group With No Associated ELB', 'IAM Access Analyzer Undefined' queries, 'Vulnerable policy for the KMS Key' ECS Service without tasks running and excludes where password equals null.
       - name: Display KICS Results
         run: |
           cat results/results.json
@@ -106,18 +106,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
-      - name: Kitchen Test Ubuntu
+      - name: Kitchen Test ECS
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
-          kitchen-command: test hybrid-http-proxy --destroy=always
+          kitchen-command: test hybrid-ecs --destroy=always
           aws-account-number: ${{ secrets.AWS_ACCOUNT }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
           TF_VAR_region: eu-west-1
-          TF_VAR_environment: GHA-${{ env.GITHUB_RUN_NUMBER }}
+          TF_VAR_environment: GHA-${{ github.run_number }}
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
+          TF_VAR_image_url: ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.eu-west-1.amazonaws.com/terraform-aws-kong-gateway:${{ github.run_number }}
       - name: Kitchen Test Amazon Linux 2
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:
@@ -127,7 +128,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACTIONS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.ACTIONS_SECRET_ACCESS_KEY }}
           TF_VAR_region: eu-west-1
-          TF_VAR_environment: GHA-${{ env.GITHUB_RUN_NUMBER }}
+          TF_VAR_environment: GHA-${{ github.run_number }}
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
       - name: Deactivate AWS Credentials

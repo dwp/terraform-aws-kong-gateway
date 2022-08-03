@@ -99,12 +99,6 @@ variable "deck_version" {
   default     = "1.0.0"
 }
 
-variable "desired_capacity" {
-  description = "(Optional) The number of Amazon EC2 instances that should be running in the group"
-  type        = number
-  default     = 1
-}
-
 variable "description" {
   description = "(Optional) Resource description tag"
   type        = string
@@ -249,24 +243,8 @@ variable "kong_hybrid_conf" {
 
 variable "kong_ports" {
   description = "(Optional) An object defining the kong http ports"
-  type = object({
-    proxy      = number
-    admin_api  = number
-    admin_gui  = number
-    portal_gui = number
-    portal_api = number
-    cluster    = number
-    telemetry  = number
-  })
-  default = {
-    proxy      = 8000
-    admin_api  = 8001
-    admin_gui  = 8002
-    portal_gui = 8003
-    portal_api = 8004
-    cluster    = 8005
-    telemetry  = 8006
-  }
+  type        = map(number)
+  default     = null
 }
 
 variable "kong_ssl_uris" {
@@ -394,38 +372,38 @@ variable "rules_with_source_cidr_blocks" {
     cidr_blocks = list(string)
   }))
   default = {
-    "kong-ingress-proxy-http" = {
+    "kong-ingress-proxy-https" = {
       type        = "ingress",
-      from_port   = 8000,
-      to_port     = 8000,
+      from_port   = 8443,
+      to_port     = 8443,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-ingress-api-http" = {
+    "kong-ingress-api-https" = {
       type        = "ingress",
-      from_port   = 8001,
-      to_port     = 8001,
+      from_port   = 8444,
+      to_port     = 8444,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-ingress-manager-http" = {
+    "kong-ingress-manager-https" = {
       type        = "ingress",
-      from_port   = 8002,
-      to_port     = 8002,
+      from_port   = 8445,
+      to_port     = 8445,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-ingress-portal-gui-http" = {
+    "kong-ingress-portal-gui-https" = {
       type        = "ingress",
-      from_port   = 8003,
-      to_port     = 8003,
+      from_port   = 8446,
+      to_port     = 8446,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-ingress-portal-http" = {
+    "kong-ingress-portal-https" = {
       type        = "ingress",
-      from_port   = 8004,
-      to_port     = 8004,
+      from_port   = 8447,
+      to_port     = 8447,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
@@ -450,6 +428,13 @@ variable "rules_with_source_cidr_blocks" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
+    "kong-ingress-8100" = {
+      type        = "ingress",
+      from_port   = 8100,
+      to_port     = 8100,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    },
     "kong-egress-80" = {
       type        = "egress",
       from_port   = 80,
@@ -464,17 +449,17 @@ variable "rules_with_source_cidr_blocks" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-egress-8000" = {
+    "kong-egress-8443" = {
       type        = "egress",
-      from_port   = 8000,
-      to_port     = 8000,
+      from_port   = 8443,
+      to_port     = 8443,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
-    "kong-egress-8001" = {
+    "kong-egress-8444" = {
       type        = "egress",
-      from_port   = 8001,
-      to_port     = 8001,
+      from_port   = 8444,
+      to_port     = 8444,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     },
@@ -498,6 +483,13 @@ variable "rules_with_source_cidr_blocks" {
       to_port     = 5432,
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
+    },
+    "kong-egress-proxy" = {
+      type        = "egress",
+      from_port   = 3128,
+      to_port     = 3128,
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
     }
   }
 }
@@ -515,7 +507,7 @@ variable "rules_with_source_security_groups" {
 }
 
 variable "rules_with_source_prefix_list_id" {
-  description = "Security rules for the Kong instance that have a Prefix List ID as their Source"
+  description = "(Optional) Security rules for the Kong instance that have a Prefix List ID as their Source"
   type = map(object({
     type           = string,
     from_port      = number,
@@ -568,6 +560,12 @@ variable "target_group_arns" {
   default     = []
 }
 
+variable "desired_capacity" {
+  description = "(Optional) The number of Amazon EC2 instances that should be running in the group"
+  type        = number
+  default     = 1
+}
+
 variable "min_healthy_percentage" {
   description = "(Optional) The minimum percentage of healthy instances in Auto Scaling Gorup during inastnce refresh"
   type        = number
@@ -575,7 +573,7 @@ variable "min_healthy_percentage" {
 }
 
 variable "role" {
-  description = "(Optional) The role name for the Kong Instance, used in the ASG name. Defaults to use the KONG_ROLE"
+  description = "(Optional) Role of the Kong Task"
   type        = string
   default     = null
 }
@@ -584,4 +582,208 @@ variable "security_group_name" {
   description = "(Optional) Common name. Used as security_group name prefix and `Name` tag"
   type        = string
   default     = "kong-security-group"
+}
+
+## ECS
+
+variable "fargate_cpu" {
+  description = "(Optional) The CPU for the Fargate Task"
+  type        = number
+  default     = 512
+
+  validation {
+    condition     = contains([256, 512, 1024, 2048, 4096], var.fargate_cpu)
+    error_message = "Must be one of the following values: 256, 512, 1024, 2048, 4096."
+  }
+}
+
+variable "fargate_memory" {
+  description = "(Optional) The Memory for the Fargate Task"
+  type        = number
+  default     = 2048
+
+  validation {
+    condition     = contains([512, 1024, 2048, 3072, 4096, 5120, 6144, 7168, 8192, 9216, 10240, 11264, 12288, 13312, 14336, 15360, 16384, 17408, 18432, 19456, 20480, 21504, 22528, 23552, 24576, 25600, 26624, 27648, 28672, 29696, 30720], var.fargate_memory)
+    error_message = "Must be either 512 or a multiple of 1024, up to 30720."
+  }
+}
+
+variable "enable_execute_command" {
+  description = "(Optional) Define whether to enable Amazon ECS Exec for tasks within the service."
+  type        = bool
+  default     = true
+}
+
+variable "platform_version" {
+  description = "(Optional) ECS Service platform version"
+  type        = string
+  default     = "1.4.0"
+}
+
+variable "ssl_cert" {
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Certificate used to secure traffic to the gateway"
+  type        = string
+  default     = null
+}
+
+variable "ssl_key" {
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Key used to secure traffic to the gateway"
+  type        = string
+  default     = null
+}
+
+variable "lua_ssl_cert" {
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Certificate used for Lua cosockets"
+  type        = string
+  default     = null
+}
+
+variable "cluster_cert" {
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Clustering Certificate"
+  type        = string
+  default     = null
+}
+
+variable "cluster_key" {
+  description = "(Optional) Secrets Manager or Parameter Store ARN of the Clustering Key"
+  type        = string
+  default     = null
+}
+
+variable "kong_log_level" {
+  description = "(Optional) Level of log output for the Gateway"
+  type        = string
+  default     = "warn"
+}
+
+variable "access_log_format" {
+  description = "(Optional) Log location and format to be defined for the access logs"
+  type        = string
+  default     = "logs/access.log"
+}
+
+variable "error_log_format" {
+  description = "(Optional) Log location and format to be defined for the error logs"
+  type        = string
+  default     = "logs/error.log"
+}
+
+variable "desired_count" {
+  description = "(Optional) Desired Task count for the Gateway ECS Task Definition"
+  type        = number
+  default     = 1
+}
+
+variable "min_capacity" {
+  description = "(Optional) Minimum Capacity for the Gateway ECS Task Definition"
+  type        = number
+  default     = 1
+}
+
+variable "max_capacity" {
+  description = "(Optional) Maximum Capacity for the Gateway ECS Task Definition"
+  type        = number
+  default     = 2
+}
+
+variable "custom_nginx_conf" {
+  description = "(Optional) Custom NGINX Config that is included in the main configuration through the variable KONG_NGINX_HTTP_INCLUDE"
+  type        = string
+  default     = "# No custom configuration required, can be ignored"
+}
+
+variable "image_url" {
+  description = "(Optional) The URL where the Docker image resides"
+  type        = string
+  default     = null
+}
+
+variable "ecs_target_group_arns" {
+  description = "(Optional) Target Group ARNs for the ECS Service"
+  type        = map(string)
+  default     = null
+}
+
+variable "template_file" {
+  description = "(Optional) Template file to use to decide if data or control plane"
+  type        = string
+  default     = null
+}
+
+variable "execution_role_arn" {
+  type        = string
+  description = "(Optional) ARN of the Task Execution Role"
+  default     = null
+}
+
+variable "ecs_cluster_arn" {
+  type        = string
+  description = "(Optional) The ARN of the ECS Cluster created"
+  default     = null
+}
+
+variable "ecs_cluster_name" {
+  type        = string
+  description = "(Optional) The ARN of the ECS Cluster created"
+  default     = null
+}
+
+variable "db_password_arn" {
+  description = "(Optional) The DB Password ARN that is used by the ECS Task Definition"
+  type        = string
+  default     = null
+}
+
+variable "log_group" {
+  description = "(Optional) The Log Group for ECS to report out to"
+  type        = string
+  default     = null
+}
+
+variable "kong_admin_gui_session_conf" {
+  description = "(Optional) The session configuration that Kong will use"
+  type        = string
+  default     = null
+}
+
+variable "clustering_endpoint" {
+  type        = string
+  description = "(Optional) Address of the control plane node from which configuration updates will be fetched"
+  default     = null
+}
+
+variable "telemetry_endpoint" {
+  type        = string
+  description = "(Optional) Telemetry address of the control plane node to which telemetry updates will be posted"
+  default     = ""
+}
+
+variable "cluster_server_name" {
+  type        = string
+  description = "(Optional) The server name used in the SNI of the TLS connection from a DP node to a CP node"
+  default     = ""
+}
+
+variable "admin_token" {
+  type        = string
+  description = "(Optional) The ARN of the admin token to be used within the ECS Task Definition."
+  default     = null
+}
+
+variable "kong_admin_api_uri" {
+  description = "(Optional) The Admin API URI composed of a host, port and path on which the Admin API accepts traffic."
+  type        = string
+  default     = ""
+}
+
+variable "kong_admin_gui_url" {
+  description = "(Optional) The Admin GUI URL of the Kong Manager."
+  type        = string
+  default     = ""
+}
+
+variable "entrypoint" {
+  description = "(Optional) The entrypoint for the Docker container. Set this to override the default behaviour."
+  type        = string
+  default     = null
 }

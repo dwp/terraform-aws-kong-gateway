@@ -1,3 +1,30 @@
+locals {
+  kong_ports = {
+    control_plane = {
+      "admin-api"  = 8444,
+      "admin-gui"  = 8445,
+      "status"     = 8100,
+      "clustering" = 8005,
+      "telemetry"  = 8006,
+      "status"     = 8100
+    }
+    data_plane = {
+      "proxy"  = 8443,
+      "status" = 8100
+    }
+    stand_alone = {
+      proxy      = 8000,
+      admin_api  = 8001,
+      admin_gui  = 8002,
+      portal_gui = 8003,
+      portal_api = 8004,
+      cluster    = 8005,
+      telemetry  = 8006,
+      status     = 8100
+    }
+  }
+}
+
 module "kong_ec2" {
   count  = var.deployment_type == "ec2" ? 1 : 0
   source = "./modules/ec2"
@@ -35,7 +62,7 @@ module "kong_ec2" {
   kong_config                       = var.kong_config
   kong_database_config              = var.kong_database_config
   kong_hybrid_conf                  = var.kong_hybrid_conf
-  kong_ports                        = var.kong_ports
+  kong_ports                        = var.kong_ports != null ? var.kong_ports : local.kong_ports["stand_alone"]
   kong_ssl_uris                     = var.kong_ssl_uris
   manager_host                      = var.manager_host
   placement_tenancy                 = var.placement_tenancy
@@ -60,4 +87,79 @@ module "kong_ec2" {
   min_healthy_percentage            = var.min_healthy_percentage
   role                              = var.role
   security_group_name               = var.security_group_name
+}
+
+
+module "kong_ecs" {
+  count  = var.deployment_type == "ecs" ? 1 : 0
+  source = "./modules/ecs"
+
+  role                   = var.role
+  ecs_cluster_arn        = var.ecs_cluster_arn
+  ecs_cluster_name       = var.ecs_cluster_name
+  platform_version       = var.platform_version
+  service                = var.service
+  fargate_cpu            = var.fargate_cpu
+  fargate_memory         = var.fargate_memory
+  enable_execute_command = var.enable_execute_command
+  kong_ports             = var.kong_ports != null ? var.kong_ports : local.kong_ports[var.role]
+  vpc_id                 = var.vpc_id
+
+  security_group_ids  = var.security_group_ids
+  security_group_name = var.security_group_name
+  availability_zones  = var.availability_zones
+
+  access_log_format = var.access_log_format
+  error_log_format  = var.error_log_format
+
+  rules_with_source_cidr_blocks     = var.rules_with_source_cidr_blocks
+  rules_with_source_security_groups = var.rules_with_source_security_groups
+  rules_with_source_prefix_list_id  = var.rules_with_source_prefix_list_id
+
+  region                    = var.region
+  private_subnets           = var.private_subnets
+  private_subnets_to_create = var.private_subnets_to_create
+  tags                      = var.tags
+
+  kong_admin_api_uri = var.kong_admin_api_uri
+  kong_admin_gui_url = var.kong_admin_gui_url
+
+  ecs_target_group_arns = var.ecs_target_group_arns
+  image_url             = var.image_url
+  execution_role_arn    = var.execution_role_arn
+
+  skip_final_snapshot = var.skip_final_snapshot
+  skip_rds_creation   = var.skip_rds_creation
+  postgres_config     = var.postgres_config
+  postgres_host       = var.postgres_host
+  db_password_arn     = var.db_password_arn
+
+  kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
+
+  entrypoint = var.entrypoint
+
+  log_group = var.log_group
+
+  template_file = var.template_file
+
+  custom_nginx_conf = var.custom_nginx_conf
+
+  ssl_cert     = var.ssl_cert
+  ssl_key      = var.ssl_key
+  lua_ssl_cert = var.lua_ssl_cert
+
+  admin_token = var.admin_token
+
+  cluster_cert = var.cluster_cert
+  cluster_key  = var.cluster_key
+
+  kong_log_level = var.kong_log_level
+
+  desired_count = var.desired_count
+  min_capacity  = var.min_capacity
+  max_capacity  = var.max_capacity
+
+  clustering_endpoint = var.clustering_endpoint
+  telemetry_endpoint  = var.telemetry_endpoint
+  cluster_server_name = var.cluster_server_name
 }

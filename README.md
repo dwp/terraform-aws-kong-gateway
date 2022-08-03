@@ -16,11 +16,15 @@ Maturing - Some scenarios tested, but not all. Module in use, but only for a lim
 
 ## Examples
 Examples of how to use the module are in the [examples](examples) directory.
-Currently, there are three examples:
+Currently, there are five examples:
 
 - [hybrid](examples/hybrid) deploys Kong in hybrid mode
 - [hybrid_external_database](examples/hybrid_external_database) first creates a database, then supplies the DB config to the module to use, instead of the module building the DB.
 - [hybrid_http_proxy](examples/hybrid_http_proxy) deploys Kong in hybrid mode behind an outbound HTTP proxy for internet access
+- [hybrid_amazon_linux](examples/hybrid_amazon_linux) deploys Kong in hybrid mode Amazon Linux Instances
+- [hybrid_ecs](examples/hybrid_ecs) deploys Kong on Amazon ECS (Currently Fargate only)
+
+Example configuration for an EC2 Ubuntu based deployment:
 
 ```hcl
 locals {
