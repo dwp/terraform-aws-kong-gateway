@@ -36,3 +36,8 @@ output "kong_iam_role" {
   description = "IAM Role used by the ECS Task for the Gateway"
   value       = var.deployment_type == "ecs" ? module.kong_ecs[0].kong_iam_role : null
 }
+
+output "ecs_security_groups" {
+  description = "The Security Groups used by the ECS Task"
+  value       = var.deployment_type == "ecs" ? module.kong_ecs[0].ecs_security_groups : null
+}

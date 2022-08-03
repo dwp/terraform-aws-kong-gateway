@@ -26,3 +26,9 @@ output "private_subnet_ids" {
   description = "List of private subnet IDs. These are either supplied in the optional `private_subnets` input variable or created in `subnets` submodule."
   sensitive   = false
 }
+
+output "ecs_security_groups" {
+  value       = local.security_groups
+  description = "List of security groups associated with the ECS Service"
+  sensitive   = false
+}
