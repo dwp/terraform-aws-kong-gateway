@@ -30,6 +30,12 @@ output "private_subnet_ids" {
   sensitive   = false
 }
 
+output "security_groups" {
+  description = "List of Security Groups used by Kong."
+  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].launch_config_outputs["security_groups"] : var.deployment_type == "ecs" ? module.kong_ecs[0].security_groups : null
+  sensitive   = false
+}
+
 ## ECS
 
 output "kong_iam_role" {
@@ -37,7 +43,3 @@ output "kong_iam_role" {
   value       = var.deployment_type == "ecs" ? module.kong_ecs[0].kong_iam_role : null
 }
 
-output "ecs_security_groups" {
-  description = "The Security Groups used by the ECS Task"
-  value       = var.deployment_type == "ecs" ? module.kong_ecs[0].ecs_security_groups : null
-}

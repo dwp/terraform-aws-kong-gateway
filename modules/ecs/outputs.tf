@@ -27,8 +27,8 @@ output "private_subnet_ids" {
   sensitive   = false
 }
 
-output "ecs_security_groups" {
+output "security_groups" {
   value       = local.security_groups
-  description = "List of security groups associated with the ECS Service"
+  description = "List of Security Groups used by Kong."
   sensitive   = false
 }
