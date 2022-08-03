@@ -1,8 +1,8 @@
 locals {
   kong_ports = {
     control_plane = {
-      "admin-api"  = 8444,
-      "admin-gui"  = 8445,
+      "admin_api"  = 8444,
+      "admin_gui"  = 8445,
       "status"     = 8100,
       "clustering" = 8005,
       "telemetry"  = 8006,

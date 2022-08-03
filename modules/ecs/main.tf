@@ -83,8 +83,8 @@ data "template_file" "kong_task_definition_cp" {
     db_password_arn             = var.db_password_arn
     kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
     log_group                   = var.log_group
-    admin_api_port              = var.kong_ports.admin-api
-    admin_gui_port              = var.kong_ports.admin-gui
+    admin_api_port              = var.kong_ports.admin_api
+    admin_gui_port              = var.kong_ports.admin_gui
     status_port                 = var.kong_ports.status
     ports                       = jsonencode([for k, v in var.kong_ports : v])
     ulimits                     = jsonencode([4096])
