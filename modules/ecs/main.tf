@@ -17,7 +17,7 @@ locals {
     subnets = local.private_subnets
     azs     = local.azs
   }
-  name = format("%s-%s-%s", var.service, var.environment, var.role)
+  name = format("%s-%s-%s", var.service, substr(var.environment, 0, 24), var.role)
 }
 
 resource "aws_ecs_task_definition" "kong" {
