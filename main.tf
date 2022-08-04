@@ -129,11 +129,12 @@ module "kong_ecs" {
   image_url             = var.image_url
   execution_role_arn    = var.execution_role_arn
 
-  skip_final_snapshot = var.skip_final_snapshot
-  skip_rds_creation   = var.skip_rds_creation
-  postgres_config     = var.postgres_config
-  postgres_host       = var.postgres_host
-  db_password_arn     = var.db_password_arn
+  skip_final_snapshot  = var.skip_final_snapshot
+  skip_rds_creation    = var.skip_rds_creation
+  kong_database_config = var.kong_database_config
+  postgres_config      = var.postgres_config
+  postgres_host        = var.postgres_host
+  db_password_arn      = var.db_password_arn
 
   kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
 
