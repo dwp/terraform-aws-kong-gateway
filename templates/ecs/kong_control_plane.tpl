@@ -134,6 +134,18 @@
       "value": "control_plane"
     },
     {
+      "name": "KONG_VITALS",
+      "value": "${kong_vitals_enabled}"
+    },
+    {
+      "name": "KONG_PORTAL",
+      "value": "${kong_portal_enabled}"
+    },
+    {
+      "name": "KONG_PROXY_LISTEN",
+      "value": "off"
+    },
+    {
       "name": "KONG_LOG_LEVEL",
       "value": "${kong_log_level}"
     },

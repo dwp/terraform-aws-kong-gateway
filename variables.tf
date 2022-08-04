@@ -787,3 +787,15 @@ variable "entrypoint" {
   type        = string
   default     = null
 }
+
+variable "kong_vitals_enabled" {
+  description = "(Optional) Define whether or not Kong Vitals should be enabled."
+  type        = string
+  default     = "on"
+}
+
+variable "kong_portal_enabled" {
+  description = "(Optional) Define whether or not the Kong Portal should be enabled."
+  type        = string
+  default     = "on"
+}
