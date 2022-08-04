@@ -94,6 +94,7 @@ module "kong_ecs" {
   count  = var.deployment_type == "ecs" ? 1 : 0
   source = "./modules/ecs"
 
+  environment            = var.environment
   role                   = var.role
   ecs_cluster_arn        = var.ecs_cluster_arn
   ecs_cluster_name       = var.ecs_cluster_name
