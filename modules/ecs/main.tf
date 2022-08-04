@@ -96,6 +96,8 @@ data "template_file" "kong_task_definition_cp" {
     kong_admin_api_uri          = var.kong_admin_api_uri
     kong_admin_gui_url          = var.kong_admin_gui_url
     admin_token                 = var.admin_token
+    kong_vitals_enabled         = var.kong_vitals_enabled
+    kong_portal_enabled         = var.kong_portal_enabled
     lua_ssl_cert                = var.lua_ssl_cert
     cluster_cert                = var.cluster_cert
     cluster_key                 = var.cluster_key

@@ -306,3 +306,13 @@ variable "entrypoint" {
   description = "The entrypoint file used for the Task definition."
   type        = string
 }
+
+variable "kong_vitals_enabled" {
+  description = "Define whether or not Kong Vitals should be enabled."
+  type        = string
+}
+
+variable "kong_portal_enabled" {
+  description = "Define whether or not the Kong Portal should be enabled."
+  type        = string
+}
