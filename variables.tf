@@ -799,3 +799,8 @@ variable "kong_portal_enabled" {
   type        = string
   default     = "on"
 }
+
+variable "extra_db_users" {
+  description = "Define any extra Database Users that require permissions to access the Kong Database, e.g portal"
+  type        = string
+}

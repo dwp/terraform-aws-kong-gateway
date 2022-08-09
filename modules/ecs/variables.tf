@@ -316,3 +316,8 @@ variable "kong_portal_enabled" {
   description = "Define whether or not the Kong Portal should be enabled."
   type        = string
 }
+
+variable "extra_db_users" {
+  description = "Define any extra Database Users that require permissions to access the Kong Database, e.g portal"
+  type        = string
+}
