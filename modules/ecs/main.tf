@@ -90,6 +90,7 @@ data "template_file" "kong_task_definition_cp" {
     ulimits                     = jsonencode([4096])
     region                      = var.region
     access_log_format           = var.access_log_format
+    extra_db_users              = var.extra_db_users
     error_log_format            = var.error_log_format
     ssl_cert                    = var.ssl_cert
     ssl_key                     = var.ssl_key

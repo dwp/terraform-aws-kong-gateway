@@ -14,6 +14,10 @@
       "value": "${region}"
     },
     {
+      "name": "EXTRA_DB_USERS",
+      "value": "${extra_db_users}"
+    },
+    {
       "name": "KONG_CLUSTER_MTLS",
       "value": "shared"
     },
@@ -177,6 +181,10 @@
     },
     {
     "name": "KONG_PG_PASSWORD",
+    "valueFrom": "${db_password_arn}"
+    },
+    {
+    "name": "PGPASSWORD",
     "valueFrom": "${db_password_arn}"
     },
     {
