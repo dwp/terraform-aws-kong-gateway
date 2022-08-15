@@ -638,6 +638,23 @@ variable "lua_ssl_cert" {
   default     = null
 }
 
+variable "kong_cluster_mtls" {
+  description = "Define what type of Cluster mTLS is required - either 'shared' or 'pki'."
+  type        = string
+  default     = "shared"
+
+  validation {
+    condition     = contains(["pki", "shared"], var.kong_cluster_mtls)
+    error_message = "Invalid value - please choose pki or shared."
+  }
+}
+
+variable "cluster_ca_cert" {
+  description = "Secrets Manager or Parameter Store ARN of the Clustering Certificate Authority"
+  type        = string
+  default     = null
+}
+
 variable "cluster_cert" {
   description = "(Optional) Secrets Manager or Parameter Store ARN of the Clustering Certificate"
   type        = string
