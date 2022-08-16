@@ -15,7 +15,7 @@
     },
     {
       "name": "KONG_CLUSTER_MTLS",
-      "value": "shared"
+      "value": "${kong_cluster_mtls}"
     },
     {
       "name": "KONG_ADMIN_GUI_AUTH",
@@ -57,6 +57,12 @@
       "name": "KONG_ADMIN_GUI_ERROR_LOG",
       "value": "/dev/stderr"
     },
+    %{ if kong_cluster_mtls == "pki" }
+    {
+      "name": "KONG_CLUSTER_CA_CERT",
+      "value": "/usr/local/kong/kong_clustering/cluster_ca.crt"
+    },
+    %{ endif }
     {
       "name": "KONG_CLUSTER_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
@@ -187,6 +193,12 @@
     "name": "LUA_SSL_CERT",
     "valueFrom": "${lua_ssl_cert}"
     },
+    %{ if kong_cluster_mtls == "pki" }
+    {
+    "name": "CLUSTER_CA",
+    "valueFrom": "${cluster_ca_cert}"
+    },
+    %{ endif }
     {
     "name": "CLUSTER_CERT",
     "valueFrom": "${cluster_cert}"

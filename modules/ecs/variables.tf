@@ -178,6 +178,16 @@ variable "lua_ssl_cert" {
   type        = string
 }
 
+variable "kong_cluster_mtls" {
+  description = "Define what type of Cluster mTLS is required - either 'shared' or 'pki'."
+  type        = string
+}
+
+variable "cluster_ca_cert" {
+  description = "Secrets Manager or Parameter Store ARN of the Clustering Certificate Authority"
+  type        = string
+}
+
 variable "cluster_cert" {
   description = "Secrets Manager or Parameter Store ARN of the Clustering Certificate"
   type        = string

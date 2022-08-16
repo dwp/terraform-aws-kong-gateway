@@ -155,8 +155,10 @@ module "kong_ecs" {
 
   admin_token = var.admin_token
 
-  cluster_cert = var.cluster_cert
-  cluster_key  = var.cluster_key
+  kong_cluster_mtls = var.kong_cluster_mtls
+  cluster_ca_cert   = var.cluster_ca_cert
+  cluster_cert      = var.cluster_cert
+  cluster_key       = var.cluster_key
 
   kong_log_level = var.kong_log_level
 
