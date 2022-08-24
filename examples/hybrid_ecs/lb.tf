@@ -8,6 +8,10 @@ locals {
   target_group_dp = {
     (aws_lb_target_group.external-proxy.arn) = 8443
   }
+  target_group_portal = {
+    (aws_lb_target_group.external-portal-gui.arn) = 8446
+    (aws_lb_target_group.external-portal-api.arn) = 8447
+  }
 }
 
 resource "aws_security_group" "external-lb" {
@@ -35,6 +39,30 @@ resource "aws_security_group_rule" "external-lb-ingress-admin" {
   type      = "ingress"
   from_port = 8001
   to_port   = 8001
+  protocol  = "tcp"
+
+  cidr_blocks = var.external_cidr_blocks
+
+}
+
+resource "aws_security_group_rule" "external-lb-ingress-admin-gui" {
+  security_group_id = aws_security_group.external-lb.id
+
+  type      = "ingress"
+  from_port = 8003
+  to_port   = 8003
+  protocol  = "tcp"
+
+  cidr_blocks = var.external_cidr_blocks
+
+}
+
+resource "aws_security_group_rule" "external-lb-ingress-admin-api" {
+  security_group_id = aws_security_group.external-lb.id
+
+  type      = "ingress"
+  from_port = 8004
+  to_port   = 8004
   protocol  = "tcp"
 
   cidr_blocks = var.external_cidr_blocks
@@ -113,6 +141,44 @@ resource "aws_lb_target_group" "external-admin-api" {
   }
 }
 
+resource "aws_lb_target_group" "external-portal-gui" {
+  name        = "external-admin-api-8446"
+  port        = 8446
+  protocol    = "HTTPS"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
+  health_check {
+    healthy_threshold   = 4
+    interval            = 10
+    path                = "/status"
+    protocol            = "HTTPS"
+    port                = 8100
+    unhealthy_threshold = 2
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_lb_target_group" "external-portal-api" {
+  name        = "external-admin-api-8447"
+  port        = 8447
+  protocol    = "HTTPS"
+  vpc_id      = aws_vpc.vpc.id
+  target_type = "ip"
+  health_check {
+    healthy_threshold   = 4
+    interval            = 10
+    path                = "/status"
+    protocol            = "HTTPS"
+    port                = 8100
+    unhealthy_threshold = 2
+  }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_lb_listener" "external-proxy" {
 
   load_balancer_arn = aws_lb.external.arn
@@ -130,6 +196,27 @@ resource "aws_lb_listener" "admin" {
   port              = 8001
   default_action {
     target_group_arn = aws_lb_target_group.external-admin-api.arn
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "portal_gui" {
+
+  load_balancer_arn = aws_lb.external.arn
+  port              = 8003
+
+  default_action {
+    target_group_arn = aws_lb_target_group.external-portal-gui.arn
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "portal_api" {
+
+  load_balancer_arn = aws_lb.external.arn
+  port              = 8004
+  default_action {
+    target_group_arn = aws_lb_target_group.external-portal-api.arn
     type             = "forward"
   }
 }

@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "kong" {
   memory                   = var.fargate_memory
   task_role_arn            = aws_iam_role.kong_task_role.arn
   execution_role_arn       = var.execution_role_arn
-  container_definitions    = var.role == "control_plane" ? "[${data.template_file.kong_task_definition_cp[0].rendered}]" : var.role == "data_plane" ? "[${data.template_file.kong_task_definition_dp[0].rendered}]" : null
+  container_definitions    = var.role == "control_plane" ? "[${data.template_file.kong_task_definition_cp[0].rendered}]" : var.role == "data_plane" ? "[${data.template_file.kong_task_definition_dp[0].rendered}]" : var.role == "portal" ? "[${data.template_file.kong_task_definition_portal[0].rendered}]" : null
 
   tags = {
     Name = local.name
@@ -106,6 +106,42 @@ data "template_file" "kong_task_definition_cp" {
     kong_log_level              = var.kong_log_level
     entrypoint                  = var.entrypoint
     custom_nginx_conf           = base64encode(var.custom_nginx_conf)
+  }
+}
+
+data "template_file" "kong_task_definition_portal" {
+  count    = var.role == "portal" ? 1 : 0
+  template = file("${path.module}/../../templates/ecs/kong_portal.tpl")
+  vars = {
+    name                     = local.name
+    group_name               = local.name
+    cpu                      = var.fargate_cpu
+    image_url                = var.image_url
+    memory                   = var.fargate_memory
+    user                     = "kong"
+    db_user                  = var.kong_database_config.user
+    db_host                  = local.db_info.endpoint
+    db_name                  = local.db_info.database_name
+    db_password_arn          = var.db_password_arn
+    log_group                = var.log_group
+    portal_gui_port          = var.kong_ports.portal-gui
+    portal_api_port          = var.kong_ports.portal-api
+    status_port              = var.kong_ports.status
+    kong_portal_gui_host     = var.kong_portal_gui_host
+    kong_portal_gui_protocol = var.kong_portal_gui_protocol
+    kong_portal_api_url      = var.kong_portal_api_url
+    ports                    = jsonencode([for k, v in var.kong_ports : v])
+    ulimits                  = jsonencode([4096])
+    region                   = var.region
+    access_log_format        = var.access_log_format
+    error_log_format         = var.error_log_format
+    ssl_cert                 = var.ssl_cert
+    ssl_key                  = var.ssl_key
+    cluster_cert             = var.cluster_cert
+    cluster_key              = var.cluster_key
+    kong_log_level           = var.kong_log_level
+    entrypoint               = var.entrypoint
+    custom_nginx_conf        = base64encode(var.custom_nginx_conf)
   }
 }
 

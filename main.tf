@@ -8,6 +8,11 @@ locals {
       "telemetry"  = 8006,
       "status"     = 8100
     }
+    portal = {
+      "portal-gui" = 8446,
+      "portal-api" = 8447,
+      "status"     = 8100
+    }
     data_plane = {
       "proxy"  = 8443,
       "status" = 8100
@@ -124,6 +129,10 @@ module "kong_ecs" {
 
   kong_admin_api_uri = var.kong_admin_api_uri
   kong_admin_gui_url = var.kong_admin_gui_url
+
+  kong_portal_gui_host     = var.kong_portal_gui_host
+  kong_portal_api_url      = var.kong_portal_api_url
+  kong_portal_gui_protocol = var.kong_portal_gui_protocol
 
   ecs_target_group_arns = var.ecs_target_group_arns
   image_url             = var.image_url

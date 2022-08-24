@@ -816,3 +816,21 @@ variable "kong_portal_enabled" {
   type        = string
   default     = "on"
 }
+
+variable "kong_portal_gui_host" {
+  description = "(Optional) The Hostname used for the Portal GUI."
+  type        = string
+  default     = ""
+}
+
+variable "kong_portal_gui_protocol" {
+  description = "(Optional) The protocol used for the portal GUI."
+  type        = string
+  default     = ""
+}
+
+variable "kong_portal_api_url" {
+  description = "(Optional) The Portal API URL of the Portal."
+  type        = string
+  default     = ""
+}
