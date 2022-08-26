@@ -1,7 +1,11 @@
 ---
-name: hybrid_external_database
+name: hybrid_ecs
 inputs:
 - name: kong-api-endpoint
   type: string
 - name: kong-proxy-endpoint
+  type: string
+- name: kong-portal-endpoint
+  type: string
+- name: admin_token_path
   type: string
