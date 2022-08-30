@@ -8,7 +8,7 @@ require_relative '../../libraries/kong_util'
 
 token = aws_get_parameter(token_path, region)
 
-wait("#{api}/clustering/status", token) # wait for Kong to be running
+wait("#{api}/clustering/status", "control_plane", token) # wait for Kong to be running
 
 control 'Apply Kong license' do
     impact 1
@@ -67,6 +67,8 @@ control 'Portal' do
 
   post("#{api}/workspaces", {"name" => "portal"}, token)
   patch("#{api}/workspaces/portal", {"config.portal" => "true"}, token)
+
+  wait("#{portal}/portal", "portal") # wait for Kong to be running
 
   describe http("#{portal}/portal") do
     its('status') { should cmp 200 }

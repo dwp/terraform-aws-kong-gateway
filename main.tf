@@ -9,8 +9,8 @@ locals {
       "status"     = 8100
     }
     portal = {
-      "portal-gui" = 8446,
-      "portal-api" = 8447,
+      "portal_gui" = 8446,
+      "portal_api" = 8447,
       "status"     = 8100
     }
     data_plane = {
@@ -153,8 +153,6 @@ module "kong_ecs" {
   entrypoint = var.entrypoint
 
   log_group = var.log_group
-
-  template_file = var.template_file
 
   custom_nginx_conf = var.custom_nginx_conf
 

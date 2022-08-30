@@ -243,11 +243,6 @@ variable "image_url" {
   type        = string
 }
 
-variable "template_file" {
-  description = "(Optional) Template file to use to decide if data or control plane"
-  type        = string
-}
-
 variable "execution_role_arn" {
   type        = string
   description = "ARN of the Task Execution Role"

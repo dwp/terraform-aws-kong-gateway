@@ -173,6 +173,13 @@
     }
   ],
   "entryPoint": ["${entrypoint}"],
+  "healthCheck": {
+    "command": ["CMD-SHELL", "curl --insecure --fail https://localhost:8446/portal"],
+    "timeout": 2,
+    "interval": 5,
+    "retries": 3,
+    "startPeriod": null
+  },
   "portMappings": ${jsonencode([
     for port in jsondecode(ports) : {
       containerPort = port,

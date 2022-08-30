@@ -4,7 +4,7 @@
 ### required Variables
 variable "deployment_type" {
   type        = string
-  description = "Define the deployment type of either EC2 or ECS"
+  description = "Define the deployment type of either `ec2` or `ecs`"
 
   validation {
     condition     = contains(["ec2", "ecs"], var.deployment_type)
@@ -718,12 +718,6 @@ variable "image_url" {
 variable "ecs_target_group_arns" {
   description = "(Optional) Target Group ARNs for the ECS Service"
   type        = map(string)
-  default     = null
-}
-
-variable "template_file" {
-  description = "(Optional) Template file to use to decide if data or control plane"
-  type        = string
   default     = null
 }
 

@@ -253,7 +253,6 @@ module "create_kong_cp" {
   ecs_target_group_arns = local.target_group_cp
 
   skip_rds_creation = true
-  template_file     = "control_plane"
 
   environment = local.environment
   service     = var.service
@@ -328,7 +327,6 @@ module "create_kong_portal" {
   ecs_target_group_arns = local.target_group_portal
 
   skip_rds_creation = true
-  template_file     = "control_plane"
 
   environment = local.environment
   service     = var.service

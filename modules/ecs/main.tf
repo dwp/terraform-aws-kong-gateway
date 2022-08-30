@@ -124,8 +124,8 @@ data "template_file" "kong_task_definition_portal" {
     db_name                  = local.db_info.database_name
     db_password_arn          = var.db_password_arn
     log_group                = var.log_group
-    portal_gui_port          = var.kong_ports.portal-gui
-    portal_api_port          = var.kong_ports.portal-api
+    portal_gui_port          = var.kong_ports.portal_gui
+    portal_api_port          = var.kong_ports.portal_api
     status_port              = var.kong_ports.status
     kong_portal_gui_host     = var.kong_portal_gui_host
     kong_portal_gui_protocol = var.kong_portal_gui_protocol

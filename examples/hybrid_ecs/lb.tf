@@ -142,11 +142,12 @@ resource "aws_lb_target_group" "external-admin-api" {
 }
 
 resource "aws_lb_target_group" "external-portal-gui" {
-  name        = "external-admin-api-8446"
-  port        = 8446
-  protocol    = "HTTPS"
-  vpc_id      = aws_vpc.vpc.id
-  target_type = "ip"
+  name                 = "external-admin-api-8446"
+  port                 = 8446
+  protocol             = "HTTPS"
+  vpc_id               = aws_vpc.vpc.id
+  target_type          = "ip"
+  deregistration_delay = 60
   health_check {
     healthy_threshold   = 4
     interval            = 10
@@ -161,11 +162,12 @@ resource "aws_lb_target_group" "external-portal-gui" {
 }
 
 resource "aws_lb_target_group" "external-portal-api" {
-  name        = "external-admin-api-8447"
-  port        = 8447
-  protocol    = "HTTPS"
-  vpc_id      = aws_vpc.vpc.id
-  target_type = "ip"
+  name                 = "external-admin-api-8447"
+  port                 = 8447
+  protocol             = "HTTPS"
+  vpc_id               = aws_vpc.vpc.id
+  target_type          = "ip"
+  deregistration_delay = 60
   health_check {
     healthy_threshold   = 4
     interval            = 10
