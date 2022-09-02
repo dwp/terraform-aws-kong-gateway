@@ -71,6 +71,11 @@ resource "aws_iam_role_policy_attachment" "ecs_execute_command_policy_attachment
   policy_arn = aws_iam_policy.ecs_execute_command_policy.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ecs_execute_command_policy_attachment_portal" {
+  role       = module.create_kong_portal.kong_iam_role
+  policy_arn = aws_iam_policy.ecs_execute_command_policy.arn
+}
+
 data "aws_iam_policy_document" "ecs_execute_command_policy" {
   statement {
     sid    = "GetSecrets"

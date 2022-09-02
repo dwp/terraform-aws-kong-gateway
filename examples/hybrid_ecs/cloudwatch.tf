@@ -15,3 +15,12 @@ resource "aws_cloudwatch_log_group" "kong_cp" {
     Name = "${var.environment}-cp"
   }
 }
+
+resource "aws_cloudwatch_log_group" "kong_portal" {
+  name              = "${var.environment}-portal"
+  retention_in_days = 7
+
+  tags = {
+    Name = "${var.environment}-portal"
+  }
+}

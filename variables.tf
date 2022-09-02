@@ -4,7 +4,7 @@
 ### required Variables
 variable "deployment_type" {
   type        = string
-  description = "Define the deployment type of either EC2 or ECS"
+  description = "Define the deployment type of either `ec2` or `ecs`"
 
   validation {
     condition     = contains(["ec2", "ecs"], var.deployment_type)
@@ -721,12 +721,6 @@ variable "ecs_target_group_arns" {
   default     = null
 }
 
-variable "template_file" {
-  description = "(Optional) Template file to use to decide if data or control plane"
-  type        = string
-  default     = null
-}
-
 variable "execution_role_arn" {
   type        = string
   description = "(Optional) ARN of the Task Execution Role"
@@ -815,4 +809,22 @@ variable "kong_portal_enabled" {
   description = "(Optional) Define whether or not the Kong Portal should be enabled."
   type        = string
   default     = "on"
+}
+
+variable "kong_portal_gui_host" {
+  description = "(Optional) The Hostname used for the Portal GUI."
+  type        = string
+  default     = ""
+}
+
+variable "kong_portal_gui_protocol" {
+  description = "(Optional) The protocol used for the portal GUI."
+  type        = string
+  default     = ""
+}
+
+variable "kong_portal_api_url" {
+  description = "(Optional) The Portal API URL of the Portal."
+  type        = string
+  default     = ""
 }

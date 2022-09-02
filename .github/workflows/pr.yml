@@ -119,6 +119,7 @@ jobs:
           TF_VAR_vpc_cidr_block: "10.0.0.0/16"
           TF_VAR_kong_database_password: ${{ secrets.KONG_DATABASE_PASSWORD }}
           TF_VAR_image_url: ${{ secrets.AWS_ACCOUNT }}.dkr.ecr.eu-west-1.amazonaws.com/terraform-aws-kong-gateway:${{ github.run_number }}
+          KONG_EE_LICENSE: ${{ secrets.KONG_EE_LICENSE }}
       - name: Kitchen Test Amazon Linux 2
         uses: dwp/github-action-kitchen-terraform@0.14.7
         with:

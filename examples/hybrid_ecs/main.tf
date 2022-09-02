@@ -253,7 +253,80 @@ module "create_kong_cp" {
   ecs_target_group_arns = local.target_group_cp
 
   skip_rds_creation = true
-  template_file     = "control_plane"
+
+  environment = local.environment
+  service     = var.service
+  description = var.description
+  tags        = var.tags
+}
+
+module "create_kong_portal" {
+  source = "../../"
+
+  deployment_type  = "ecs"
+  role             = "portal"
+  ecs_cluster_arn  = aws_ecs_cluster.kong.arn
+  ecs_cluster_name = aws_ecs_cluster.kong.name
+  instance_type    = var.instance_type
+  vpc_id           = aws_vpc.vpc.id
+  region           = var.region
+  vpc_cidr_block   = aws_vpc.vpc.cidr_block
+
+  db_password_arn = aws_ssm_parameter.db_password.arn
+
+  ssl_cert     = aws_ssm_parameter.cert.arn
+  ssl_key      = aws_ssm_parameter.key.arn
+  lua_ssl_cert = aws_ssm_parameter.cert.arn
+
+  cluster_cert = aws_ssm_parameter.cert.arn
+  cluster_key  = aws_ssm_parameter.key.arn
+
+  kong_log_level = "debug"
+
+  entrypoint = "/portal-entrypoint.sh"
+
+  desired_count = var.desired_capacity
+  min_capacity  = var.min_capacity
+  max_capacity  = var.max_capacity
+
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
+
+  log_group = aws_cloudwatch_log_group.kong_portal.name
+
+  kong_portal_gui_host     = "${aws_lb.external.dns_name}:8003"
+  kong_portal_api_url      = "http://${aws_lb.external.dns_name}:8004"
+  kong_portal_gui_protocol = "http"
+
+  access_log_format = var.access_log_format
+  error_log_format  = var.error_log_format
+
+  cluster_server_name = aws_lb.external.dns_name
+
+  custom_nginx_conf = var.custom_nginx_conf
+
+  rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
+
+  postgres_config = {
+    master_user     = var.postgres_master_user
+    master_password = random_string.master_password.result
+  }
+
+  postgres_host = aws_instance.external_postgres.private_ip
+
+  kong_database_config = {
+    user     = var.kong_database_user
+    name     = var.kong_database_name
+    password = var.kong_database_password
+  }
+
+  private_subnets    = module.create_kong_cp.private_subnet_ids
+  availability_zones = module.create_kong_cp.private_subnet_azs
+
+  image_url = var.image_url
+
+  ecs_target_group_arns = local.target_group_portal
+
+  skip_rds_creation = true
 
   environment = local.environment
   service     = var.service

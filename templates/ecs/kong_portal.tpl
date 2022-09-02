@@ -15,54 +15,48 @@
     },
     {
       "name": "KONG_CLUSTER_MTLS",
-      "value": "${kong_cluster_mtls}"
+      "value": "shared"
     },
     {
-      "name": "KONG_ADMIN_GUI_AUTH",
-      "value": "basic-auth"
-    },
-    {
-      "name": "KONG_ENFORCE_RBAC",
-      "value": "on"
-    },
-    {
-      "name": "KONG_ADMIN_SSL_CERT",
+      "name": "KONG_PORTAL_GUI_SSL_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
     },
     {
-      "name": "KONG_ADMIN_SSL_CERT_KEY",
+      "name": "KONG_PORTAL_GUI_SSL_CERT_KEY",
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
-      "name": "KONG_ADMIN_GUI_SSL_CERT",
+      "name": "KONG_PORTAL_API_SSL_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
     },
     {
-      "name": "KONG_ADMIN_GUI_SSL_CERT_KEY",
+      "name": "KONG_PORTAL_API_SSL_CERT_KEY",
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
-      "name": "KONG_ADMIN_ACCESS_LOG",
+      "name": "KONG_PORTAL_GUI_HOST",
+      "value": "${kong_portal_gui_host}"
+    },
+    {
+      "name": "KONG_PORTAL_API_ACCESS_LOG",
       "value": "/dev/stdout"
     },
     {
-      "name": "KONG_ADMIN_ERROR_LOG",
+      "name": "KONG_PORTAL_API_ERROR_LOG",
       "value": "/dev/stderr"
     },
     {
-      "name": "KONG_ADMIN_GUI_ACCESS_LOG",
+      "name": "KONG_PORTAL_GUI_ACCESS_LOG",
       "value": "/dev/stdout"
     },
     {
-      "name": "KONG_ADMIN_GUI_ERROR_LOG",
+      "name": "KONG_PORTAL_GUI_ERROR_LOG",
       "value": "/dev/stderr"
     },
-    %{ if kong_cluster_mtls == "pki" }
     {
-      "name": "KONG_CLUSTER_CA_CERT",
-      "value": "/usr/local/kong/kong_clustering/cluster_ca.crt"
+      "name": "KONG_PORTAL_GUI_PROTOCOL",
+      "value": "${kong_portal_gui_protocol}"
     },
-    %{ endif }
     {
       "name": "KONG_CLUSTER_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
@@ -80,20 +74,20 @@
       "value": "/usr/local/kong/ssl/kong.key"
     },
     {
-      "name": "KONG_ADMIN_LISTEN",
-      "value": "0.0.0.0:${admin_api_port} ssl"
+      "name": "KONG_PORTAL_GUI_LISTEN",
+      "value": "0.0.0.0:${portal_gui_port} ssl"
     },
     {
-      "name": "KONG_ADMIN_GUI_LISTEN",
-      "value": "0.0.0.0:${admin_gui_port} ssl"
+    "name": "KONG_PORTAL_API_LISTEN",
+    "value": "0.0.0.0:${portal_api_port} ssl"
     },
     {
-      "name": "KONG_ADMIN_API_URI",
-      "value": "${kong_admin_api_uri}"
+    "name": "KONG_PORTAL_API_URL",
+    "value": "${kong_portal_api_url}"
     },
     {
-      "name": "KONG_ADMIN_GUI_URL",
-      "value": "${kong_admin_gui_url}"
+      "name": "KONG_PORTAL",
+      "value": "on"
     },
     {
       "name": "KONG_CLUSTER_SERVER_NAME",
@@ -140,18 +134,6 @@
       "value": "control_plane"
     },
     {
-      "name": "KONG_VITALS",
-      "value": "${kong_vitals_enabled}"
-    },
-    {
-      "name": "KONG_PORTAL",
-      "value": "${kong_portal_enabled}"
-    },
-    {
-      "name": "KONG_PROXY_LISTEN",
-      "value": "off"
-    },
-    {
       "name": "KONG_LOG_LEVEL",
       "value": "${kong_log_level}"
     },
@@ -178,27 +160,9 @@
     "valueFrom": "${ssl_key}"
     },
     {
-    "name": "KONG_PASSWORD",
-    "valueFrom": "${admin_token}"
-    },
-    {
     "name": "KONG_PG_PASSWORD",
     "valueFrom": "${db_password_arn}"
     },
-    {
-    "name": "KONG_ADMIN_GUI_SESSION_CONF",
-    "valueFrom": "${kong_admin_gui_session_conf}"
-    },
-    {
-    "name": "LUA_SSL_CERT",
-    "valueFrom": "${lua_ssl_cert}"
-    },
-    %{ if kong_cluster_mtls == "pki" }
-    {
-    "name": "CLUSTER_CA",
-    "valueFrom": "${cluster_ca_cert}"
-    },
-    %{ endif }
     {
     "name": "CLUSTER_CERT",
     "valueFrom": "${cluster_cert}"
@@ -210,10 +174,10 @@
   ],
   "entryPoint": ["${entrypoint}"],
   "healthCheck": {
-    "command": ["CMD-SHELL", "kong health"],
-    "timeout": 10,
-    "interval": 10,
-    "retries": 10,
+    "command": ["CMD-SHELL", "curl --insecure --fail https://localhost:8446/portal"],
+    "timeout": 2,
+    "interval": 5,
+    "retries": 3,
     "startPeriod": null
   },
   "portMappings": ${jsonencode([

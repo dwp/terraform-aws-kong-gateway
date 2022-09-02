@@ -117,6 +117,13 @@
     }
   ],
   "entryPoint": ["${entrypoint}"],
+  "healthCheck": {
+    "command": ["CMD-SHELL", "kong health"],
+    "timeout": 10,
+    "interval": 10,
+    "retries": 10,
+    "startPeriod": null
+  },
   "portMappings": ${jsonencode([
     for port in jsondecode(ports) : {
       containerPort = port,
