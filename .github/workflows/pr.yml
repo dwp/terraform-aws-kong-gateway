@@ -109,7 +109,7 @@ jobs:
       - name: Kitchen Test ECS
         uses: dwp/github-action-kitchen-terraform@v2.0.1
         with:
-          terraform-version: "0.14.7"
+          terraform-version: 0.14.7
           kitchen-command: test hybrid-ecs --destroy=always
           aws-account-number: ${{ secrets.AWS_ACCOUNT }}
         env:
@@ -124,7 +124,7 @@ jobs:
       - name: Kitchen Test Amazon Linux 2
         uses: dwp/github-action-kitchen-terraform@v2.0.1
         with:
-          terraform-version: "0.14.7"
+          terraform-version: 0.14.7
           kitchen-command: test hybrid-amazon-linux --destroy=always
           aws-account-number: ${{ secrets.AWS_ACCOUNT }}
         env:
