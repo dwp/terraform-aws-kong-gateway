@@ -148,10 +148,6 @@
       "value": "control_plane"
     },
     {
-      "name": "KONG_VITALS",
-      "value": "${kong_vitals_enabled}"
-    },
-    {
       "name": "KONG_PORTAL",
       "value": "${kong_portal_enabled}"
     },
@@ -174,6 +170,24 @@
     {
       "name": "KONG_TRUSTED_IPS",
       "value": "0.0.0.0/0"
+    },
+    %{ if vitals_endpoint != "" && kong_vitals_enabled == "on" }
+    {
+      "name": "KONG_VITALS",
+      "value": "${kong_vitals_enabled}"
+    },
+    {
+      "name": "KONG_VITALS_STRATEGY",
+      "value": "prometheus"
+    },
+    {
+      "name": "KONG_VITALS_STATSD_ADDRESS",
+      "value": "${vitals_endpoint}"
+    },
+    %{ endif }
+    {
+      "name": "KONG_VITALS_TSDB_ADDRESS",
+      "value": "127.0.0.1:443"
     }
   ],
   "secrets": [

@@ -397,6 +397,13 @@ KONG_CLUSTER_TELEMETRY_ENDPOINT="${kong_hybrid_conf.endpoint}:${kong_ports.telem
 
 KONG_PLUGINS="${kong_plugins}"
 
+%{ if vitals_endpoint != "" && kong_vitals_enabled == "on" }
+KONG_VITALS="on"
+KONG_VITALS_STRATEGY="prometheus"
+KONG_VITALS_STATSD_ADDRESS="${vitals_endpoint}"
+%{ endif }
+KONG_VITALS_TSDB_ADDRESS=127.0.0.1:443
+
 %{ for key, value in kong_config ~}
 ${key}="${value}"
 %{ endfor ~}

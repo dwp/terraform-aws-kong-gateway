@@ -579,3 +579,18 @@ variable "kong_plugins" {
   type        = list(string)
   default     = []
 }
+
+variable "kong_vitals_enabled" {
+  description = "Define whether or not Kong Vitals should be enabled."
+  type        = string
+}
+
+variable "vitals_endpoint" {
+  description = "(Optional) The DNS name for the Vitals endpoint that Gateways should send their metrics to"
+  type = object({
+    fqdn     = string
+    port     = number
+    protocol = string
+  })
+  default = null
+}

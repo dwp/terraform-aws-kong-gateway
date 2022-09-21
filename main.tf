@@ -94,6 +94,8 @@ module "kong_ec2" {
   min_healthy_percentage            = var.min_healthy_percentage
   role                              = var.role
   security_group_name               = var.security_group_name
+  kong_vitals_enabled               = var.kong_vitals_enabled
+  vitals_endpoint                   = var.vitals_endpoint
 }
 
 
@@ -180,4 +182,7 @@ module "kong_ecs" {
   clustering_endpoint = var.clustering_endpoint
   telemetry_endpoint  = var.telemetry_endpoint
   cluster_server_name = var.cluster_server_name
+
+  vitals_endpoint = var.vitals_endpoint
+
 }
