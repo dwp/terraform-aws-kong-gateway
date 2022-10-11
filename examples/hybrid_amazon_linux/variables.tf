@@ -10,7 +10,7 @@ variable "instance_type" {
 }
 
 variable "key_name" {
-  description = "The name of an AWS ssh key pari to associate with the instances in the ASG"
+  description = "The name of an AWS ssh key pair to associate with the instances in the ASG"
   type        = string
   default     = null
 }
