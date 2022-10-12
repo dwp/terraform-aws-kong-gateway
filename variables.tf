@@ -189,7 +189,7 @@ variable "key_name" {
 }
 
 variable "user_data" {
-  description = "(Optional) The user data to provide when launching the instance. N.B if set, this will overide the user_data provided by this module"
+  description = "(Optional) The user data to provide when launching the instance. N.B if set, this will override the user_data provided by this module"
   type        = string
   default     = null
 }
@@ -567,7 +567,7 @@ variable "desired_capacity" {
 }
 
 variable "min_healthy_percentage" {
-  description = "(Optional) The minimum percentage of healthy instances in Auto Scaling Gorup during inastnce refresh"
+  description = "(Optional) The minimum percentage of healthy instances in Auto Scaling Group during instance refresh"
   type        = number
   default     = 30
 }
