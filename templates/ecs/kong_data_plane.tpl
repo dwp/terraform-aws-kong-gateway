@@ -82,6 +82,10 @@
       "value": "data_plane"
     },
     {
+      "name": "KONG_PLUGINS",
+      "value": "${kong_plugins}"
+    },
+    {
       "name": "KONG_DATABASE",
       "value": "off"
     },

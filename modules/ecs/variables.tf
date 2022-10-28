@@ -336,3 +336,9 @@ variable "kong_portal_api_url" {
   description = "The Portal API URL of the Portal."
   type        = string
 }
+
+variable "kong_plugins" {
+  description = "Comma-separated list of Kong plugins, passed through the variable KONG_PLUGINS"
+  type        = string
+  default     = "bundled"
+}
