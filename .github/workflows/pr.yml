@@ -1,5 +1,7 @@
 name: PR
 
+concurrency: pr
+
 on:
   pull_request:
     paths-ignore:
