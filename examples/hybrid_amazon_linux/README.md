@@ -1,6 +1,6 @@
 # Hybrid Example With External Database
 
-![architecture-diagram](https://raw.githubusercontent.com/dwp/terraform-aws-kong-gateway/main/examples/hybrid_external_database/hybrid_external_amazon_linux.png)
+![architecture-diagram](https://raw.githubusercontent.com/dwp/terraform-aws-kong-gateway/main/examples/hybrid_amazon_linux/hybrid_amazon_linux.png)
 
 ## Description
 
