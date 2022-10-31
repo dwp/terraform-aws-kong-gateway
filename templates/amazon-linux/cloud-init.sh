@@ -395,6 +395,8 @@ KONG_CLUSTER_CONTROL_PLANE="${kong_hybrid_conf.endpoint}:${kong_ports.cluster}"
 KONG_CLUSTER_TELEMETRY_ENDPOINT="${kong_hybrid_conf.endpoint}:${kong_ports.telemetry}"
 %{ endif ~}
 
+KONG_PLUGINS="${kong_plugins}"
+
 %{ for key, value in kong_config ~}
 ${key}="${value}"
 %{ endfor ~}
