@@ -116,6 +116,10 @@
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
+      "name": "KONG_PLUGINS",
+      "value": "${kong_plugins}"
+    },
+    {
       "name": "KONG_DATABASE",
       "value": "postgres"
     },
