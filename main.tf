@@ -154,6 +154,8 @@ module "kong_ecs" {
 
   log_group = var.log_group
 
+  kong_plugins = var.kong_plugins
+
   custom_nginx_conf = var.custom_nginx_conf
 
   ssl_cert     = var.ssl_cert

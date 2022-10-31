@@ -104,7 +104,7 @@ data "template_file" "kong_task_definition_cp" {
     cluster_cert                = var.cluster_cert
     cluster_key                 = var.cluster_key
     kong_log_level              = var.kong_log_level
-    kong_plugins                = var.kong_plugins
+    kong_plugins                = join(",", concat(["bundled"], var.kong_plugins))
     entrypoint                  = var.entrypoint
     custom_nginx_conf           = base64encode(var.custom_nginx_conf)
   }
@@ -172,7 +172,7 @@ data "template_file" "kong_task_definition_dp" {
     cluster_cert        = var.cluster_cert
     cluster_key         = var.cluster_key
     kong_log_level      = var.kong_log_level
-    kong_plugins        = var.kong_plugins
+    kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
     entrypoint          = var.entrypoint
     custom_nginx_conf   = base64encode(var.custom_nginx_conf)
   }
