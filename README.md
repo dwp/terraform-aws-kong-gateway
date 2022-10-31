@@ -1,8 +1,8 @@
 # terraform-aws-kong-gateway
 
-Terraform module for provisioning [Kong Gateway]() in AWS on EC2 instances. The module will also, optionally, create an RDS database cluster, subnets, and security groups.
+Terraform module for provisioning [Kong Gateway](https://konghq.com/products/api-gateway-platform) in AWS on either ECS or EC2. The module will also, optionally, create an RDS database cluster, subnets, and security groups.
 
-The [cloud-init script]() will install either Kong community or enterprise edition (depending on `ee_creds_ssm_param` variable value)
+The cloud-init script ([Amazon Linux](templates/amazon-linux/cloud-init.sh) and [Ubunutu](templates/ubuntu/cloud-init.sh)) will install either Kong community or enterprise edition (depending on `ee_creds_ssm_param` variable value)
 
 The module can deploy Kong Gateway in several ways:
 - [Embedded](https://docs.konghq.com/enterprise/2.3.x/deployment/deployment-options/#embedded)
