@@ -69,6 +69,7 @@ module "kong_ec2" {
   kong_hybrid_conf                  = var.kong_hybrid_conf
   kong_ports                        = var.kong_ports != null ? var.kong_ports : local.kong_ports["stand_alone"]
   kong_ssl_uris                     = var.kong_ssl_uris
+  kong_plugins                      = var.kong_plugins
   manager_host                      = var.manager_host
   placement_tenancy                 = var.placement_tenancy
   portal_host                       = var.portal_host

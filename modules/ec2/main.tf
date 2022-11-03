@@ -57,6 +57,7 @@ locals {
       kong_ssl_uris      = var.kong_ssl_uris
       kong_hybrid_conf   = var.kong_hybrid_conf
       clear_database     = var.kong_clear_database
+      kong_plugins       = join(",", concat(["bundled"], var.kong_plugins))
     })
     ubuntu = templatefile("${path.module}/../../templates/ubuntu/cloud-init.sh", {
       proxy_config       = var.proxy_config
@@ -78,6 +79,7 @@ locals {
       kong_ssl_uris      = var.kong_ssl_uris
       kong_hybrid_conf   = var.kong_hybrid_conf
       clear_database     = var.kong_clear_database
+      kong_plugins       = join(",", concat(["bundled"], var.kong_plugins))
     })
   }
 

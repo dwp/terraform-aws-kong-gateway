@@ -573,3 +573,9 @@ variable "security_group_name" {
   type        = string
   default     = "kong-security-group"
 }
+
+variable "kong_plugins" {
+  description = "(Optional) List of Kong plugins, passed through the variable KONG_PLUGINS"
+  type        = list(string)
+  default     = []
+}
