@@ -4,9 +4,15 @@ output "asg_outputs" {
   sensitive   = false
 }
 
-output "launch_config_outputs" {
-  value       = aws_launch_configuration.kong
-  description = "Full `aws_launch_configuration` resource details for the launch configuration created for Kong."
+output "launch_template_outputs" {
+  value       = aws_launch_template.kong
+  description = "Full `aws_launch_template` resource details for the launch configuration created for Kong."
+  sensitive   = false
+}
+
+output "security_groups" {
+  value       = local.security_groups
+  description = "List of security groups created within the security group module"
   sensitive   = false
 }
 

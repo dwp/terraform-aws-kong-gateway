@@ -136,24 +136,37 @@ data "template_cloudinit_config" "cloud_init" {
   }
 }
 
-resource "aws_launch_configuration" "kong" {
-  name_prefix          = local.name
-  image_id             = var.ami_id
-  instance_type        = var.instance_type
-  iam_instance_profile = var.iam_instance_profile_name
-  key_name             = var.key_name
+resource "aws_launch_template" "kong" {
+  name_prefix   = local.name
+  image_id      = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+  user_data     = var.user_data == null ? base64encode(data.template_cloudinit_config.cloud_init.rendered) : base64encode(var.user_data)
 
-  security_groups = local.security_groups
+  iam_instance_profile {
+    name = var.iam_instance_profile_name
+  }
 
-  associate_public_ip_address = false
-  enable_monitoring           = true
-  placement_tenancy           = "default"
-  user_data                   = var.user_data == null ? data.template_cloudinit_config.cloud_init.rendered : var.user_data
+  network_interfaces {
+    associate_public_ip_address = false
+    security_groups             = local.security_groups
+  }
 
-  root_block_device {
-    volume_size = var.ec2_root_volume_size
-    volume_type = var.ec2_root_volume_type
-    encrypted   = true
+  monitoring {
+    enabled = true
+  }
+
+  placement {
+    tenancy = "default"
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = var.ec2_root_volume_size
+      volume_type = var.ec2_root_volume_type
+      encrypted   = true
+    }
   }
 
   lifecycle {
@@ -162,13 +175,14 @@ resource "aws_launch_configuration" "kong" {
   depends_on = [module.database]
 }
 
-
-
 resource "aws_autoscaling_group" "kong" {
   name                = local.name
   vpc_zone_identifier = local.private_subnets
 
-  launch_configuration = aws_launch_configuration.kong.name
+  launch_template {
+    name    = aws_launch_template.kong.name
+    version = "$Latest"
+  }
 
   desired_capacity          = var.asg_desired_capacity
   force_delete              = false

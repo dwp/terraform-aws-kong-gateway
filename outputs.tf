@@ -5,9 +5,9 @@ output "asg_outputs" {
   sensitive   = false
 }
 
-output "launch_config_outputs" {
-  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].launch_config_outputs : null
-  description = "Full `aws_launch_configuration` resource details for the launch configuration created for Kong."
+output "launch_template_outputs" {
+  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].launch_template_outputs : null
+  description = "Full `aws_launch_template` resource details for the launch configuration created for Kong."
   sensitive   = false
 }
 
@@ -32,7 +32,7 @@ output "private_subnet_ids" {
 
 output "security_groups" {
   description = "List of Security Groups used by Kong."
-  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].launch_config_outputs["security_groups"] : var.deployment_type == "ecs" ? module.kong_ecs[0].security_groups : null
+  value       = var.deployment_type == "ec2" ? module.kong_ec2[0].security_groups : var.deployment_type == "ecs" ? module.kong_ecs[0].security_groups : null
   sensitive   = false
 }
 
