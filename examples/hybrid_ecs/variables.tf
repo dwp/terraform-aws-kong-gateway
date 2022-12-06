@@ -238,12 +238,6 @@ variable "error_log_format" {
   default     = "logs/error.log"
 }
 
-variable "custom_nginx_conf" {
-  description = "(Optional) Custom NGINX Config that is included in the main configuration through the variable KONG_NGINX_HTTP_INCLUDE"
-  type        = string
-  default     = "# No custom configuration required, can be ignored"
-}
-
 variable "image_url" {
   description = "URL Image"
   type        = string

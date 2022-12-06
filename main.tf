@@ -1,4 +1,5 @@
 locals {
+  nginx_default_custom_config_path = "${path.module}/templates/common/custom-nginx.conf"
   kong_ports = {
     control_plane = {
       "admin_api"  = 8444,
@@ -157,7 +158,7 @@ module "kong_ecs" {
 
   kong_plugins = var.kong_plugins
 
-  custom_nginx_conf = var.custom_nginx_conf
+  nginx_custom_config = file(coalesce(var.nginx_custom_config_path, local.nginx_default_custom_config_path))
 
   ssl_cert     = var.ssl_cert
   ssl_key      = var.ssl_key

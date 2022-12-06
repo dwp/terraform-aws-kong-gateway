@@ -231,8 +231,6 @@ module "create_kong_cp" {
 
   cluster_server_name = aws_lb.external.dns_name
 
-  custom_nginx_conf = var.custom_nginx_conf
-
   rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 
   postgres_config = {
@@ -302,8 +300,6 @@ module "create_kong_portal" {
 
   cluster_server_name = aws_lb.external.dns_name
 
-  custom_nginx_conf = var.custom_nginx_conf
-
   rules_with_source_cidr_blocks = var.rules_with_source_cidr_blocks
 
   postgres_config = {
@@ -365,7 +361,6 @@ module "create_kong_dp" {
   log_group         = aws_cloudwatch_log_group.kong_dp.name
   access_log_format = var.access_log_format
   error_log_format  = var.error_log_format
-  custom_nginx_conf = var.custom_nginx_conf
   kong_log_level    = "debug"
 
   entrypoint = "/gateway-entrypoint.sh"

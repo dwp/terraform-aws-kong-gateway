@@ -39,19 +39,19 @@
     },
     {
       "name": "KONG_PORTAL_API_ACCESS_LOG",
-      "value": "/dev/stdout"
+      "value": "${access_log_format}"
     },
     {
       "name": "KONG_PORTAL_API_ERROR_LOG",
-      "value": "/dev/stderr"
+      "value": "${error_log_format}"
     },
     {
       "name": "KONG_PORTAL_GUI_ACCESS_LOG",
-      "value": "/dev/stdout"
+      "value": "${access_log_format}"
     },
     {
       "name": "KONG_PORTAL_GUI_ERROR_LOG",
-      "value": "/dev/stderr"
+      "value": "${error_log_format}"
     },
     {
       "name": "KONG_PORTAL_GUI_PROTOCOL",
@@ -108,6 +108,10 @@
     {
       "name": "KONG_STATUS_SSL_CERT_KEY",
       "value": "/usr/local/kong/kong_clustering/cluster.key"
+    },
+    {
+      "name": "CUSTOM_NGINX_CONF",
+      "value": "${nginx_custom_config}"
     },
     {
       "name": "KONG_DATABASE",

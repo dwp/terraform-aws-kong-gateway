@@ -75,7 +75,7 @@
     },
     {
       "name": "CUSTOM_NGINX_CONF",
-      "value": "${custom_nginx_conf}"
+      "value": "${nginx_custom_config}"
     },
     {
       "name": "KONG_ROLE",

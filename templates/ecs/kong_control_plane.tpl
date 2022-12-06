@@ -43,19 +43,19 @@
     },
     {
       "name": "KONG_ADMIN_ACCESS_LOG",
-      "value": "/dev/stdout"
+      "value": "${access_log_format}"
     },
     {
       "name": "KONG_ADMIN_ERROR_LOG",
-      "value": "/dev/stderr"
+      "value": "${error_log_format}"
     },
     {
       "name": "KONG_ADMIN_GUI_ACCESS_LOG",
-      "value": "/dev/stdout"
+      "value": "${access_log_format}"
     },
     {
       "name": "KONG_ADMIN_GUI_ERROR_LOG",
-      "value": "/dev/stderr"
+      "value": "${error_log_format}"
     },
     %{ if kong_cluster_mtls == "pki" }
     {
@@ -114,6 +114,10 @@
     {
       "name": "KONG_STATUS_SSL_CERT_KEY",
       "value": "/usr/local/kong/kong_clustering/cluster.key"
+    },
+    {
+      "name": "CUSTOM_NGINX_CONF",
+      "value": "${nginx_custom_config}"
     },
     {
       "name": "KONG_PLUGINS",
