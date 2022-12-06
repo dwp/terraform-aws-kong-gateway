@@ -228,7 +228,7 @@ variable "max_capacity" {
   type        = number
 }
 
-variable "custom_nginx_conf" {
+variable "nginx_custom_config" {
   description = "Custom NGINX Config that is included in the main configuration through the variable KONG_NGINX_HTTP_INCLUDE"
   type        = string
 }

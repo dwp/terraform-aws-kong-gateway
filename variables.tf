@@ -685,6 +685,12 @@ variable "error_log_format" {
   default     = "logs/error.log"
 }
 
+variable "nginx_custom_config_path" {
+  description = "(Optional) Custom NGINX Config that is included in the main configuration through the variable KONG_NGINX_HTTP_INCLUDE"
+  type        = string
+  default     = null
+}
+
 variable "desired_count" {
   description = "(Optional) Desired Task count for the Gateway ECS Task Definition"
   type        = number
@@ -701,12 +707,6 @@ variable "max_capacity" {
   description = "(Optional) Maximum Capacity for the Gateway ECS Task Definition"
   type        = number
   default     = 2
-}
-
-variable "custom_nginx_conf" {
-  description = "(Optional) Custom NGINX Config that is included in the main configuration through the variable KONG_NGINX_HTTP_INCLUDE"
-  type        = string
-  default     = "# No custom configuration required, can be ignored"
 }
 
 variable "image_url" {

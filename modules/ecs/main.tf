@@ -106,7 +106,7 @@ data "template_file" "kong_task_definition_cp" {
     kong_log_level              = var.kong_log_level
     kong_plugins                = join(",", concat(["bundled"], var.kong_plugins))
     entrypoint                  = var.entrypoint
-    custom_nginx_conf           = base64encode(var.custom_nginx_conf)
+    nginx_custom_config         = base64encode(var.nginx_custom_config)
   }
 }
 
@@ -142,7 +142,7 @@ data "template_file" "kong_task_definition_portal" {
     cluster_key              = var.cluster_key
     kong_log_level           = var.kong_log_level
     entrypoint               = var.entrypoint
-    custom_nginx_conf        = base64encode(var.custom_nginx_conf)
+    nginx_custom_config      = base64encode(var.nginx_custom_config)
   }
 }
 
@@ -174,7 +174,7 @@ data "template_file" "kong_task_definition_dp" {
     kong_log_level      = var.kong_log_level
     kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
     entrypoint          = var.entrypoint
-    custom_nginx_conf   = base64encode(var.custom_nginx_conf)
+    nginx_custom_config = base64encode(var.nginx_custom_config)
   }
 }
 data "aws_iam_policy_document" "ecs_assume_role_policy" {
