@@ -141,6 +141,7 @@ data "template_file" "kong_task_definition_portal" {
     cluster_cert             = var.cluster_cert
     cluster_key              = var.cluster_key
     kong_log_level           = var.kong_log_level
+    kong_plugins             = join(",", concat(["bundled"], var.kong_plugins))
     entrypoint               = var.entrypoint
     nginx_custom_config      = base64encode(var.nginx_custom_config)
   }
