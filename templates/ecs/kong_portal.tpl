@@ -114,6 +114,10 @@
       "value": "${nginx_custom_config}"
     },
     {
+      "name": "KONG_PLUGINS",
+      "value": "${kong_plugins}"
+    },
+    {
       "name": "KONG_DATABASE",
       "value": "postgres"
     },
