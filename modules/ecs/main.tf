@@ -28,7 +28,104 @@ resource "aws_ecs_task_definition" "kong" {
   memory                   = var.fargate_memory
   task_role_arn            = aws_iam_role.kong_task_role.arn
   execution_role_arn       = var.execution_role_arn
-  container_definitions    = var.role == "control_plane" ? "[${data.template_file.kong_task_definition_cp[0].rendered}]" : var.role == "data_plane" ? "[${data.template_file.kong_task_definition_dp[0].rendered}]" : var.role == "portal" ? "[${data.template_file.kong_task_definition_portal[0].rendered}]" : null
+    container_definitions    = var.role == "control_plane" ? templatefile("${path.module}/../../templates/ecs/kong_control_plane.tpl",
+    {
+      name                        = local.name
+      group_name                  = local.name
+      cpu                         = var.fargate_cpu
+      image_url                   = var.image_url
+      memory                      = var.fargate_memory
+      user                        = "kong"
+      db_user                     = var.kong_database_config.user
+      db_host                     = local.db_info.endpoint
+      db_name                     = local.db_info.database_name
+      db_password_arn             = var.db_password_arn
+      kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
+      log_group                   = var.log_group
+      admin_api_port              = var.kong_ports.admin_api
+      admin_gui_port              = var.kong_ports.admin_gui
+      status_port                 = var.kong_ports.status
+      ports                       = jsonencode([for k, v in var.kong_ports : v])
+      ulimits                     = jsonencode([4096])
+      region                      = var.region
+      access_log_format           = var.access_log_format
+      error_log_format            = var.error_log_format
+      ssl_cert                    = var.ssl_cert
+      ssl_key                     = var.ssl_key
+      kong_admin_api_uri          = var.kong_admin_api_uri
+      kong_admin_gui_url          = var.kong_admin_gui_url
+      admin_token                 = var.admin_token
+      kong_vitals_enabled         = var.kong_vitals_enabled
+      kong_portal_enabled         = var.kong_portal_enabled
+      lua_ssl_cert                = var.lua_ssl_cert
+      kong_cluster_mtls           = var.kong_cluster_mtls
+      cluster_ca_cert             = var.cluster_ca_cert
+      cluster_cert                = var.cluster_cert
+      cluster_key                 = var.cluster_key
+      kong_log_level              = var.kong_log_level
+      kong_plugins                = join(",", concat(["bundled"], var.kong_plugins))
+      entrypoint                  = var.entrypoint
+      nginx_custom_config         = base64encode(var.nginx_custom_config)
+    }) : var.role == "data_plane" ? templatefile("${path.module}/../../templates/ecs/kong_data_plane.tpl",
+    {
+      name                = local.name
+      group_name          = local.name
+      cpu                 = var.fargate_cpu
+      image_url           = var.image_url
+      memory              = var.fargate_memory
+      user                = "kong"
+      log_group           = var.log_group
+      ports               = jsonencode([for k, v in var.kong_ports : v])
+      ulimits             = jsonencode([4096])
+      region              = var.region
+      access_log_format   = var.access_log_format
+      error_log_format    = var.error_log_format
+      clustering_endpoint = var.clustering_endpoint
+      telemetry_endpoint  = var.telemetry_endpoint
+      cluster_server_name = var.cluster_server_name
+      status_port         = var.kong_ports.status
+      ssl_cert            = var.ssl_cert
+      ssl_key             = var.ssl_key
+      lua_ssl_cert        = var.lua_ssl_cert
+      cluster_cert        = var.cluster_cert
+      cluster_key         = var.cluster_key
+      kong_log_level      = var.kong_log_level
+      kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
+      entrypoint          = var.entrypoint
+      nginx_custom_config = base64encode(var.nginx_custom_config)
+    }) : var.role == "portal" ? templatefile("${path.module}/../../templates/ecs/kong_portal.tpl",
+    {
+      name                     = local.name
+      group_name               = local.name
+      cpu                      = var.fargate_cpu
+      image_url                = var.image_url
+      memory                   = var.fargate_memory
+      user                     = "kong"
+      db_user                  = var.kong_database_config.user
+      db_host                  = local.db_info.endpoint
+      db_name                  = local.db_info.database_name
+      db_password_arn          = var.db_password_arn
+      log_group                = var.log_group
+      portal_gui_port          = var.kong_ports.portal_gui
+      portal_api_port          = var.kong_ports.portal_api
+      status_port              = var.kong_ports.status
+      kong_portal_gui_host     = var.kong_portal_gui_host
+      kong_portal_gui_protocol = var.kong_portal_gui_protocol
+      kong_portal_api_url      = var.kong_portal_api_url
+      ports                    = jsonencode([for k, v in var.kong_ports : v])
+      ulimits                  = jsonencode([4096])
+      region                   = var.region
+      access_log_format        = var.access_log_format
+      error_log_format         = var.error_log_format
+      ssl_cert                 = var.ssl_cert
+      ssl_key                  = var.ssl_key
+      cluster_cert             = var.cluster_cert
+      cluster_key              = var.cluster_key
+      kong_log_level           = var.kong_log_level
+      kong_plugins             = join(",", concat(["bundled"], var.kong_plugins))
+      entrypoint               = var.entrypoint
+      nginx_custom_config      = base64encode(var.nginx_custom_config)
+    }) : null
 
   tags = {
     Name = local.name
@@ -64,118 +161,6 @@ resource "aws_ecs_service" "kong" {
 
   tags = {
     Name = local.name
-  }
-}
-
-data "template_file" "kong_task_definition_cp" {
-  count    = var.role == "control_plane" ? 1 : 0
-  template = file("${path.module}/../../templates/ecs/kong_control_plane.tpl")
-  vars = {
-    name                        = local.name
-    group_name                  = local.name
-    cpu                         = var.fargate_cpu
-    image_url                   = var.image_url
-    memory                      = var.fargate_memory
-    user                        = "kong"
-    db_user                     = var.kong_database_config.user
-    db_host                     = local.db_info.endpoint
-    db_name                     = local.db_info.database_name
-    db_password_arn             = var.db_password_arn
-    kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
-    log_group                   = var.log_group
-    admin_api_port              = var.kong_ports.admin_api
-    admin_gui_port              = var.kong_ports.admin_gui
-    status_port                 = var.kong_ports.status
-    ports                       = jsonencode([for k, v in var.kong_ports : v])
-    ulimits                     = jsonencode([4096])
-    region                      = var.region
-    access_log_format           = var.access_log_format
-    error_log_format            = var.error_log_format
-    ssl_cert                    = var.ssl_cert
-    ssl_key                     = var.ssl_key
-    kong_admin_api_uri          = var.kong_admin_api_uri
-    kong_admin_gui_url          = var.kong_admin_gui_url
-    admin_token                 = var.admin_token
-    kong_vitals_enabled         = var.kong_vitals_enabled
-    kong_portal_enabled         = var.kong_portal_enabled
-    lua_ssl_cert                = var.lua_ssl_cert
-    kong_cluster_mtls           = var.kong_cluster_mtls
-    cluster_ca_cert             = var.cluster_ca_cert
-    cluster_cert                = var.cluster_cert
-    cluster_key                 = var.cluster_key
-    kong_log_level              = var.kong_log_level
-    kong_plugins                = join(",", concat(["bundled"], var.kong_plugins))
-    entrypoint                  = var.entrypoint
-    nginx_custom_config         = base64encode(var.nginx_custom_config)
-  }
-}
-
-data "template_file" "kong_task_definition_portal" {
-  count    = var.role == "portal" ? 1 : 0
-  template = file("${path.module}/../../templates/ecs/kong_portal.tpl")
-  vars = {
-    name                     = local.name
-    group_name               = local.name
-    cpu                      = var.fargate_cpu
-    image_url                = var.image_url
-    memory                   = var.fargate_memory
-    user                     = "kong"
-    db_user                  = var.kong_database_config.user
-    db_host                  = local.db_info.endpoint
-    db_name                  = local.db_info.database_name
-    db_password_arn          = var.db_password_arn
-    log_group                = var.log_group
-    portal_gui_port          = var.kong_ports.portal_gui
-    portal_api_port          = var.kong_ports.portal_api
-    status_port              = var.kong_ports.status
-    kong_portal_gui_host     = var.kong_portal_gui_host
-    kong_portal_gui_protocol = var.kong_portal_gui_protocol
-    kong_portal_api_url      = var.kong_portal_api_url
-    ports                    = jsonencode([for k, v in var.kong_ports : v])
-    ulimits                  = jsonencode([4096])
-    region                   = var.region
-    access_log_format        = var.access_log_format
-    error_log_format         = var.error_log_format
-    ssl_cert                 = var.ssl_cert
-    ssl_key                  = var.ssl_key
-    cluster_cert             = var.cluster_cert
-    cluster_key              = var.cluster_key
-    kong_log_level           = var.kong_log_level
-    kong_plugins             = join(",", concat(["bundled"], var.kong_plugins))
-    entrypoint               = var.entrypoint
-    nginx_custom_config      = base64encode(var.nginx_custom_config)
-  }
-}
-
-data "template_file" "kong_task_definition_dp" {
-  count    = var.role == "data_plane" ? 1 : 0
-  template = file("${path.module}/../../templates/ecs/kong_data_plane.tpl")
-  vars = {
-    name                = local.name
-    group_name          = local.name
-    cpu                 = var.fargate_cpu
-    image_url           = var.image_url
-    memory              = var.fargate_memory
-    user                = "kong"
-    log_group           = var.log_group
-    ports               = jsonencode([for k, v in var.kong_ports : v])
-    ulimits             = jsonencode([4096])
-    region              = var.region
-    access_log_format   = var.access_log_format
-    error_log_format    = var.error_log_format
-    clustering_endpoint = var.clustering_endpoint
-    telemetry_endpoint  = var.telemetry_endpoint
-    cluster_server_name = var.cluster_server_name
-    status_port         = var.kong_ports.status
-    ssl_cert            = var.ssl_cert
-    ssl_key             = var.ssl_key
-    lua_ssl_cert        = var.lua_ssl_cert
-    cluster_cert        = var.cluster_cert
-    cluster_key         = var.cluster_key
-    kong_log_level      = var.kong_log_level
-    kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
-    entrypoint          = var.entrypoint
-    nginx_custom_config = base64encode(var.nginx_custom_config)
   }
 }
 data "aws_iam_policy_document" "ecs_assume_role_policy" {

@@ -1,4 +1,4 @@
-{
+[{
   "cpu": ${cpu},
   "image": "${image_url}",
   "memory": ${memory},
@@ -253,4 +253,4 @@
       "type": "spread"
     }
   ]
-}
+}]
