@@ -72,14 +72,6 @@
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
-      "name": "KONG_SSL_CERT",
-      "value": "/usr/local/kong/ssl/kong.crt"
-    },
-    {
-      "name": "KONG_SSL_CERT_KEY",
-      "value": "/usr/local/kong/ssl/kong.key"
-    },
-    {
       "name": "KONG_ADMIN_LISTEN",
       "value": "0.0.0.0:${admin_api_port} ssl"
     },
