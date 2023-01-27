@@ -149,8 +149,9 @@ module "kong_ecs" {
   postgres_host        = var.postgres_host
   db_password_arn      = var.db_password_arn
 
-  kong_vitals_enabled = var.kong_vitals_enabled
-  kong_portal_enabled = var.kong_portal_enabled
+  kong_vitals_enabled     = var.kong_vitals_enabled
+  kong_portal_enabled     = var.kong_portal_enabled
+  kong_portal_api_enabled = var.kong_portal_api_enabled
 
   kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
 

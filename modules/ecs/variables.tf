@@ -322,6 +322,11 @@ variable "kong_portal_enabled" {
   type        = string
 }
 
+variable "kong_portal_api_enabled" {
+  description = "Define whether or not the Kong Portal API should be enabled."
+  type        = string
+}
+
 variable "kong_portal_gui_host" {
   description = "The Hostname used for the Portal GUI."
   type        = string
