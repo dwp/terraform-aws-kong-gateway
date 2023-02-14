@@ -829,6 +829,16 @@ variable "kong_portal_api_url" {
   default     = ""
 }
 
+variable "vitals_endpoint" {
+  description = "(Optional) The DNS name for the Vitals endpoint that Gateways should send their metrics to"
+  type = object({
+    fqdn     = string
+    port     = number
+    protocol = string
+  })
+  default = null
+}
+
 variable "kong_plugins" {
   description = "(Optional) List of Kong plugins, passed through the variable KONG_PLUGINS"
   type        = list(string)

@@ -342,3 +342,13 @@ variable "kong_plugins" {
   type        = list(string)
   default     = []
 }
+
+variable "vitals_endpoint" {
+  description = "(Optional) The DNS name for the Vitals endpoint that Gateways should send their metrics to"
+  type = object({
+    fqdn     = string
+    port     = number
+    protocol = string
+  })
+  default = null
+}

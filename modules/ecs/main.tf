@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "kong" {
   memory                   = var.fargate_memory
   task_role_arn            = aws_iam_role.kong_task_role.arn
   execution_role_arn       = var.execution_role_arn
-    container_definitions    = var.role == "control_plane" ? templatefile("${path.module}/../../templates/ecs/kong_control_plane.tpl",
+  container_definitions = var.role == "control_plane" ? templatefile("${path.module}/../../templates/ecs/kong_control_plane.tpl",
     {
       name                        = local.name
       group_name                  = local.name
@@ -66,6 +66,11 @@ resource "aws_ecs_task_definition" "kong" {
       kong_plugins                = join(",", concat(["bundled"], var.kong_plugins))
       entrypoint                  = var.entrypoint
       nginx_custom_config         = base64encode(var.nginx_custom_config)
+      vitals_endpoint = var.vitals_endpoint != null ? format("%s:%g %s",
+        var.vitals_endpoint.fqdn,
+        var.vitals_endpoint.port,
+        lower(var.vitals_endpoint.protocol)
+      ) : ""
     }) : var.role == "data_plane" ? templatefile("${path.module}/../../templates/ecs/kong_data_plane.tpl",
     {
       name                = local.name
@@ -93,6 +98,12 @@ resource "aws_ecs_task_definition" "kong" {
       kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
       entrypoint          = var.entrypoint
       nginx_custom_config = base64encode(var.nginx_custom_config)
+      kong_vitals_enabled = var.kong_vitals_enabled
+      vitals_endpoint = var.vitals_endpoint != null ? format("%s:%g %s",
+        var.vitals_endpoint.fqdn,
+        var.vitals_endpoint.port,
+        lower(var.vitals_endpoint.protocol)
+      ) : ""
     }) : var.role == "portal" ? templatefile("${path.module}/../../templates/ecs/kong_portal.tpl",
     {
       name                     = local.name
@@ -125,7 +136,7 @@ resource "aws_ecs_task_definition" "kong" {
       kong_plugins             = join(",", concat(["bundled"], var.kong_plugins))
       entrypoint               = var.entrypoint
       nginx_custom_config      = base64encode(var.nginx_custom_config)
-    }) : null
+  }) : null
 
   tags = {
     Name = local.name
@@ -163,6 +174,7 @@ resource "aws_ecs_service" "kong" {
     Name = local.name
   }
 }
+
 data "aws_iam_policy_document" "ecs_assume_role_policy" {
   statement {
     sid     = "EcsAssumeRole"
