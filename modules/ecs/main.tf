@@ -151,6 +151,7 @@ resource "aws_ecs_service" "kong" {
   platform_version       = var.platform_version
   desired_count          = var.desired_count
   launch_type            = "FARGATE"
+  propagate_tags         = "TASK_DEFINITION"
 
   lifecycle {
     ignore_changes = [desired_count] # Required in case Autoscaling Policy changes the desired_count
