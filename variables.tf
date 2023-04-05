@@ -811,6 +811,12 @@ variable "kong_portal_enabled" {
   default     = "on"
 }
 
+variable "kong_portal_api_enabled" {
+  description = "(Optional) Define whether or not the Kong Portal API should be enabled."
+  type        = string
+  default     = "on"
+}
+
 variable "kong_portal_gui_host" {
   description = "(Optional) The Hostname used for the Portal GUI."
   type        = string

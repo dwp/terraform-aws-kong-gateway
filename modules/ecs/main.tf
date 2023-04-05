@@ -118,11 +118,12 @@ resource "aws_ecs_task_definition" "kong" {
       db_password_arn          = var.db_password_arn
       log_group                = var.log_group
       portal_gui_port          = var.kong_ports.portal_gui
-      portal_api_port          = var.kong_ports.portal_api
+      portal_api_port          = var.kong_portal_api_enabled == "on" ? var.kong_ports.portal_api : ""
       status_port              = var.kong_ports.status
       kong_portal_gui_host     = var.kong_portal_gui_host
       kong_portal_gui_protocol = var.kong_portal_gui_protocol
       kong_portal_api_url      = var.kong_portal_api_url
+      kong_portal_api_enabled  = var.kong_portal_api_enabled
       ports                    = jsonencode([for k, v in var.kong_ports : v])
       ulimits                  = jsonencode([4096])
       region                   = var.region

@@ -25,6 +25,7 @@
       "name": "KONG_PORTAL_GUI_SSL_CERT_KEY",
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
+    %{ if kong_portal_api_enabled == "on" }
     {
       "name": "KONG_PORTAL_API_SSL_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
@@ -34,8 +35,12 @@
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
-      "name": "KONG_PORTAL_GUI_HOST",
-      "value": "${kong_portal_gui_host}"
+      "name": "KONG_PORTAL_API_LISTEN",
+      "value": "0.0.0.0:${portal_api_port} ssl"
+    },
+    {
+      "name": "KONG_PORTAL_API_URL",
+      "value": "${kong_portal_api_url}"
     },
     {
       "name": "KONG_PORTAL_API_ACCESS_LOG",
@@ -44,6 +49,11 @@
     {
       "name": "KONG_PORTAL_API_ERROR_LOG",
       "value": "${error_log_format}"
+    },
+    %{ endif }
+    {
+      "name": "KONG_PORTAL_GUI_HOST",
+      "value": "${kong_portal_gui_host}"
     },
     {
       "name": "KONG_PORTAL_GUI_ACCESS_LOG",
@@ -58,6 +68,10 @@
       "value": "${kong_portal_gui_protocol}"
     },
     {
+      "name": "KONG_PORTAL_GUI_LISTEN",
+      "value": "0.0.0.0:${portal_gui_port} ssl"
+    },
+    {
       "name": "KONG_CLUSTER_CERT",
       "value": "/usr/local/kong/kong_clustering/cluster.crt"
     },
@@ -66,24 +80,12 @@
       "value": "/usr/local/kong/kong_clustering/cluster.key"
     },
     {
-      "name": "KONG_PORTAL_GUI_LISTEN",
-      "value": "0.0.0.0:${portal_gui_port} ssl"
-    },
-    {
-    "name": "KONG_PORTAL_API_LISTEN",
-    "value": "0.0.0.0:${portal_api_port} ssl"
-    },
-    {
-    "name": "KONG_PORTAL_API_URL",
-    "value": "${kong_portal_api_url}"
+      "name": "KONG_CLUSTER_SERVER_NAME",
+      "value": ""
     },
     {
       "name": "KONG_PORTAL",
       "value": "on"
-    },
-    {
-      "name": "KONG_CLUSTER_SERVER_NAME",
-      "value": ""
     },
     {
       "name": "KONG_AUDIT_LOG",
