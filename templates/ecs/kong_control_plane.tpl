@@ -179,7 +179,7 @@
     %{ endif }
     {
       "name": "KONG_VITALS_TSDB_ADDRESS",
-      "value": "127.0.0.1:443"
+      "value": "${vitals_tsdb_address}"
     }
   ],
   "secrets": [

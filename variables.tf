@@ -845,6 +845,12 @@ variable "vitals_endpoint" {
   default = null
 }
 
+variable "vitals_tsdb_address" {
+  description = "(Optional) Time series database address for Vitals e.g. my-prometheus.net:9090"
+  type        = string
+  default     = "127.0.0.1:443"
+}
+
 variable "kong_plugins" {
   description = "(Optional) List of Kong plugins, passed through the variable KONG_PLUGINS"
   type        = list(string)

@@ -96,6 +96,7 @@ module "kong_ec2" {
   security_group_name               = var.security_group_name
   kong_vitals_enabled               = var.kong_vitals_enabled
   vitals_endpoint                   = var.vitals_endpoint
+  vitals_tsdb_address               = var.vitals_tsdb_address
 }
 
 
@@ -184,6 +185,7 @@ module "kong_ecs" {
   telemetry_endpoint  = var.telemetry_endpoint
   cluster_server_name = var.cluster_server_name
 
-  vitals_endpoint = var.vitals_endpoint
+  vitals_endpoint     = var.vitals_endpoint
+  vitals_tsdb_address = var.vitals_tsdb_address
 
 }
