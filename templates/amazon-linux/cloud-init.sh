@@ -402,7 +402,7 @@ KONG_VITALS="on"
 KONG_VITALS_STRATEGY="prometheus"
 KONG_VITALS_STATSD_ADDRESS="${vitals_endpoint}"
 %{ endif }
-KONG_VITALS_TSDB_ADDRESS=127.0.0.1:443
+KONG_VITALS_TSDB_ADDRESS=${vitals_tsdb_address}
 
 %{ for key, value in kong_config ~}
 ${key}="${value}"

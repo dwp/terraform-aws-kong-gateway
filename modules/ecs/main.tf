@@ -66,6 +66,7 @@ resource "aws_ecs_task_definition" "kong" {
       kong_plugins                = join(",", concat(["bundled"], var.kong_plugins))
       entrypoint                  = var.entrypoint
       nginx_custom_config         = base64encode(var.nginx_custom_config)
+      vitals_tsdb_address         = var.vitals_tsdb_address
       vitals_endpoint = var.vitals_endpoint != null ? format("%s:%g %s",
         var.vitals_endpoint.fqdn,
         var.vitals_endpoint.port,

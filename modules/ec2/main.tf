@@ -59,6 +59,7 @@ locals {
       clear_database      = var.kong_clear_database
       kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
       kong_vitals_enabled = var.kong_vitals_enabled
+      vitals_tsdb_address = var.vitals_tsdb_address
       vitals_endpoint = var.vitals_endpoint != null ? format("%s:%g %s",
         var.vitals_endpoint.fqdn,
         var.vitals_endpoint.port,
@@ -87,6 +88,7 @@ locals {
       clear_database      = var.kong_clear_database
       kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
       kong_vitals_enabled = var.kong_vitals_enabled
+      vitals_tsdb_address = var.vitals_tsdb_address
       vitals_endpoint = var.vitals_endpoint != null ? format("%s:%g %s",
         var.vitals_endpoint.fqdn,
         var.vitals_endpoint.port,
