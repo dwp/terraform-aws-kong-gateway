@@ -14,6 +14,10 @@
       "value": "${region}"
     },
     {
+      "name": "ENVIRONMENT",
+      "value": "${environment}"
+    },
+    {
       "name": "KONG_CLUSTER_MTLS",
       "value": "shared"
     },
