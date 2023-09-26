@@ -136,7 +136,7 @@ module "database" {
   tags = var.tags
 }
 
-data "template_cloudinit_config" "cloud_init" {
+data "cloudinit_config" "cloud_init" {
   gzip          = true
   base64_encode = true
 
@@ -157,7 +157,7 @@ resource "aws_launch_template" "kong" {
   image_id               = var.ami_id
   instance_type          = var.instance_type
   key_name               = var.key_name
-  user_data              = var.user_data == null ? base64encode(data.template_cloudinit_config.cloud_init.rendered) : base64encode(var.user_data)
+  user_data              = var.user_data == null ? base64encode(data.cloudinit_config.cloud_init.rendered) : base64encode(var.user_data)
   update_default_version = true
 
   iam_instance_profile {

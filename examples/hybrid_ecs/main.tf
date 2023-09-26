@@ -131,7 +131,7 @@ locals {
   })
 }
 
-data "template_cloudinit_config" "cloud-init" {
+data "cloudinit_config" "cloud-init" {
   gzip          = true
   base64_encode = true
 
@@ -153,11 +153,11 @@ resource "aws_instance" "external_postgres" {
   key_name               = var.key_name
   subnet_id              = aws_subnet.public_subnets.0.id
   vpc_security_group_ids = [aws_security_group.allow_postgres.id]
-  user_data              = data.template_cloudinit_config.cloud-init.rendered
+  user_data              = data.cloudinit_config.cloud-init.rendered
   tags                   = var.tags
 }
 
-data "template_cloudinit_config" "proxy_cloud_init" {
+data "cloudinit_config" "proxy_cloud_init" {
   gzip          = true
   base64_encode = true
 
@@ -179,7 +179,7 @@ resource "aws_instance" "external_proxy" {
   key_name               = var.key_name
   subnet_id              = aws_subnet.public_subnets.0.id
   vpc_security_group_ids = [aws_security_group.allow_proxy.id]
-  user_data              = data.template_cloudinit_config.proxy_cloud_init.rendered
+  user_data              = data.cloudinit_config.proxy_cloud_init.rendered
   tags                   = merge({ Name = "proxy" }, var.tags)
 }
 
