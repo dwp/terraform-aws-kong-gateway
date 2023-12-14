@@ -1,6 +1,13 @@
 # kics-scan disable=1e434b25-8763-4b00-a5ca-ca03b7abbb66
 # The above line disables rule "Name Is Not Snake Case" in KICS
 
+# V3 WIP
+variable "kong_major_version" {
+  description = "(Optional) Used to define which Kong major version to use"
+  type        = number
+  default     = 2 # Eventually moved to 3
+}
+
 ### required Variables
 variable "ami_id" {
   description = "AMI image id to use for the deployments"

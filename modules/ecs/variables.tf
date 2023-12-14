@@ -1,3 +1,15 @@
+# KONG3 WIP VARS
+variable "portal_and_vitals_key_arn" {
+  description = "ARN of the secret which contains the token used to unlock portal and vitals in Kong V3"
+  type        = string
+}
+
+variable "kong_major_version" {
+  description = "(Optional) Used to define which Kong major version to use"
+  type        = number
+  default     = 2 # Eventually changed to three
+}
+
 variable "private_subnets" {
   description = "(Optional) List of private subnet IDs, if not specified then the subnets listed in the private_subnets_to_create variable will be created and used"
   type        = list(string)

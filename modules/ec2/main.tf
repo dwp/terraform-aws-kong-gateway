@@ -57,6 +57,7 @@ locals {
       kong_ssl_uris       = var.kong_ssl_uris
       kong_hybrid_conf    = var.kong_hybrid_conf
       clear_database      = var.kong_clear_database
+      api_uri_env_name    = var.kong_major_version > 2 ? "KONG_ADMIN_GUI_API_URL" : "KONG_ADMIN_API_URI"
       kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
       kong_vitals_enabled = var.kong_vitals_enabled
       vitals_tsdb_address = var.vitals_tsdb_address
@@ -86,6 +87,7 @@ locals {
       kong_ssl_uris       = var.kong_ssl_uris
       kong_hybrid_conf    = var.kong_hybrid_conf
       clear_database      = var.kong_clear_database
+      api_uri_env_name    = var.kong_major_version > 2 ? "KONG_ADMIN_GUI_API_URL" : "KONG_ADMIN_API_URI"
       kong_plugins        = join(",", concat(["bundled"], var.kong_plugins))
       kong_vitals_enabled = var.kong_vitals_enabled
       vitals_tsdb_address = var.vitals_tsdb_address

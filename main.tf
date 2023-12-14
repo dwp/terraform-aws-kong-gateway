@@ -35,6 +35,8 @@ module "kong_ec2" {
   count  = var.deployment_type == "ec2" ? 1 : 0
   source = "./modules/ec2"
 
+  kong_major_version = var.kong_major_version
+
   ami_id                            = var.ami_id
   ami_operating_system              = var.ami_operating_system
   iam_instance_profile_name         = var.iam_instance_profile_name
@@ -104,6 +106,8 @@ module "kong_ecs" {
   count  = var.deployment_type == "ecs" ? 1 : 0
   source = "./modules/ecs"
 
+  kong_major_version = var.kong_major_version
+
   environment            = var.environment
   role                   = var.role
   ecs_cluster_arn        = var.ecs_cluster_arn
@@ -150,9 +154,10 @@ module "kong_ecs" {
   postgres_host        = var.postgres_host
   db_password_arn      = var.db_password_arn
 
-  kong_vitals_enabled     = var.kong_vitals_enabled
-  kong_portal_enabled     = var.kong_portal_enabled
-  kong_portal_api_enabled = var.kong_portal_api_enabled
+  kong_vitals_enabled       = var.kong_vitals_enabled
+  kong_portal_enabled       = var.kong_portal_enabled
+  kong_portal_api_enabled   = var.kong_portal_api_enabled
+  portal_and_vitals_key_arn = var.portal_and_vitals_key_arn
 
   kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
 

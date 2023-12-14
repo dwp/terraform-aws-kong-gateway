@@ -235,7 +235,7 @@ KONG_ADMIN_GUI_LISTEN="0.0.0.0:${kong_ports.admin_gui}%{ if kong_ssl_uris.protoc
 KONG_PORTAL_GUI_LISTEN="0.0.0.0:${kong_ports.portal_gui}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 KONG_PORTAL_API_LISTEN="0.0.0.0:${kong_ports.portal_api}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 
-KONG_ADMIN_API_URI="${replace(kong_ssl_uris.admin_api_uri, "${kong_ssl_uris.protocol}://", "")}"
+${api_uri_env_name}="${replace(kong_ssl_uris.admin_api_uri, "${kong_ssl_uris.protocol}://", "")}"
 KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 
 KONG_PORTAL_GUI_PROTOCOL="${kong_ssl_uris.protocol}"

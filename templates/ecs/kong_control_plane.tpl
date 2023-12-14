@@ -80,9 +80,10 @@
       "value": "0.0.0.0:${admin_gui_port} ssl"
     },
     {
-      "name": "KONG_ADMIN_API_URI",
+      "name": "${api_uri_env_name}",
       "value": "${kong_admin_api_uri}"
     },
+
     {
       "name": "KONG_ADMIN_GUI_URL",
       "value": "${kong_admin_gui_url}"
@@ -221,6 +222,12 @@
     "name": "CLUSTER_KEY",
     "valueFrom": "${cluster_key}"
     }
+    %{ if portal_and_vitals_key_arn != "" }
+    ,{
+    "name": "KONG_PORTAL_AND_VITALS_KEY",
+    "valueFrom": "${portal_and_vitals_key_arn}"
+    }
+    %{ endif }
   ],
   "entryPoint": ["${entrypoint}"],
   "healthCheck": {

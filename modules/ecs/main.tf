@@ -52,11 +52,13 @@ resource "aws_ecs_task_definition" "kong" {
       error_log_format            = var.error_log_format
       ssl_cert                    = var.ssl_cert
       ssl_key                     = var.ssl_key
+      api_uri_env_name            = var.kong_major_version > 2 ? "KONG_ADMIN_GUI_API_URL" : "KONG_ADMIN_API_URI"
       kong_admin_api_uri          = var.kong_admin_api_uri
       kong_admin_gui_url          = var.kong_admin_gui_url
       admin_token                 = var.admin_token
       kong_vitals_enabled         = var.kong_vitals_enabled
       kong_portal_enabled         = var.kong_portal_enabled
+      portal_and_vitals_key_arn   = var.portal_and_vitals_key_arn
       lua_ssl_cert                = var.lua_ssl_cert
       kong_cluster_mtls           = var.kong_cluster_mtls
       cluster_ca_cert             = var.cluster_ca_cert
@@ -107,38 +109,39 @@ resource "aws_ecs_task_definition" "kong" {
       ) : ""
     }) : var.role == "portal" ? templatefile("${path.module}/../../templates/ecs/kong_portal.tpl",
     {
-      name                     = local.name
-      group_name               = local.name
-      cpu                      = var.fargate_cpu
-      image_url                = var.image_url
-      memory                   = var.fargate_memory
-      user                     = "kong"
-      db_user                  = var.kong_database_config.user
-      db_host                  = local.db_info.endpoint
-      db_name                  = local.db_info.database_name
-      db_password_arn          = var.db_password_arn
-      log_group                = var.log_group
-      portal_gui_port          = var.kong_ports.portal_gui
-      portal_api_port          = var.kong_portal_api_enabled == "on" ? var.kong_ports.portal_api : ""
-      status_port              = var.kong_ports.status
-      kong_portal_gui_host     = var.kong_portal_gui_host
-      kong_portal_gui_protocol = var.kong_portal_gui_protocol
-      kong_portal_api_url      = var.kong_portal_api_url
-      kong_portal_api_enabled  = var.kong_portal_api_enabled
-      ports                    = jsonencode([for k, v in var.kong_ports : v])
-      ulimits                  = jsonencode([4096])
-      region                   = var.region
-      access_log_format        = var.access_log_format
-      error_log_format         = var.error_log_format
-      ssl_cert                 = var.ssl_cert
-      ssl_key                  = var.ssl_key
-      cluster_cert             = var.cluster_cert
-      cluster_key              = var.cluster_key
-      kong_log_level           = var.kong_log_level
-      kong_plugins             = join(",", concat(["bundled"], var.kong_plugins))
-      entrypoint               = var.entrypoint
-      nginx_custom_config      = base64encode(var.nginx_custom_config)
-      environment              = var.environment
+      name                      = local.name
+      group_name                = local.name
+      cpu                       = var.fargate_cpu
+      image_url                 = var.image_url
+      memory                    = var.fargate_memory
+      user                      = "kong"
+      db_user                   = var.kong_database_config.user
+      db_host                   = local.db_info.endpoint
+      db_name                   = local.db_info.database_name
+      db_password_arn           = var.db_password_arn
+      log_group                 = var.log_group
+      portal_gui_port           = var.kong_ports.portal_gui
+      portal_api_port           = var.kong_portal_api_enabled == "on" ? var.kong_ports.portal_api : ""
+      status_port               = var.kong_ports.status
+      kong_portal_gui_host      = var.kong_portal_gui_host
+      kong_portal_gui_protocol  = var.kong_portal_gui_protocol
+      kong_portal_api_url       = var.kong_portal_api_url
+      kong_portal_api_enabled   = var.kong_portal_api_enabled
+      portal_and_vitals_key_arn = var.portal_and_vitals_key_arn
+      ports                     = jsonencode([for k, v in var.kong_ports : v])
+      ulimits                   = jsonencode([4096])
+      region                    = var.region
+      access_log_format         = var.access_log_format
+      error_log_format          = var.error_log_format
+      ssl_cert                  = var.ssl_cert
+      ssl_key                   = var.ssl_key
+      cluster_cert              = var.cluster_cert
+      cluster_key               = var.cluster_key
+      kong_log_level            = var.kong_log_level
+      kong_plugins              = join(",", concat(["bundled"], var.kong_plugins))
+      entrypoint                = var.entrypoint
+      nginx_custom_config       = base64encode(var.nginx_custom_config)
+      environment               = var.environment
   }) : null
 
   tags = {
