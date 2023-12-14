@@ -1,3 +1,17 @@
+# KONG3 WIP VARS
+variable "kong_major_version" {
+  description = "(Optional) Used to define which Kong major version to use"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = contains([2, 3], var.kong_major_version)
+    error_message = "Must be one of the following values: 2, 3."
+  }
+}
+
+
+
 variable "private_subnets" {
   description = "(Optional) List of private subnet IDs, if not specified then the subnets listed in the private_subnets_to_create variable will be created and used"
   type        = list(string)

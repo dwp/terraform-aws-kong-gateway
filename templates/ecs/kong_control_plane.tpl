@@ -221,6 +221,10 @@
     "name": "CLUSTER_KEY",
     "valueFrom": "${cluster_key}"
     }
+    ,{
+    "name": "KONG_PORTAL_AND_VITALS_KEY",
+    "valueFrom": "arn:aws:secretsmanager:eu-west-2:731252101191:secret:/exchange/kong/portal-and-vitals-token-1SQKlP"
+    }
   ],
   "entryPoint": ["${entrypoint}"],
   "healthCheck": {
