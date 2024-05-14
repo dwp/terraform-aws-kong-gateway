@@ -233,7 +233,7 @@ KONG_ADMIN_GUI_LISTEN="0.0.0.0:${kong_ports.admin_gui}%{ if kong_ssl_uris.protoc
 KONG_PORTAL_GUI_LISTEN="0.0.0.0:${kong_ports.portal_gui}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 KONG_PORTAL_API_LISTEN="0.0.0.0:${kong_ports.portal_api}%{ if kong_ssl_uris.protocol == "https"} ssl%{endif}"
 
-KONG_ADMIN_API_URI="${replace(kong_ssl_uris.admin_api_uri, "${kong_ssl_uris.protocol}://", "")}"
+${api_uri_env_name}="${replace(kong_ssl_uris.admin_api_uri, "${kong_ssl_uris.protocol}://", "")}"
 KONG_ADMIN_GUI_URL="${kong_ssl_uris.admin_gui_url}"
 
 KONG_PORTAL_GUI_PROTOCOL="${kong_ssl_uris.protocol}"
@@ -379,6 +379,10 @@ KONG_PORTAL_API_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 KONG_PORTAL_GUI_SSL_CERT="/etc/kong_clustering/cluster.crt"
 KONG_PORTAL_GUI_SSL_CERT_KEY="/etc/kong_clustering/cluster.key"
 %{ endif ~}
+
+%{ if portal_and_vitals_key_arn != "" }
+KONG_PORTAL_AND_VITALS_KEY="${portal_and_vitals_key_arn}"
+%{ endif }
 
 %{ if lookup(kong_config, "KONG_ROLE", null) == "data_plane" ~}
 KONG_CLUSTER_MTLS="${kong_hybrid_conf.mtls}"

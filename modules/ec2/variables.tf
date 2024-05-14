@@ -194,6 +194,13 @@ variable "kong_clear_database" {
   default     = false
 }
 
+# V3 WIP
+variable "kong_major_version" {
+  description = "(Optional) Used to define which Kong major version to use"
+  type        = number
+  default     = 2 # Eventually moved to 3
+}
+
 variable "kong_config" {
   description = "(Optional) A map of key value pairs that describe the Kong GW config, used when constructing the userdata script"
   type        = map(string)
@@ -598,4 +605,10 @@ variable "vitals_endpoint" {
 variable "vitals_tsdb_address" {
   description = "Time series database address for Vitals e.g. my-prometheus.net:9090"
   type        = string
+}
+
+variable "portal_and_vitals_key_arn" {
+  description = "ARN of the secret which contains the token used to unlock portal and vitals in Kong V3"
+  type        = string
+  default     = ""
 }

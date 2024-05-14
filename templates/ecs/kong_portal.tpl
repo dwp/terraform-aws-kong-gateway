@@ -177,6 +177,12 @@
     "name": "CLUSTER_KEY",
     "valueFrom": "${cluster_key}"
     }
+    %{ if portal_and_vitals_key_arn != "" }
+    ,{
+    "name": "KONG_PORTAL_AND_VITALS_KEY",
+    "valueFrom": "${portal_and_vitals_key_arn}"
+    }
+    %{ endif }
   ],
   "entryPoint": ["${entrypoint}"],
   "healthCheck": {
