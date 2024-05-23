@@ -64,6 +64,7 @@ module "kong_ec2" {
   instance_type                     = var.instance_type
   key_name                          = var.key_name
   user_data                         = var.user_data
+  kong_major_version                = var.kong_major_version
   kong_clear_database               = var.kong_clear_database
   kong_config                       = var.kong_config
   kong_database_config              = var.kong_database_config
@@ -97,12 +98,15 @@ module "kong_ec2" {
   kong_vitals_enabled               = var.kong_vitals_enabled
   vitals_endpoint                   = var.vitals_endpoint
   vitals_tsdb_address               = var.vitals_tsdb_address
+  portal_and_vitals_key_arn         = var.portal_and_vitals_key_arn
 }
 
 
 module "kong_ecs" {
   count  = var.deployment_type == "ecs" ? 1 : 0
   source = "./modules/ecs"
+
+  kong_major_version = var.kong_major_version
 
   environment            = var.environment
   role                   = var.role
@@ -150,9 +154,10 @@ module "kong_ecs" {
   postgres_host        = var.postgres_host
   db_password_arn      = var.db_password_arn
 
-  kong_vitals_enabled     = var.kong_vitals_enabled
-  kong_portal_enabled     = var.kong_portal_enabled
-  kong_portal_api_enabled = var.kong_portal_api_enabled
+  kong_vitals_enabled       = var.kong_vitals_enabled
+  kong_portal_enabled       = var.kong_portal_enabled
+  kong_portal_api_enabled   = var.kong_portal_api_enabled
+  portal_and_vitals_key_arn = var.portal_and_vitals_key_arn
 
   kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
 

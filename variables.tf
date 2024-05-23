@@ -241,6 +241,17 @@ variable "kong_hybrid_conf" {
   }
 }
 
+variable "kong_major_version" {
+  description = "(Optional) Used to define which Kong major version to use"
+  type        = number
+  default     = 2 # Eventually moved to 3
+
+  validation {
+    condition     = contains([2, 3], var.kong_major_version)
+    error_message = "Must be one of the following values: 2, 3."
+  }
+}
+
 variable "kong_ports" {
   description = "(Optional) An object defining the kong http ports"
   type        = map(number)
@@ -302,6 +313,17 @@ variable "postgres_host" {
   description = "(Optional) The address or name of the postgres database host, set this variable when choosing to skip_rds_creation"
   type        = string
   default     = ""
+}
+
+variable "portal_and_vitals_key_arn" {
+  description = "(Optional) ARN of the secret which contains the token used to unlock portal and vitals in Kong V3"
+  type        = string
+  default     = ""
+
+  validation {
+    condition     = var.portal_and_vitals_key_arn != "" ? can(startswith("arn:aws:", var.portal_and_vitals_key_arn)) : true
+    error_message = "Invalid format. Please provide a valid ARN."
+  }
 }
 
 variable "private_subnets" {
