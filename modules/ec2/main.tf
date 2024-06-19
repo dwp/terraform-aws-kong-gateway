@@ -163,6 +163,7 @@ resource "aws_launch_template" "kong" {
   key_name               = var.key_name
   user_data              = var.user_data == null ? base64encode(data.cloudinit_config.cloud_init.rendered) : base64encode(var.user_data)
   update_default_version = true
+  tags                   = var.tags
 
   iam_instance_profile {
     name = var.iam_instance_profile_name
