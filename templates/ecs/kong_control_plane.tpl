@@ -131,6 +131,18 @@
       "name": "KONG_PG_DATABASE",
       "value": "${db_name}"
     },
+    %{ if pg_max_concurrent_queries != null }
+    {
+      "name": "KONG_PG_MAX_CONCURRENT_QUERIES",
+      "value": "${pg_max_concurrent_queries}"
+    },
+    %{ endif }
+    %{ if pg_keepalive_timeout != null }
+    {
+      "name": "KONG_PG_KEEPALIVE_TIMEOUT",
+      "value": "${pg_keepalive_timeout}"
+    },
+    %{ endif }
     {
       "name": "KONG_NGINX_HTTP_INCLUDE",
       "value": "/usr/local/kong/custom-nginx.conf"
