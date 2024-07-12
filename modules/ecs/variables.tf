@@ -269,6 +269,16 @@ variable "db_password_arn" {
   type        = string
 }
 
+variable "pg_max_concurrent_queries" {
+  description = "The maximum number of concurrent queries that can be executing at any given time. The total number of concurrent queries for this node will be will be: pg_max_concurrent_queries * nginx_worker_processes. The default value of 0 removes this concurrency limitation."
+  type        = number
+}
+
+variable "pg_keepalive_timeout" {
+  description = "Specify the maximal idle timeout (in ms) for the postgres connections in the pool. If this value is set to 0 then the timeout interval is unlimited."
+  type        = number
+}
+
 variable "log_group" {
   description = "The Log Group for ECS to report out to"
   type        = string
