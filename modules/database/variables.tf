@@ -88,3 +88,9 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "ca_certificate_identifier" {
+  description = "(Optional) The CA certificate identifier to use for the DB cluster's server certificate."
+  type        = string
+  default     = "rds-ca-rsa2048-g1"
+}
