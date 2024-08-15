@@ -64,6 +64,7 @@ resource "aws_rds_cluster_instance" "cluster" {
   cluster_identifier = aws_rds_cluster.cluster.id
   instance_class     = var.database.instance_type
   apply_immediately  = var.instance_apply_immediately
+  ca_cert_identifier = var.ca_certificate_identifier
   tags               = merge(var.tags, { Name = "${var.name}-db" })
 
   lifecycle {
