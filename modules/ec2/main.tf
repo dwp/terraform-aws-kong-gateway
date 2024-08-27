@@ -189,6 +189,16 @@ resource "aws_launch_template" "kong" {
       encrypted   = true
     }
   }
+  
+  tag_specifications {
+    resource_type = "instance"
+    tags          = var.tags_asg
+  }
+
+  tag_specifications {
+    resource_type = "volume"
+    tags          = var.tags_asg
+  }
 
   lifecycle {
     create_before_destroy = true
