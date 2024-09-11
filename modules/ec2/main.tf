@@ -104,6 +104,8 @@ locals {
   name = format("%s-%s-%s", var.service, var.environment, local.role)
 }
 
+data "aws_default_tags" "current" {}
+
 module "security_groups" {
   count                             = local.create_security_groups
   source                            = "../security_groups"
@@ -189,15 +191,23 @@ resource "aws_launch_template" "kong" {
       encrypted   = true
     }
   }
-  
+
   tag_specifications {
     resource_type = "instance"
-    tags          = var.tags_asg
+    tags = merge(data.aws_default_tags.current.tags, var.tags, {
+      Name = local.name,
+    })
   }
 
   tag_specifications {
     resource_type = "volume"
-    tags          = var.tags_asg
+    tags = merge(data.aws_default_tags.current.tags, var.tags, {
+      Name = local.name,
+    })
+  }
+
+  tags = {
+    Name = local.name,
   }
 
   lifecycle {
