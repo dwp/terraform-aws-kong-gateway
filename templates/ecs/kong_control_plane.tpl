@@ -193,6 +193,14 @@
       "name": "KONG_VITALS_TSDB_ADDRESS",
       "value": "${vitals_tsdb_address}"
     }
+    %{ if additional_vars != null }
+    %{ for name, value in additional_vars ~}
+    ,{
+      "name": "${name}",
+      "value": "${value}"
+    }
+    %{ endfor ~}
+    %{ endif }
   ],
   "secrets": [
     {
