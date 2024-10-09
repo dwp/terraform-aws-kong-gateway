@@ -384,3 +384,8 @@ variable "vitals_tsdb_address" {
   description = "Time series database address for Vitals e.g. my-prometheus.net:9090"
   type        = string
 }
+
+variable "additional_vars" {
+  description = "Map of additional environment variables to set in the Control Plane"
+  type        = map(string)
+}

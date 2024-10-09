@@ -171,6 +171,8 @@ module "kong_ecs" {
 
   nginx_custom_config = file(coalesce(var.nginx_custom_config_path, local.nginx_default_custom_config_path))
 
+  additional_vars = var.additional_vars
+
   ssl_cert     = var.ssl_cert
   ssl_key      = var.ssl_key
   lua_ssl_cert = var.lua_ssl_cert

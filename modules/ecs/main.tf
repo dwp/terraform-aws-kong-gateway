@@ -42,6 +42,7 @@ resource "aws_ecs_task_definition" "kong" {
       db_password_arn             = var.db_password_arn
       pg_max_concurrent_queries   = var.pg_max_concurrent_queries
       pg_keepalive_timeout        = var.pg_keepalive_timeout
+      additional_vars             = var.additional_vars
       kong_admin_gui_session_conf = var.kong_admin_gui_session_conf
       log_group                   = var.log_group
       admin_api_port              = var.kong_ports.admin_api
