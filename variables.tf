@@ -890,3 +890,9 @@ variable "kong_plugins" {
   type        = list(string)
   default     = []
 }
+
+variable "additional_vars" {
+  description = "(Optional) Map of additional environment variables to set in the Control Plane"
+  type        = map(string)
+  default     = null
+}
