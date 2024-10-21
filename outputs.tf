@@ -43,3 +43,14 @@ output "kong_iam_role" {
   value       = var.deployment_type == "ecs" ? module.kong_ecs[0].kong_iam_role : null
 }
 
+output "ecs_task_definition_outputs" {
+  value       = module.kong_ecs[0].ecs_task_definition_outputs
+  description = "Full resource details for the ECS Task definition"
+  sensitive   = false
+}
+
+output "ecs_service_outputs" {
+  value       = module.kong_ecs[0].ecs_service_outputs
+  description = "Full resource details for the ECS Service"
+  sensitive   = false
+}
