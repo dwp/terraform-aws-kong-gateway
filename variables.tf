@@ -837,6 +837,11 @@ variable "kong_vitals_enabled" {
   description = "(Optional) Define whether or not Kong Vitals should be enabled."
   type        = string
   default     = "on"
+
+  validation {
+    condition     = contains(["on", "off"], var.kong_vitals_enabled)
+    error_message = "Must be one of the following values: 'on' or 'off'."
+  }
 }
 
 variable "kong_portal_enabled" {
