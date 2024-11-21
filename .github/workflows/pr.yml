@@ -14,7 +14,40 @@ env:
   KICS_ecs_service_with_no_tasks: '91f16d09-689e-4926-aca7-155157f634ed'       # KICS Query 'ECS Service Without Running Tasks'
   KICS_passwords_and_secrets: 'a88baa34-e2ad-44ea-ad6f-8cac87bc7c71'           # KICS Query 'Passwords And Secrets'
 
+
 jobs:
+  get-publish-version:
+    runs-on: ubuntu-latest
+    outputs:
+      publish-version: ${{ steps.get-publish-version.outputs.publish-version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Prepare SemVer
+        id: prepare-semver
+        run: |
+          LATEST_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          [  -z "$LATEST_VERSION" ] && LATEST_VERSION="0.0.0"
+          echo ::set-output name=latest_version_out::$LATEST_VERSION
+          commit_message=$(cat commit_message.txt)
+          echo $commit_message
+          if [[ "${commit_message,,}" == *"major release"* ]]; then
+            echo ::set-output name=semver_increment::"m"
+          elif [[ "${commit_message,,}" == *"minor release"* ]]; then
+            echo ::set-output name=semver_increment::"i"
+          else
+            echo ::set-output name=semver_increment::"p"
+          fi
+      - name: Increment SemVer
+        id: semver
+        uses: matt-FFFFFF/simple-semver@v0.1.0
+        with:
+          semver-input: ${{ steps.prepare-semver.outputs.latest_version_out }}
+          increment: ${{ steps.prepare-semver.outputs.semver_increment }}
+      - name: Get publish version
+        id: get-publish-version
+        run: echo "::set-output name=publish-version::${{ steps.semver.outputs.semver }}"
+
   format:
     name: Terraform-Format
     runs-on: ubuntu-latest
