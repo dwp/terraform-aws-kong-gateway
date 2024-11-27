@@ -1,0 +1,13 @@
+$schema: https://gitlab.com/dwp/secure-development/schema/project-metadata/-/raw/v2.0.0/schema/project-metadata.json
+schema_version: 2.0.0
+project:
+  - project_id: 64880414
+    component_name: terraform-aws-gateway-module
+    version: 1.0.0
+    last_verified:
+      date: 2024-11-27
+      name: "orla.dunlop"
+    tags:
+      payments: false
+      personally_identifying_information: false
+    cmdb_id: unallocated
