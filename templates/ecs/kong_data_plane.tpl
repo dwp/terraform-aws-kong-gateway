@@ -97,24 +97,26 @@
       "name": "KONG_ANONYMOUS_REPORTS",
       "value": "off"
     },
-    %{ if vitals_endpoint != "" && kong_vitals_enabled == "on" }
     {
       "name": "KONG_VITALS",
       "value": "${kong_vitals_enabled}"
-    },
-    {
+    }
+    %{ if kong_vitals_enabled == "on" }
+    %{ if vitals_endpoint != "" }
+    ,{
       "name": "KONG_VITALS_STRATEGY",
       "value": "prometheus"
     },
     {
       "name": "KONG_VITALS_STATSD_ADDRESS",
       "value": "${vitals_endpoint}"
-    },
-    %{ endif }
-    {
-      "name": "KONG_VITALS_TSDB_ADDRESS",
-      "value": "127.0.0.1:443"
     }
+    %{ endif }
+    ,{
+      "name": "KONG_VITALS_TSDB_ADDRESS",
+      "value": "${vitals_tsdb_address}"
+    }
+    %{ endif }
   ],
   "secrets": [
     {

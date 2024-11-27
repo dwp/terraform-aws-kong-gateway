@@ -405,12 +405,14 @@ KONG_CLUSTER_TELEMETRY_ENDPOINT="${kong_hybrid_conf.endpoint}:${kong_ports.telem
 
 KONG_PLUGINS="${kong_plugins}"
 
-%{ if vitals_endpoint != "" && kong_vitals_enabled == "on" }
-KONG_VITALS="on"
+KONG_VITALS="${kong_vitals_enabled}"
+%{ if kong_vitals_enabled == "on" }
+%{ if vitals_endpoint != "" }
 KONG_VITALS_STRATEGY="prometheus"
 KONG_VITALS_STATSD_ADDRESS="${vitals_endpoint}"
 %{ endif }
 KONG_VITALS_TSDB_ADDRESS=${vitals_tsdb_address}
+%{ endif }
 
 %{ for key, value in kong_config ~}
 ${key}="${value}"
