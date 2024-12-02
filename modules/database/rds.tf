@@ -46,6 +46,8 @@ resource "aws_rds_cluster" "cluster" {
   vpc_security_group_ids    = [aws_security_group.db.id]
   tags                      = merge(var.tags, { Name = "${var.name}-db" })
 
+  snapshot_identifier = "backup-2024-11-29"
+
   lifecycle {
     ignore_changes = [
       engine_version,
